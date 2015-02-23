@@ -1,1 +1,1 @@
-# azurermtemplates
+# Azure Resource Manager
