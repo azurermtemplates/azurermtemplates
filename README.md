@@ -4,8 +4,7 @@ This is an index of all the currently available Azure Resource Manager templates
 * Host the template in your repo
 * Host the template in this repo
 
- You can deploy the template to Azure by clicking the "Deploy to Azure" button below next to each template. 
-
+You can deploy the template to Azure by clicking the "Deploy to Azure" button below next to each template. 
 
 | Deploy to Azure  | Author                          | Template Name   | Description     | 
 |:-----------------|:--------------------------------| :---------------| :---------------|
