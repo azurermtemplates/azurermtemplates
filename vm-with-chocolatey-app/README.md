@@ -19,6 +19,8 @@ Below are the parameters that the template expects
 | adminPassword | Admin password for the VM |
 | subscriptionId | Your Azure Subscription Id |
 | applicationToInstall | Name of Chocolatey Application (default notepadplusplus.install) |
+| vmSourceImageName | Any version of Windows |
+| virtualNetworkName | Name of new or existing VNet |
 
 
 
