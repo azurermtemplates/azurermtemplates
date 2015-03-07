@@ -6,19 +6,19 @@
             "value": "West US"
         },
         "newStorageAccountName": {
-            "value": "drewmcoco1"
+            "value": "chocolateystorage"
         },
         "adminUsername": {
-            "value": "drewm"
+            "value": "azureuser"
         },
         "adminPassword": {
-            "value": "abc_123!"
+            "value": ""
         },
         "uniqueDNSNameBase": {
-            "value": "drewm-coco1"
+            "value": "chocovm"
         },
         "subscriptionId": {
-            "value": "d5b479c8-1e37-4a15-bf0f-d8847edb043a"
+            "value": ""
         },
         "vmSize": {
             "value": "Standard_A0"
