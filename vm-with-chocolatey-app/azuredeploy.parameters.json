@@ -21,10 +21,16 @@
             "value": ""
         },
         "vmSize": {
-            "value": "Standard_A0"
+            "value": "Standard_A1"
         },
         "applicationToInstall": {
             "value": "notepadplusplus.install"
+        },
+        "vmSourceImageName": {
+            "value": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201412.01-en.us-127GB.vhd"
+        },
+        "virtualNetworkName": {
+            "value": "myVNet"
         }
    }
 }
