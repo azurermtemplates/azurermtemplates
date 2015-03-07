@@ -1,17 +1,24 @@
-# Azure Resource Manager
+# VM-Chocolatey
 
-This is an index of all the currently available Azure Resource Manager templates. There are two ways to contribute
-* Host the template in your repo
-* Host the template in this repo
+<a href="https://azuredeploy.net/" target="_blank">
+    <img src="http://azuredeploy.net/deploybutton.png"/>
+</a>
 
-You can deploy the template to Azure by clicking the "Deploy to Azure" button below next to each template. 
+This template allows you to create a VM with an application from Chocolatey.org installed
 
-| Deploy to Azure  | Author                          | Template Name   | Description     | 
-|:-----------------|:--------------------------------| :---------------| :---------------|
-| <a href="https://azuredeploy.net/?repository=https://github.com/singhkay/VM-DSC-Extension-IIS-Server" target="_blank"><img src="https://cloud.githubusercontent.com/assets/6164178/6479117/bcb11198-c1f4-11e4-8f06-b6743d7d2e1c.png"/></a> | [singhkay](https://github.com/singhkay) | [VM DSC Extension IIS Server](https://github.com/singhkay/VM-DSC-Extension-IIS-Server) | This template allows you to deploy a VM with with a DSC extension that sets up an IIS server |
-| <a href="https://azuredeploy.net/?repository=https://github.com/coreysa/deploy-docker-container-simple" target="_blank"><img src="https://cloud.githubusercontent.com/assets/6164178/6479117/bcb11198-c1f4-11e4-8f06-b6743d7d2e1c.png"/></a> | [coreysa](https://github.com/coreysa) | [Deploy from DockerHub (Simple Template)](https://github.com/coreysa/deploy-docker-container-simple) | This template allows you to deploy a Docker container from DockerHub using Compose with a very small amount of parameters (simple). |
-| <a href="https://azuredeploy.net/?repository=https://github.com/coreysa/deploy-docker-container" target="_blank"><img src="https://cloud.githubusercontent.com/assets/6164178/6479117/bcb11198-c1f4-11e4-8f06-b6743d7d2e1c.png"/></a> | [coreysa](https://github.com/coreysa) | [Deploy from DockerHub](https://github.com/coreysa/deploy-docker-container) | This template allows you to deploy a Docker container from DockerHub using Compose. |
+Below are the parameters that the template expects
 
+| Name   | Description    |
+|:--- |:---|
+| location  | Location where to deploy the resource  |
+| newStorageAccountName    | Name of the storage account to create    |
+| storageAccountType      | Type of the storage account <br> <ul>**Allowed Values**<li>Standard_LRS **(default)**</li><li>Standard_GRS</li></ul> |
+| uniqueDNSNameBase | Name of VM and suffix for resources |
+| vmSize | Size of the VM <br> <ul>**Allowed Values**<li>Standard_A0 **(default)**</li><li>Standard_A1</li><li>Standard_A2</li><li>Standard_A3</li><li>Standard_A4</li></ul>|
+| adminUsername | Admin username for the VM |
+| adminPassword | Admin password for the VM |
+| subscriptionId | Your Azure Subscription Id |
+| applicationToInstall | Name of Chocolatey Application (default notepadplusplus.install) |
 
 
 
