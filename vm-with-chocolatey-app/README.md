@@ -4,7 +4,7 @@
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
-This template allows you to create a VM with an application from Chocolatey.org installed
+This template allows you to create a VM with an application from Chocolatey.org installed. Currently the custom script to launch the choco install is being pulled from https://iaasscripts.blob.core.windows.net/scripts/InstallApplication.ps1. Once the Custom Script Extension is updated to pull from any URL it will be updated to pull directly from GitHub.
 
 Below are the parameters that the template expects
 
