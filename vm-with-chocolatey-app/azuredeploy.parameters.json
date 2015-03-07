@@ -1,0 +1,30 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "West US"
+        },
+        "newStorageAccountName": {
+            "value": "drewmcoco1"
+        },
+        "adminUsername": {
+            "value": "drewm"
+        },
+        "adminPassword": {
+            "value": "abc_123!"
+        },
+        "uniqueDNSNameBase": {
+            "value": "drewm-coco1"
+        },
+        "subscriptionId": {
+            "value": "d5b479c8-1e37-4a15-bf0f-d8847edb043a"
+        },
+        "vmSize": {
+            "value": "Standard_A0"
+        },
+        "applicationToInstall": {
+            "value": "notepadplusplus.install"
+        }
+   }
+}
