@@ -4,7 +4,7 @@
     "parameters": {
         "dnsNameforLBIP": {
             "type": "string",
-            "defaultName" : "uniqueDNSName"
+            "defaultValue" : "uniqueDNSName"
         },
         "location": {
             "type": "string",
