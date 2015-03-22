@@ -156,7 +156,7 @@
             "osProfile": {
                 "computername": "[parameters('vmName')]",
                 "adminUsername": "[parameters('adminUsername')]",
-                "adminPassword": "[parameters('adminPassword')]",                
+                "adminPassword": "[parameters('adminPassword')]",
                 "linuxConfiguration" : {
                     "ssh" : {
                         "publicKeys" : [
@@ -185,11 +185,11 @@
     },
     {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(variables('vmName'),'/installmongo')]",
+            "name": "[concat(parameters('vmName'),'-installmongo')]",
             "apiVersion": "2014-12-01-preview",
-            "location": "[variables('location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
             ],
             "properties": {
                 "publisher": "Microsoft.OSTCExtensions",
