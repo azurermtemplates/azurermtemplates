@@ -1,0 +1,29 @@
+{
+    "dnsNameForPublicIP" : {
+        "value" : "uniqueDNSNameForPublicIP"
+    },
+    "location" : {
+        "value" : "West US"
+    },
+    "publicIPAddressName": {
+        "value": "cloudguyIP"
+    },
+    "virtualNetworkName": {
+        "value": "cloudguyIP"
+    },
+    "publicIPAddressType": {
+        "value": "Dynamic"
+    },
+    "nicName": {
+        "value": "cloudguyNic"
+    },
+    "addressPrefix": {
+        "value": "10.0.0.0/16"
+    },
+    "subnetName": {
+        "value": "Subnet-1"
+    },
+    "subnetPrefix": {
+        "value": "10.0.0.0/24"
+    }
+}
