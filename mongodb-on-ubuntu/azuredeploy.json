@@ -168,6 +168,26 @@
                 ]
             }
         }
-    }
+    },
+    {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmName'),'/installmongo')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.OSTCExtensions",
+                "type": "CustomScriptForLinux",
+                "typeHandlerVersion": "1.2",
+                "settings": {
+                    "fileUris": [
+                        "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/mongodb-on-centos/mongo-install-ubuntu.sh"
+                    ],
+                    "commandToExecute": "sh mongo-install-ubuntu.sh"
+                }
+            }
+        }
     ]
 }
