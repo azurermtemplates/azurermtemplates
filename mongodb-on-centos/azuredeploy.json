@@ -23,9 +23,6 @@
         "subscriptionId":{
             "type" : "string"
         },
-        "sshKey" : {
-            "type" : "string"
-        },
         "location": {
             "type": "String",
             "defaultValue" : "West US"
@@ -185,7 +182,7 @@
     },
     {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(parameters('vmName'),'-installmongo')]",
+            "name": "[concat(parameters('vmName'),'/installmongo')]",
             "apiVersion": "2014-12-01-preview",
             "location": "[parameters('location')]",
             "dependsOn": [
