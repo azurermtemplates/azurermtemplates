@@ -16,6 +16,10 @@
         "adminPassword": {
             "type": "securestring"
         },
+        "sshKeyData" : {
+          "type" : "string",
+          "defaultValue" : "AAAAB3NzaC1kc3MAAAEBAKDQ+Xt10xE0OzZ8OEnCrpnl4KyANn/Fk1AbCDjEWvX4qSVM2PmEIro8+zyX7qo1b/pFj4guoMYse5u05OUB3yeWEvRqtC/PdPnZDRc8bbb4Q+fFCJ7kVbmQAOWRCKIKcGYdBCdhsyGfFlqvJl7biY9p/Ma9mNv9YxGrI3ZTcGDmeUEYSbPlCv8+jEEYiW4DwmaqZfszDl7yZWa/h3VG5f/Y7jMDcscHOHhLxwfsqp1QXs58nMnBZpmXgK10gFzzwZdh7O/qQOVuBd6l2UzN8UJV+YY//g7RDOCcXYknasMh31NlO6rIkGS3W1ZmUihzTrxrqZ/6tRsUSXrorBE8UJ0AAAAVAMFeqkr91yw/7JLm9LkHkYspWLu5AAABAQCW3EU/2xwgKi42NH/M7yn3Lp5GWROvXFibxzM8d8EDSg2SYUzyu9fm2r3FrnmYxTFkogtpcKbQflvDZSADtrt03yBw2S3INHkxNjGv7f+ldsm7eI34OqPIiDWCl5GCp5hdKzvJRhPaCIXTvqxIBhn3TJFr0BZpRCqACyqWAyW1GG3FUDJBhpKODGQK1VvhyBRexz7SqI77OOdM8GJa1pFm3in5jYMQ65uWplf807rP1P4/5LZMwoZYInmhnaT/SnLxuy56Ka4H14Uq6EV7VkoifVBHtJQjP7T3D6ziZP6EE9ecI54aUWMUGJA6YBindOWrszkBhWeWB7HEaDvo6zfwAAABADr7Pgwcb55CSkFb2mAefRb9+KlH9HIhwjJmRMsvfcFu9n0Xdkko6Gx14xjuI+1M8GhDb0B5a8poXxVx+H+ms4NpJOiMUzfdxaPfb5s71p3TfbNpPpJLDKjx0s6cGs2Am8Zy8JdPXQwaw5h1eZ7/A4IEBJGd6Ho8ftzCubzzO+cRTp5t5S/fuOjhh/L+RBMKQPZnaJBk8KA+EIMNmuxtvui4QER+2Q3nM+VUrf+SGhF4yJleVgVM9zTO8wLFfXDrs0wE7NQ6SKsjaUgqz8CFmZBAKjTCl8Gcuetk7zqZKaakOuvd4N3xnSvXlmuVuRnKBIgiwxREnCuDXVMZEtq5670="
+        }
         "vmSourceImageName": {
             "type": "string",
             "defaultValue": "5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-70-20150128"
@@ -57,7 +61,7 @@
         "vmStorageAccountContainerName": "vhds",
         "publicIPAddressType" : "Dynamic",
         "storageAccountType": "Standard_LRS",
-        "sshKeyPath" : "",
+        "sshKeyPath" : "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
         "sourceImageName" : "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('vmSourceImageName'))]",
         "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "subnet1Ref" : "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]"
@@ -158,8 +162,8 @@
                     "ssh" : {
                         "publicKeys" : [
                           {
-                              "path" : "/home/cloudguy/.ssh/authorized_keys",
-                              "keyData" : "AAAAB3NzaC1kc3MAAAEBAKDQ+Xt10xE0OzZ8OEnCrpnl4KyANn/Fk1AbCDjEWvX4qSVM2PmEIro8+zyX7qo1b/pFj4guoMYse5u05OUB3yeWEvRqtC/PdPnZDRc8bbb4Q+fFCJ7kVbmQAOWRCKIKcGYdBCdhsyGfFlqvJl7biY9p/Ma9mNv9YxGrI3ZTcGDmeUEYSbPlCv8+jEEYiW4DwmaqZfszDl7yZWa/h3VG5f/Y7jMDcscHOHhLxwfsqp1QXs58nMnBZpmXgK10gFzzwZdh7O/qQOVuBd6l2UzN8UJV+YY//g7RDOCcXYknasMh31NlO6rIkGS3W1ZmUihzTrxrqZ/6tRsUSXrorBE8UJ0AAAAVAMFeqkr91yw/7JLm9LkHkYspWLu5AAABAQCW3EU/2xwgKi42NH/M7yn3Lp5GWROvXFibxzM8d8EDSg2SYUzyu9fm2r3FrnmYxTFkogtpcKbQflvDZSADtrt03yBw2S3INHkxNjGv7f+ldsm7eI34OqPIiDWCl5GCp5hdKzvJRhPaCIXTvqxIBhn3TJFr0BZpRCqACyqWAyW1GG3FUDJBhpKODGQK1VvhyBRexz7SqI77OOdM8GJa1pFm3in5jYMQ65uWplf807rP1P4/5LZMwoZYInmhnaT/SnLxuy56Ka4H14Uq6EV7VkoifVBHtJQjP7T3D6ziZP6EE9ecI54aUWMUGJA6YBindOWrszkBhWeWB7HEaDvo6zfwAAABADr7Pgwcb55CSkFb2mAefRb9+KlH9HIhwjJmRMsvfcFu9n0Xdkko6Gx14xjuI+1M8GhDb0B5a8poXxVx+H+ms4NpJOiMUzfdxaPfb5s71p3TfbNpPpJLDKjx0s6cGs2Am8Zy8JdPXQwaw5h1eZ7/A4IEBJGd6Ho8ftzCubzzO+cRTp5t5S/fuOjhh/L+RBMKQPZnaJBk8KA+EIMNmuxtvui4QER+2Q3nM+VUrf+SGhF4yJleVgVM9zTO8wLFfXDrs0wE7NQ6SKsjaUgqz8CFmZBAKjTCl8Gcuetk7zqZKaakOuvd4N3xnSvXlmuVuRnKBIgiwxREnCuDXVMZEtq5670="
+                              "path" : "[variables('sshKeyPath')]",
+                              "keyData" : "[parameters('sshKeyData')]"
                           }
                         ]
                     }
