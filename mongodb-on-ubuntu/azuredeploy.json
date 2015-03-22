@@ -171,9 +171,9 @@
     },
     {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(parameters('vmName'),'/installmongo')]",
+            "name": "[concat(parameters('vmName'),'-installmongo')]",
             "apiVersion": "2014-12-01-preview",
-            "location": "[variables('location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
             ],
