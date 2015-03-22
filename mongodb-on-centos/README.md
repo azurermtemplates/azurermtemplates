@@ -1,10 +1,10 @@
-# Create a Virtual Machine from an Image
+# Install Mongo DB on a CentOS Virtual Machine using Custom Script Linux Extension
 
 <a href="https://azuredeploy.net/" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
-This template allows you to create a Virtual Machines from a specified image during the template deployment. This template also deploys a Storage Account, Virtual Network, Public IP addresses and a Network Interface.
+This template deploys Mongo DB on a CentOS Virtual Machine. This template also deploys a Storage Account, Virtual Network, Public IP addresses and a Network Interface.
 
 Below are the parameters that the template expects
 
