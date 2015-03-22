@@ -4,14 +4,11 @@
     "parameters" : {
       "location": {
         "type": "String",
-        "defaultValue" : "West US",
-        "allowedValues": [
-          "West US",
-          "East US"
-        ]
+        "defaultValue" : "West US"
       },
       "virtualNetworkName":{
-        "type" : "string"
+        "type" : "string",
+        "defaultValue":"myVNET"
       },
       "addressPrefix":{
         "type" : "string",
