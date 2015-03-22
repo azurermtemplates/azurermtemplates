@@ -18,7 +18,7 @@
         },
         "vmSourceImageName": {
             "type": "string",
-            "defaultValue": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-12_04_5-LTS-amd64-server-20140927-en-us-30GB"
+            "defaultValue": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu_DAILY_BUILD-vivid-15_04-amd64-server-20150321.1-en-us-30GB"
         },
         "subscriptionId":{
             "type" : "string"
@@ -41,7 +41,7 @@
         },
         "virtualNetworkName":{
             "type" : "string",
-            "defaultName" : "myVNET"
+            "defaultValue" : "myVNET"
         },
         "nicName":{
             "type" : "string",
