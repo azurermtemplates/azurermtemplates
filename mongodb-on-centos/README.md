@@ -6,6 +6,8 @@
 
 This template deploys Mongo DB on a CentOS Virtual Machine. This template also deploys a Storage Account, Virtual Network, Public IP addresses and a Network Interface.
 
+Note: Cent OS disables Username/Password on Azure SKUs by default. This template will be updated with SSH Keys for the VMs soon.
+
 Below are the parameters that the template expects
 
 | Name   | Description    |
