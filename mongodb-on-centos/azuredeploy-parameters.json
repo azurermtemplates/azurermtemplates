@@ -1,6 +1,6 @@
 ﻿{
     "newStorageAccountName" : {
-        "value":"uniqueStorageAccountName"
+        "value":"cloudfg1"
     },
     "adminUsername": {
         "value": "cloudguy"
@@ -9,10 +9,10 @@
         "value": "abc_123!"
     },
     "dnsNameForPublicIP": {
-        "value": "uniqueDnsNameForPublicIP"
+        "value": "cloudfg1"
     },
     "subscriptionId": {
-        "value": "98234d73-as24-466d-b9e0-d73235447c69"
+        "value": "87a9cd1c-aa24-446d-b7e0-d73955447c69"
     },
     "vmSourceImageName" : {
         "value" : "5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-70-20150128"
