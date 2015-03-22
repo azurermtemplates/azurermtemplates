@@ -86,9 +86,6 @@
         "vmExtensionName": {
             "type": "string"
         },
-        "customScriptStorageAccountName": {
-            "type": "string"
-        },
         "customScriptFilePath": {
             "type": "string"
         },
