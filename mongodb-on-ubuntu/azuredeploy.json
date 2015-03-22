@@ -4,11 +4,11 @@
     "parameters" : {
         "newStorageAccountName": {
             "type": "string",
-            "defaultValue" : "uniqueStorageAccountName"
+            "defaultValue" : "uniquestorageaccountName"
         },
         "dnsNameForPublicIP" : {
             "type" : "string",
-            "defaultValue": "uniqueDnsNameForPublicIP"
+            "defaultValue": "uniquednsnameforpublicip"
         },
         "adminUserName": {
             "type": "string"
@@ -171,7 +171,7 @@
     },
     {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(parameters('vmName'),'-installmongo')]",
+            "name": "[concat(parameters('vmName'),'/installmongo')]",
             "apiVersion": "2014-12-01-preview",
             "location": "[parameters('location')]",
             "dependsOn": [
