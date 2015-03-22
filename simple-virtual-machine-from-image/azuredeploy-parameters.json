@@ -3,10 +3,10 @@
         "value":"uniqueStorageAccountName"
     },
     "adminUsername": {
-        "value": "cloudguy"
+        "value": ""
     },
     "adminPassword": {
-        "value": "abc_123!"
+        "value": ""
     },
     "dnsNameForPublicIP": {
         "value": "uniqueDnsNameForPublicIP"
