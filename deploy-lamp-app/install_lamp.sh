@@ -1,4 +1,6 @@
 #!/bin/bash
+apt-get update
+
 # set up a silent install of MySQL
 dbpass="mySQLPassw0rd"
 
