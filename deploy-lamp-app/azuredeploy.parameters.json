@@ -5,6 +5,9 @@
         "newStorageAccountName": {
             "value": "uniqueStorage"
         },
+        "location": {
+            "value": "West US"
+        },
         "adminUsername": {
             "value": "user"
         },
