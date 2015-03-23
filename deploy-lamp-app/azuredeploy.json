@@ -31,7 +31,7 @@
         "publicIPAddressName": "myPublicIP",
         "publicIPAddressType": "Dynamic",
         "vmStorageAccountContainerName": "vhds",
-        "vmName": "MyUbuntuVM",
+        "vmName": "[parameters('vmDnsName')]",
         "vmSize": "Standard_A0",
         "virtualNetworkName": "MyVNET",
         "sourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',variables('vmSourceImageName'))]",
