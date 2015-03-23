@@ -6,6 +6,10 @@
             "type": "string",
             "defaultValue": "uniqueStorageName"
         },
+        "location": {
+            "type": "string",
+            "defaultValue": "West US"
+        },
         "adminUsername": {
             "type": "string"
         },
@@ -21,7 +25,6 @@
         }
     },
     "variables": {
-        "location": "West US",
         "nicName": "myVMNic",
         "addressPrefix": "10.0.0.0/16",
         "subnetName": "Subnet-1",
@@ -43,7 +46,7 @@
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[parameters('newStorageAccountName')]",
             "apiVersion": "2014-12-01-preview",
-            "location": "[variables('location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "accountType": "[variables('storageAccountType')]"
             }
@@ -52,7 +55,7 @@
             "apiVersion": "2014-12-01-preview",
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "[variables('publicIPAddressName')]",
-            "location": "[variables('location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
                 "dnsSettings": {
@@ -64,7 +67,7 @@
             "apiVersion": "2014-12-01-preview",
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[variables('virtualNetworkName')]",
-            "location": "[variables('location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
@@ -85,7 +88,7 @@
             "apiVersion": "2014-12-01-preview",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[variables('nicName')]",
-            "location": "[variables('location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
@@ -111,7 +114,7 @@
             "apiVersion": "2014-12-01-preview",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[variables('vmName')]",
-            "location": "[variables('location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
                 "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
@@ -144,7 +147,7 @@
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "name": "[concat(variables('vmName'),'/newuserscript')]",
             "apiVersion": "2014-12-01-preview",
-            "location": "[variables('location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
             ],
