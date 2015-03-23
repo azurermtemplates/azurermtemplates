@@ -1,0 +1,41 @@
+﻿{
+    "newStorageAccountName" : {
+        "value":"uniqueStorageAccountName"
+    },
+    "adminUsername": {
+        "value": ""
+    },
+    "adminPassword": {
+        "value": ""
+    },
+    "customData" : {
+        "value" : "base64EncodedCustomData"
+    },
+    "dnsNameForPublicIP": {
+        "value": "uniqueDnsNameForPublicIP"
+    },
+    "subscriptionId": {
+        "value": "98234d73-as24-466d-b9e0-d73235447c69"
+    },
+    "vmSourceImageName" : {
+        "value" : "b4590d9e3ed742e4a1d46e5424aa335e__SUSE-Linux-Enterprise-Server-11-SP3-v206"
+    },
+    "location": {
+        "value": "West US"
+    },
+    "virtualNetworkName": {
+        "value": "myVNET"
+    },
+    "vmSize": {
+        "value": "Standard_A0"
+    },
+    "vmName" : {
+      "value" : "myVM"
+    },
+    "publicIPAddressName" : {
+      "value" : "myPublicIP"
+    },
+    "nicName" : {
+      "value" : "myNic"
+    }
+}
