@@ -1,0 +1,47 @@
+{
+    "location": {
+        "value": "West US"
+    },
+    "newStorageAccountName": {
+        "value": "kpchefstorage"
+    },
+    "publicIPAddressName": {
+        "value": "chefubuntuvm1"
+    },
+    "dnsName": {
+        "value": "chefubuntuvm1"
+    },
+    "adminUserName": {
+        "value": "kundanap"
+    },
+    "adminPassword": {
+        "value": "123Four!"
+    },
+    "vmName": {
+        "value": "kpchefdemo"
+    },
+    "vmSourceImageName": {
+        "value": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_10-amd64-server-20150202-en-us-30GB"
+    },
+    "virtualNetworkName": {
+        "value": "chefubuntu1vnet"
+    },
+    "nicName": {
+        "value": "chefubuntu1vnetnic"
+    },
+    "subscriptionId": {
+        "value": "91e2e56d-18dd-43ce-a106-cfd111d3bcfc"
+    },
+    "client_rb": {
+        "value": "foo"
+    },
+    "runlist": {
+        "value": "bar"
+    },
+    "validation_key": {
+        "value": "xyz"
+    },
+    "vmExtensionName": {
+            "value": "LinuxChefExtension"
+    }
+}
