@@ -9,8 +9,7 @@
             "type": "securestring"
         },
         "storageAccountName": {
-            "type": "string",
-            "defaultValue" : "uniqueStorageAccountName"
+            "type": "string"
         },
         "numberOfInstances": {
             "type": "int",
@@ -130,7 +129,8 @@
                 "count": "[parameters('numberOfInstances')]"
             },
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', 'publicIP', copyindex())]"
+                "[concat('Microsoft.Network/publicIPAddresses/', 'publicIP', copyindex())]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -159,7 +159,8 @@
                 "count": "[parameters('numberOfInstances')]"
             },
             "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', 'nic', copyindex())]"
+                "[concat('Microsoft.Network/networkInterfaces/', 'nic', copyindex())]",
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
             ],
             "properties": {
                 "hardwareProfile": {
