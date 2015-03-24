@@ -14,6 +14,9 @@
         "adminPassword": {
             "value": "userPassword"
         },
+		"mySqlPassword": {
+            "value": "mySqlPassword"
+        },
         "vmDnsName": {
             "value": "uniqueDomain"
         },

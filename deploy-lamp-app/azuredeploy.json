@@ -16,6 +16,9 @@
         "adminPassword": {
             "type": "securestring"
         },
+		"mySqlPassword": {
+            "type": "securestring"
+        },
         "vmDnsName": {
             "type": "string",
             "defaultValue": "uniqueDNS"
@@ -159,7 +162,7 @@
                     "fileUris": [
                         "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/deploy-lamp-app/install_lamp.sh"
                     ],
-                    "commandToExecute": "sh install_lamp.sh"
+                    "commandToExecute": "[concat('sh install_lamp.sh ', parameters('mySqlPassword'))]"
                 }
             }
         }
