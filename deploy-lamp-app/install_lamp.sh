@@ -1,8 +1,8 @@
 #!/bin/bash
-apt-get update
+apt-get -y update
 
 # set up a silent install of MySQL
-dbpass="mySQLPassw0rd"
+dbpass=$1
 
 export DEBIAN_FRONTEND=noninteractive
 echo mysql-server-5.6 mysql-server/root_password password $dbpass | debconf-set-selections
