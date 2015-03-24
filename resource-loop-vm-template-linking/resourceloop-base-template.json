@@ -23,8 +23,7 @@
             "defaultValue": "West US"
         },
         "virtualNetworkName": {
-            "type": "string",
-            "defaultValue": "myVNET"
+            "type": "string"
         },
         "vmSize": {
             "type": "string",
@@ -51,16 +50,13 @@
             "defaultValue": "10.0.1.0/24"
         },
         "publicIPNamePrefix" : {
-            "type" : "string",
-            "defaultValue" : "publicIP"
+            "type" : "string"
         },
         "nicNamePrefix" : {
-          "type" : "string",
-          "defaultValue" : "nic"
+          "type" : "string"
         },
         "vmNamePrefix" : {
-          "type" : "string",
-          "defaultValue" : "myVM"
+          "type" : "string"
         }
     },
     "variables": {
