@@ -12,16 +12,16 @@
         "value": "chefubuntuvm1"
     },
     "adminUserName": {
-        "value": "kundanap"
+        "value": ""
     },
     "adminPassword": {
-        "value": "123Four!"
+        "value": ""
     },
     "vmName": {
-        "value": "kpchefdemo"
+        "value": ""
     },
     "vmSourceImageName": {
-        "value": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_10-amd64-server-20150202-en-us-30GB"
+        "value": ""
     },
     "virtualNetworkName": {
         "value": "chefubuntu1vnet"
@@ -30,7 +30,7 @@
         "value": "chefubuntu1vnetnic"
     },
     "subscriptionId": {
-        "value": "91e2e56d-18dd-43ce-a106-cfd111d3bcfc"
+        "value": ""
     },
     "client_rb": {
         "value": ""
