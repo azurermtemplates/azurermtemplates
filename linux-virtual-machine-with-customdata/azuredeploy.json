@@ -10,7 +10,7 @@
             "type" : "string",
             "defaultValue": "uniqueDnsNameForPublicIP"
         },
-        "adminUserName": {
+        "adminUsername": {
             "type": "string"
         },
         "customData" : {
@@ -157,7 +157,10 @@
                 "computername": "[parameters('vmName')]",
                 "adminUsername": "[parameters('adminUsername')]",
                 "adminPassword": "[parameters('adminPassword')]",
-                "customData" : "[parameters('customData')]"
+                "customData" : "[parameters('customData')]",
+                "linuxConfiguration": {
+                    "disablePasswordAuthentication": "false"
+                }
             },
             "storageProfile": {
                 "sourceImage": {
