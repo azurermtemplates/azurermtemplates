@@ -33,15 +33,15 @@
         "value": "91e2e56d-18dd-43ce-a106-cfd111d3bcfc"
     },
     "client_rb": {
-        "value": "foo"
+        "value": ""
     },
     "runlist": {
-        "value": "bar"
+        "value": ""
     },
     "validation_key": {
-        "value": "xyz"
+        "value": ""
     },
     "vmExtensionName": {
-            "value": "LinuxChefExtension"
+        "value": "LinuxChefExtension"
     }
 }
