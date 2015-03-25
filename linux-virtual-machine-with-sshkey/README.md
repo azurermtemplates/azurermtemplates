@@ -1,4 +1,4 @@
-# Deploy a Virtual Machine with CustomData
+# Deploy a Virtual Machine with SSH Keys
 
 <a href="https://azuredeploy.net/" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
