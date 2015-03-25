@@ -21,7 +21,8 @@
             ]
         },
         "publicIPAddressName": {
-            "type": "string"
+            "type": "string",
+            "defaultValue" : "myPublicIP"
         },
         "publicIPAddressType" : {
             "type" : "string",
@@ -48,9 +49,6 @@
                 "Standard_A4"
             ]
         },
-        "vmSourceImageName": {
-            "type": "string"
-        },
         "adminUserName": {
             "type": "string"
         },
@@ -58,7 +56,8 @@
             "type": "securestring"
         },
         "virtualNetworkName":{
-            "type" : "string"
+            "type" : "string",
+            "defaultValue" : "MyVNET"
         },
         "addressPrefix":{
             "type" : "string",
@@ -87,11 +86,13 @@
             "type" : "string"
         },
         "nicName":{
-            "type" : "string"
+            "type" : "string",
+            "defaultValue" : "myVMNic"
         },
 
         "vmExtensionName": {
-            "type": "string"
+            "type": "string",
+            "defaultValue" : "LinuxChefExtension"
         },
 
         "client_rb": {
@@ -102,6 +103,10 @@
         },
         "validation_key": {
             "type":  "string"
+        },
+        "vmSourceImageName" : {
+          "type":  "string",
+          "defaultValue" : "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB"
         }
     },
     "variables": {
