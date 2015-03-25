@@ -1,7 +1,3 @@
-# Create Availability Set
+# Starter template with validation
 
-This template creates an Availability Set
-
-Create Availability Set  - <a href="https://azuredeploy.net" target="_blank">
-    <img src="http://azuredeploy.net/deploybutton.png"/>
-</a>
+This is a starter template that will pass the validation checks. Please read the contributing guide to learn more about what's required for successfully passing validation checks when the indexing process to Azure.com begins.
