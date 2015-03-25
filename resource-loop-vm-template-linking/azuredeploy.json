@@ -24,13 +24,15 @@
         "scaleNumberPerRegion" : {
             "type" : "int",
             "defaultValue" : 50
+        },
+        "subscriptionId" : {
+          "type" : "string"
         }
     },
   	"variables" : {
       "adminUsername" : "cloudguy",
       "adminPassword" : "abc_123!",
       "baseTemplateUri" : "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/resource-loop-vm-template-linking/resourceloop-base-template.json",
-      "subscriptionId" : "87a9cd1c-aa24-446d-b7e0-d73955447c69",
 
   		"stgAcctName1" : "[concat(parameters('storageAccountNamePrefix'),'1')]",
   		"stgAcctName2" : "[concat(parameters('storageAccountNamePrefix'),'2')]",
@@ -78,7 +80,7 @@
                 "adminUsername" :  { "value": "[variables('adminUsername')]"},
                 "adminPassword" :  { "value": "[variables('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
-                "subscriptionId" : { "value": "[variables('subscriptionId')]"},
+                "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
                 "region" : { "value": "West Europe"},
                 "publicIPNamePrefix" :{ "value": "[variables('publicippref1')]"},
                 "nicNamePrefix" :{ "value": "[variables('nicref1')]"},
@@ -102,7 +104,7 @@
                 "adminUsername" :  { "value": "[variables('adminUsername')]"},
                 "adminPassword" :  { "value": "[variables('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
-                "subscriptionId" : { "value": "[variables('subscriptionId')]"},
+                "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
                 "region" : { "value": "East Asia"},
                 "publicIPNamePrefix" :{ "value": "[variables('publicippref2')]"},
                 "nicNamePrefix" :{ "value": "[variables('nicref2')]"},
@@ -126,7 +128,7 @@
                 "adminUsername" :  { "value": "[variables('adminUsername')]"},
                 "adminPassword" :  { "value": "[variables('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
-                "subscriptionId" : { "value": "[variables('subscriptionId')]"},
+                "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
                 "region" : { "value": "West US"},
                 "publicIPNamePrefix" :{ "value": "[variables('publicippref3')]"},
                 "nicNamePrefix" :{ "value": "[variables('nicref3')]"},
@@ -150,7 +152,7 @@
                 "adminUsername" :  { "value": "[variables('adminUsername')]"},
                 "adminPassword" :  { "value": "[variables('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
-                "subscriptionId" : { "value": "[variables('subscriptionId')]"},
+                "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
                 "region" : { "value": "East US"},
                 "publicIPNamePrefix" :{ "value": "[variables('publicippref4')]"},
                 "nicNamePrefix" :{ "value": "[variables('nicref4')]"},
@@ -174,7 +176,7 @@
                 "adminUsername" :  { "value": "[variables('adminUsername')]"},
                 "adminPassword" :  { "value": "[variables('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
-                "subscriptionId" : { "value": "[variables('subscriptionId')]"},
+                "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
                 "region" : { "value": "Southeast Asia"},
                 "publicIPNamePrefix" :{ "value": "[variables('publicippref5')]"},
                 "nicNamePrefix" :{ "value": "[variables('nicref5')]"},
