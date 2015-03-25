@@ -5,43 +5,28 @@
     "newStorageAccountName": {
         "value": "kpchefstorage"
     },
-    "publicIPAddressName": {
-        "value": "chefubuntuvm1"
-    },
     "dnsName": {
         "value": "chefubuntuvm1"
     },
     "adminUserName": {
-        "value": ""
+        "value": "yourUserName"
     },
     "adminPassword": {
-        "value": ""
+        "value": "yourPassWord"
     },
     "vmName": {
-        "value": ""
-    },
-    "vmSourceImageName": {
-        "value": ""
-    },
-    "virtualNetworkName": {
-        "value": "chefubuntu1vnet"
-    },
-    "nicName": {
-        "value": "chefubuntu1vnetnic"
+        "value": "kpchefdemo2"
     },
     "subscriptionId": {
-        "value": ""
+        "value": "your subscription"
     },
     "client_rb": {
-        "value": ""
+        "value": "yourclientrb"
     },
     "runlist": {
-        "value": ""
+        "value": "runlist"
     },
     "validation_key": {
-        "value": ""
-    },
-    "vmExtensionName": {
-        "value": "LinuxChefExtension"
+        "value": "value"
     }
 }
