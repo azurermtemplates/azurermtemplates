@@ -1,0 +1,8 @@
+﻿{
+    "storageAccountNamePrefix" : {
+        "value":"clodfe1"
+    },
+    "scaleNumberPerRegion" : {
+        "value" : 2
+    }
+}

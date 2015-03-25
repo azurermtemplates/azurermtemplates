@@ -1,0 +1,187 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters" : {
+        "storageAccountNamePrefix": {
+            "type": "string"
+        },
+        "virtualNetworkNamePrefix" : {
+            "type": "string",
+            "defaultValue" : "myVNET"
+        },
+        "vmNamePrefix" :{
+            "type": "string",
+            "defaultValue" : "myVM"
+        },
+        "publicIPAddressNamePrefix" :{
+            "type": "string",
+            "defaultValue" : "myPublicIP"
+        },
+        "nicNamePrefix" : {
+            "type": "string",
+            "defaultValue" : "myNic"
+        },
+        "scaleNumberPerRegion" : {
+            "type" : "int",
+            "defaultValue" : 50
+        }
+    },
+  	"variables" : {
+      "adminUsername" : "cloudguy",
+      "adminPassword" : "abc_123!",
+      "baseTemplateUri" : "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/resource-loop-vm-template-linking/resourceloop-base-template.json",
+      "subscriptionId" : "87a9cd1c-aa24-446d-b7e0-d73955447c69",
+
+  		"stgAcctName1" : "[concat(parameters('storageAccountNamePrefix'),'1')]",
+  		"stgAcctName2" : "[concat(parameters('storageAccountNamePrefix'),'2')]",
+      "stgAcctName3" : "[concat(parameters('storageAccountNamePrefix'),'3')]",
+      "stgAcctName4" : "[concat(parameters('storageAccountNamePrefix'),'4')]",
+      "stgAcctName5" : "[concat(parameters('storageAccountNamePrefix'),'5')]",
+
+      "vnetName1" : "[concat(parameters('virtualNetworkNamePrefix'),'1')]",
+      "vnetName2" : "[concat(parameters('virtualNetworkNamePrefix'),'2')]",
+      "vnetName3" : "[concat(parameters('virtualNetworkNamePrefix'),'3')]",
+      "vnetName4" : "[concat(parameters('virtualNetworkNamePrefix'),'4')]",
+      "vnetName5" : "[concat(parameters('virtualNetworkNamePrefix'),'5')]",
+
+      "publicippref1" : "[concat(parameters('publicIPAddressNamePrefix'),'1')]",
+      "publicippref2" : "[concat(parameters('publicIPAddressNamePrefix'),'10')]",
+      "publicippref3" : "[concat(parameters('publicIPAddressNamePrefix'),'20')]",
+      "publicippref4" : "[concat(parameters('publicIPAddressNamePrefix'),'30')]",
+      "publicippref5" : "[concat(parameters('publicIPAddressNamePrefix'),'40')]",
+
+      "nicref1" : "[concat(parameters('nicNamePrefix'),'1')]",
+      "nicref2" : "[concat(parameters('nicNamePrefix'),'10')]",
+      "nicref3" : "[concat(parameters('nicNamePrefix'),'20')]",
+      "nicref4" : "[concat(parameters('nicNamePrefix'),'30')]",
+      "nicref5" : "[concat(parameters('nicNamePrefix'),'40')]",
+
+      "vmref1" : "[concat(parameters('vmNamePrefix'),'1')]",
+      "vmref2" : "[concat(parameters('vmNamePrefix'),'10')]",
+      "vmref3" : "[concat(parameters('vmNamePrefix'),'20')]",
+      "vmref4" : "[concat(parameters('vmNamePrefix'),'30')]",
+      "vmref5" : "[concat(parameters('vmNamePrefix'),'40')]"
+  	},
+    "resources": [
+	  {
+        "name": "instance01",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2015-01-01",
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+              "uri": "[variables('baseTemplateUri')]",
+              "contentVersion": "1.0.0.0"
+            },
+            "parameters": {
+                "storageAccountName": { "value": "[variables('stgAcctName1')]"},
+                "adminUsername" :  { "value": "[variables('adminUsername')]"},
+                "adminPassword" :  { "value": "[variables('adminPassword')]"},
+                "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
+                "subscriptionId" : { "value": "[variables('subscriptionId')]"},
+                "region" : { "value": "West Europe"},
+                "publicIPNamePrefix" :{ "value": "[variables('publicippref1')]"},
+                "nicNamePrefix" :{ "value": "[variables('nicref1')]"},
+                "vmNamePrefix" : { "value": "[variables('vmref1')]"},
+                "virtualNetworkName" : { "value": "[variables('vnetName1')]"}
+            }
+  	    }
+    },
+  	{
+        "name": "instance02",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2015-01-01",
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+              "uri": "[variables('baseTemplateUri')]",
+              "contentVersion": "1.0.0.0"
+            },
+            "parameters": {
+                "storageAccountName": { "value": "[variables('stgAcctName2')]"},
+                "adminUsername" :  { "value": "[variables('adminUsername')]"},
+                "adminPassword" :  { "value": "[variables('adminPassword')]"},
+                "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
+                "subscriptionId" : { "value": "[variables('subscriptionId')]"},
+                "region" : { "value": "East Asia"},
+                "publicIPNamePrefix" :{ "value": "[variables('publicippref2')]"},
+                "nicNamePrefix" :{ "value": "[variables('nicref2')]"},
+                "vmNamePrefix" : { "value": "[variables('vmref2')]"},
+                "virtualNetworkName" : { "value": "[variables('vnetName2')]"}
+            }
+  	    }
+    },
+    {
+        "name": "instance03",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2015-01-01",
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+              "uri": "[variables('baseTemplateUri')]",
+              "contentVersion": "1.0.0.0"
+            },
+            "parameters": {
+                "storageAccountName": { "value": "[variables('stgAcctName3')]"},
+                "adminUsername" :  { "value": "[variables('adminUsername')]"},
+                "adminPassword" :  { "value": "[variables('adminPassword')]"},
+                "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
+                "subscriptionId" : { "value": "[variables('subscriptionId')]"},
+                "region" : { "value": "West US"},
+                "publicIPNamePrefix" :{ "value": "[variables('publicippref3')]"},
+                "nicNamePrefix" :{ "value": "[variables('nicref3')]"},
+                "vmNamePrefix" : { "value": "[variables('vmref3')]"},
+                "virtualNetworkName" : { "value": "[variables('vnetName3')]"}
+            }
+        }
+    },
+    {
+        "name": "instance04",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2015-01-01",
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+              "uri": "[variables('baseTemplateUri')]",
+              "contentVersion": "1.0.0.0"
+            },
+            "parameters": {
+                "storageAccountName": { "value": "[variables('stgAcctName4')]"},
+                "adminUsername" :  { "value": "[variables('adminUsername')]"},
+                "adminPassword" :  { "value": "[variables('adminPassword')]"},
+                "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
+                "subscriptionId" : { "value": "[variables('subscriptionId')]"},
+                "region" : { "value": "East US"},
+                "publicIPNamePrefix" :{ "value": "[variables('publicippref4')]"},
+                "nicNamePrefix" :{ "value": "[variables('nicref4')]"},
+                "vmNamePrefix" : { "value": "[variables('vmref4')]"},
+                "virtualNetworkName" : { "value": "[variables('vnetName4')]"}
+            }
+        }
+    },
+    {
+        "name": "instance05",
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2015-01-01",
+        "properties": {
+            "mode": "Incremental",
+            "templateLink": {
+              "uri": "[variables('baseTemplateUri')]",
+              "contentVersion": "1.0.0.0"
+            },
+            "parameters": {
+                "storageAccountName": { "value": "[variables('stgAcctName5')]"},
+                "adminUsername" :  { "value": "[variables('adminUsername')]"},
+                "adminPassword" :  { "value": "[variables('adminPassword')]"},
+                "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
+                "subscriptionId" : { "value": "[variables('subscriptionId')]"},
+                "region" : { "value": "Southeast Asia"},
+                "publicIPNamePrefix" :{ "value": "[variables('publicippref5')]"},
+                "nicNamePrefix" :{ "value": "[variables('nicref5')]"},
+                "vmNamePrefix" : { "value": "[variables('vmref5')]"},
+                "virtualNetworkName" : { "value": "[variables('vnetName5')]"}
+            }
+        }
+    }
+  	]
+}
