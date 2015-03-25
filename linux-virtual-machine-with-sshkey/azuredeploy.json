@@ -17,9 +17,6 @@
             "type" : "string",
             "defaultValue" : "base64EncodedSSHPublicKey"
         },
-        "adminPassword": {
-            "type": "securestring"
-        },
         "vmSourceImageName": {
             "type": "string",
             "defaultValue": "b4590d9e3ed742e4a1d46e5424aa335e__SUSE-Linux-Enterprise-Server-11-SP3-v206"
