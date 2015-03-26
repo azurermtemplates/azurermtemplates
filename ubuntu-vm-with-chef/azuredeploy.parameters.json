@@ -1,18 +1,12 @@
 {
-    "location": {
-        "value": "West US"
-    },
     "newStorageAccountName": {
         "value": "kpchefstorage"
     },
-    "dnsName": {
-        "value": "chefubuntuvm1"
-    },
     "adminUserName": {
-        "value": "yourUserName"
+        "value": "username"
     },
     "adminPassword": {
-        "value": "yourPassWord"
+        "value": "password"
     },
     "vmName": {
         "value": "kpchefdemo2"
@@ -21,7 +15,7 @@
         "value": "your subscription"
     },
     "client_rb": {
-        "value": "yourclientrb"
+        "value": "clientrb"
     },
     "runlist": {
         "value": "runlist"
