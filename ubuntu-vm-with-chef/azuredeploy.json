@@ -2,52 +2,11 @@
     "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
     "contentVersion": "1.0.0.0",
     "parameters" : {
-        "location": {
-            "type": "String",
-            "defaultValue" : "West US",
-            "allowedValues": [
-              "West US"
-            ]
-        },
         "newStorageAccountName": {
             "type": "string"
         },
-        "storageAccountType": {
-            "type": "string",
-            "defaultValue": "Standard_LRS",
-            "allowedValues": [
-                "Standard_LRS",
-                "Standard_GRS"
-            ]
-        },
-        "publicIPAddressName": {
-            "type": "string",
-            "defaultValue" : "myPublicIP"
-        },
-        "publicIPAddressType" : {
-            "type" : "string",
-            "defaultValue" : "Dynamic",
-            "allowedValues" : [
-                "Dynamic"
-            ]
-        },
-        "vmStorageAccountContainerName": {
-            "type": "string",
-            "defaultValue": "vhds"
-        },
         "vmName": {
             "type": "string"
-        },
-        "vmSize": {
-            "type": "string",
-            "defaultValue": "Standard_A0",
-            "allowedValues" : [
-                "Standard_A0",
-                "Standard_A1",
-                "Standard_A2",
-                "Standard_A3",
-                "Standard_A4"
-            ]
         },
         "adminUserName": {
             "type": "string"
@@ -55,46 +14,9 @@
         "adminPassword": {
             "type": "securestring"
         },
-        "virtualNetworkName":{
-            "type" : "string",
-            "defaultValue" : "MyVNET"
-        },
-        "addressPrefix":{
-            "type" : "string",
-            "defaultValue" : "10.0.0.0/16"
-        },
-        "subnet1Name": {
-            "type" : "string",
-            "defaultValue" : "Subnet-1"
-        },
-        "subnet2Name": {
-            "type" : "string",
-            "defaultValue" : "Subnet-2"
-        },
-        "subnet1Prefix" : {
-            "type" : "string",
-            "defaultValue" : "10.0.0.0/24"
-        },
-        "subnet2Prefix" : {
-            "type" : "string",
-            "defaultValue" : "10.0.1.0/24"
-        },
-        "dnsName" : {
-            "type" : "string"
-        },
         "subscriptionId":{
             "type" : "string"
         },
-        "nicName":{
-            "type" : "string",
-            "defaultValue" : "myVMNic"
-        },
-
-        "vmExtensionName": {
-            "type": "string",
-            "defaultValue" : "LinuxChefExtension"
-        },
-
         "client_rb": {
             "type": "string"
         },
@@ -103,61 +25,74 @@
         },
         "validation_key": {
             "type":  "string"
-        },
-        "vmSourceImageName" : {
-          "type":  "string",
-          "defaultValue" : "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB"
         }
+
     },
     "variables": {
-        "sourceImageName" : "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('vmSourceImageName'))]",
-        "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
-        "subnet1Ref" : "[concat(variables('vnetID'),'/subnets/',parameters('subnet1Name'))]"
+        "vmSourceImageName" : "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_10-amd64-server-20141204-en-us-30GB",
+        "sourceImageName" : "[concat('/',parameters('subscriptionId'),'/services/images/',variables('vmSourceImageName'))]",
+        "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
+        "subnet1Ref" : "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]",
+        "vmExtensionName" : "LinuxChefExtension",
+        "location" : "West US",
+        "storageAccountType" : "Standard_LRS",
+        "publicIPAddressName" : "myPublicIP",
+        "publicIPAddressType" : "Dynamic",
+        "vmStorageAccountContainerName" : "vhds",
+        "vmSize" : "Standard_A0",
+        "virtualNetworkName" : "MyVNET",
+        "addressPrefix" : "10.0.0.0/16",
+        "subnet1Name": "subnet-1",
+        "subnet2Name": "subnet-2",
+        "subnet1Prefix" : "10.0.0.0/24",
+        "subnet2Prefix" : "10.0.1.0/24",
+        "nicName" : "myVMNic",
+        "dnsName" : "[variables('subnet1Name')]"
       },
 		"resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[parameters('newStorageAccountName')]",
       "apiVersion": "2014-12-01-preview",
-      "location": "[parameters('location')]",
+      "location": "[variables('location')]",
       "properties": {
-        "accountType": "[parameters('storageAccountType')]"
+        "accountType": "[variables('storageAccountType')]"
       }
     },
     {
         "apiVersion": "2014-12-01-preview",
         "type": "Microsoft.Network/publicIPAddresses",
-        "name": "[parameters('publicIPAddressName')]",
-        "location": "[parameters('location')]",
+        "name": "[variables('publicIPAddressName')]",
+        "location": "[variables('location')]",
         "properties": {
-            "publicIPAllocationMethod": "[parameters('publicIPAddressType')]",
+            "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
             "dnsSettings": {
-                "domainNameLabel": "[parameters('dnsName')]"
+                "domainNameLabel": "[variables('dnsName')]"
             }
         }
     },
     {
       "apiVersion": "2014-12-01-preview",
       "type": "Microsoft.Network/virtualNetworks",
-      "name": "[parameters('virtualNetworkName')]",
-      "location": "[parameters('location')]",
+      "name": "[variables('virtualNetworkName')]",
+      "location": "[variables('location')]",
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
-            "[parameters('addressPrefix')]"
+            "[variables('addressPrefix')]"
           ]
         },
         "subnets": [
           {
-            "name": "[parameters('subnet1Name')]",
+            "name": "[variables('subnet1Name')]",
             "properties" : {
-                "addressPrefix": "[parameters('subnet1Prefix')]"
+                "addressPrefix": "[variables('subnet1Prefix')]"
             }
           },
           {
-            "name": "[parameters('subnet2Name')]",
+            "name": "[variables('subnet2Name')]",
             "properties" : {
-                "addressPrefix": "[parameters('subnet2Prefix')]"
+                "addressPrefix": "[variables('subnet2Prefix')]"
             }
           }
         ]
@@ -166,11 +101,11 @@
     {
         "apiVersion": "2014-12-01-preview",
         "type": "Microsoft.Network/networkInterfaces",
-        "name": "[parameters('nicName')]",
-        "location": "[parameters('location')]",
+        "name": "[variables('nicName')]",
+        "location": "[variables('location')]",
         "dependsOn": [
-            "[concat('Microsoft.Network/publicIPAddresses/', parameters('publicIPAddressName'))]",
-            "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+            "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+            "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
         ],
         "properties": {
             "ipConfigurations": [
@@ -179,7 +114,7 @@
                 "properties": {
                     "privateIPAllocationMethod": "Dynamic",
                     "publicIPAddress": {
-                        "id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName'))]"
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
                     },
                     "subnet": {
                         "id": "[variables('subnet1Ref')]"
@@ -193,14 +128,14 @@
         "apiVersion": "2014-12-01-preview",
         "type": "Microsoft.Compute/virtualMachines",
         "name": "[parameters('vmName')]",
-        "location": "[parameters('location')]",
+        "location": "[variables('location')]",
         "dependsOn": [
             "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
-            "[concat('Microsoft.Network/networkInterfaces/', parameters('nicName'))]"
+            "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
         ],
         "properties": {
             "hardwareProfile": {
-                "vmSize": "[parameters('vmSize')]"
+                "vmSize": "[variables('vmSize')]"
             },
             "osProfile": {
                 "computername": "[parameters('vmName')]",
@@ -211,12 +146,12 @@
                 "sourceImage": {
                     "id": "[variables('sourceImageName')]"
                 },
-                "destinationVhdsContainer" : "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/')]"
+                "destinationVhdsContainer" : "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
             },
             "networkProfile": {
                 "networkInterfaces" : [
                 {
-                    "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('nicName'))]"
+                    "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
                 }
                 ]
             }
@@ -224,9 +159,9 @@
     },
     {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(parameters('vmName'),'/', parameters('vmExtensionName'))]",
+            "name": "[concat(parameters('vmName'),'/', variables('vmExtensionName'))]",
             "apiVersion": "2014-12-01-preview",
-            "location": "[parameters('location')]",
+            "location": "[variables('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
             ],
