@@ -1,0 +1,57 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "newStorageAccountName": {
+      "value": "cloudguystore1"
+    },
+    "location": {
+      "value": "West US"
+    },
+    "dnsName": {
+      "value": "cloudguydns1"
+    },
+    "publicIPAddressName": {
+      "value": "cloudguyIP"
+    },
+    "publicIPAddressType": {
+      "value": "Dynamic"
+    },
+    "vmName": {
+      "value": "cloudguyvm"
+    },
+    "vmSize": {
+      "value": "Standard_A2"
+    },
+    "adminUserName": {
+      "value": "cloudguy"
+    },
+    "adminPassword": {
+      "value": "abc_123!"
+    },
+    "virtualNetworkName": {
+      "value": "cloudguyvnet"
+    },
+    "subscriptionId": {
+      "value": ""
+    },
+    "nicName": {
+      "value": "cloudguyNic"
+    },
+    "vmExtensionName": {
+      "value": "dscExtension"
+    },
+    "modulesUrl": {
+      "value": ""
+    },
+    "sasToken": {
+      "value": ""
+    },
+    "configurationFunction": {
+      "value": "MySample.ps1\\Main"
+    },
+    "destinationPath": {
+      "value": "c:\foo\\MySample.ps1.zip"
+    }
+  }
+}

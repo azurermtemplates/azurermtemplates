@@ -1,0 +1,7 @@
+{
+  "TemplateName": "Create an Availability Set",
+  "Description": "This template creates an availability set using the specified location and name",
+  "ShortDescription": "This template creates and availability set",
+  "GithubUsername": "singhkay",
+  "DateUpdated": "2015-24-01"
+}
