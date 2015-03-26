@@ -3,7 +3,11 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "scaleNumber": {
-            "type": "int"
+            "type": "int",
+            "defaultValue": 2,
+            "metadata": {
+              "Description": "Number of VMs to deploy"
+            }
         },
         "location": {
             "type": "string",
@@ -11,10 +15,16 @@
             "allowedValues": [
                 "West US",
                 "East US"
-            ]
+            ],
+            "metadata": {
+              "Description": "Location of resources"
+            }
         },
         "newStorageAccountName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+              "Description": "Name of new storage account"
+            }
         },
         "storageAccountType": {
             "type": "string",
@@ -22,24 +32,39 @@
             "allowedValues": [
                 "Standard_LRS",
                 "Standard_GRS"
-            ]
+            ],
+            "metadata": {
+              "Description": "Type of storage account"
+            }
         },
         "publicIPAddressType": {
             "type": "string",
             "defaultValue": "Dynamic",
             "allowedValues": [
                 "Dynamic"
-            ]
+            ],
+            "metadata": {
+              "Description": "Type of Public Address"
+            }
         },
         "vmStorageAccountContainerName": {
             "type": "string",
-            "defaultValue": "vhds"
+            "defaultValue": "vhds",
+            "metadata": {
+              "Description": "Name of storage account container"
+            }
         },
         "vmName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+              "Description": "Name of the VM"
+            }
         },
         "availabilitySetName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+              "Description": "Name of Availability Set to deploy VMs into"
+            }
         },
         "vmSize": {
             "type": "string",
@@ -50,47 +75,86 @@
                 "Standard_A2",
                 "Standard_A3",
                 "Standard_A4"
-            ]
+            ],
+            "metadata": {
+              "Description": "Size of the VM"
+            }
         },
         "vmSourceImageName": {
             "type": "string",
-            "defaultValue": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB"
+            "defaultValue": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
+            "metadata": {
+              "Description": "Image to be used"
+            }
         },
         "adminUserName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+              "Description": "VM Admin Username"
+            }
         },
         "adminPassword": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata": {
+              "Description": "VM Password"
+            }
         },
         "virtualNetworkName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+              "Description": "VNET Name"
+            }
         },
         "addressPrefix": {
             "type": "string",
-            "defaultValue": "10.0.0.0/16"
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+              "Description": "Address Prefix for the VNET"
+            }
         },
         "subnet1Name": {
             "type": "string",
-            "defaultValue": "Subnet-1"
+            "defaultValue": "Subnet-1",
+            "metadata": {
+              "Description": "Subnet 1 Name"
+            }
         },
         "subnet1Prefix": {
             "type": "string",
-            "defaultValue": "10.0.1.0/24"
+            "defaultValue": "10.0.1.0/24",
+            "metadata": {
+              "Description": "Subnet 1 Address Prefix"
+            }
         },
         "subscriptionId": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+              "Description": "Subscription Id"
+            }
         },
         "nicName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+              "Description": "Network Interface Name"
+            }
         },
         "vmExtensionName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+              "Description": "VM extension name"
+            }
         },
         "customScriptFilePath": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+              "Description": "Path to the download the custom script from"
+            }
         },
         "customScriptCommandToExecute": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+              "Description": "Command to execute on the VM"
+            }
         }
     },
     "variables": {
@@ -152,23 +216,20 @@
             "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
         ],
         "properties": {
-            "ipConfigurations": [
-                {
-                    "name": "ipconfig1",
-                    "properties": {
-                        "privateIPAllocationMethod": "Dynamic",
-                        "publicIPAddress": {
-                            "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'publicIP0')]"
-                        },
-                        "subnet": {
-                            "id": "[variables('subnet1Ref')]"
-                        }
+            "ipConfigurations": [{
+                "name": "ipconfig1",
+                "properties": {
+                    "privateIPAllocationMethod": "Dynamic",
+                    "publicIPAddress": {
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'publicIP0')]"
+                    },
+                    "subnet": {
+                        "id": "[variables('subnet1Ref')]"
                     }
                 }
-            ]
+            }]
         }
-    },
-    {
+    }, {
         "apiVersion": "2014-12-01-preview",
         "type": "Microsoft.Network/networkInterfaces",
         "name": "[concat(parameters('nicName'), 1)]",
@@ -178,20 +239,18 @@
             "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
         ],
         "properties": {
-            "ipConfigurations": [
-                {
-                    "name": "ipconfig1",
-                    "properties": {
-                        "privateIPAllocationMethod": "Dynamic",
-                        "publicIPAddress": {
-                            "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'publicIP1')]"
-                        },
-                        "subnet": {
-                            "id": "[variables('subnet1Ref')]"
-                        }
+            "ipConfigurations": [{
+                "name": "ipconfig1",
+                "properties": {
+                    "privateIPAllocationMethod": "Dynamic",
+                    "publicIPAddress": {
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'publicIP1')]"
+                    },
+                    "subnet": {
+                        "id": "[variables('subnet1Ref')]"
                     }
                 }
-            ]
+            }]
         }
     }, {
         "apiVersion": "2014-12-01-preview",
