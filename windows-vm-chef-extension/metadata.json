@@ -3,5 +3,5 @@
   "Description": "This template creates a Windows VM and installs the Chef extension, then runs the specified Chef recipe",
   "ShortDescription": "This template creates a Windows VM and installs the Chef extension",
   "GithubUsername": "singhkay",
-  "DateUpdated": "2015-24-03"
+  "DateUpdated": "2015-03-24"
 }
