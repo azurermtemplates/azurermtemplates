@@ -147,7 +147,8 @@
                 "count": "[parameters('numberOfInstances')]"
             },
             "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', 'nic', copyindex())]"
+                "[concat('Microsoft.Network/networkInterfaces/', 'nic', copyindex())]",
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
             ],
             "properties": {
                 "hardwareProfile": {
