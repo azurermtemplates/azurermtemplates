@@ -1,4 +1,4 @@
-# Create a Virtual Machine from an Image
+# Create a Virtual Machine from an Image with VM Diagnostics Extension
 
 <a href="https://azuredeploy.net/" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
@@ -6,9 +6,9 @@
 
 This template allows you to create a Windows Virtual Machine from a specified image during the template deployment and install the VM Diagnostics Extension. This template also deploys a Storage Account, Virtual Network, Public IP addresses and a Network Interface.
 
-NOTE: The configuration of the VM diagnostics extension relies on a Base64 encoded string for the xmlConfig. 
+NOTE: The configuration of the VM diagnostics extension relies on a Base64 encoded string for the xmlConfig. This configures a basic set of counters, including CPU and Memory. 
 
-Below are the parameters that the template expects
+Below are the parameters that the template expects.
 
 | Name   | Description    |
 |:--- |:---|
