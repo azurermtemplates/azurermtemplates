@@ -5,8 +5,9 @@
         "newStorageAccountName": {
             "type": "string"
         },
-        "vmName": {
-            "type": "string"
+        "vmDnsName": {
+                "type": "string",
+                "defaultValue": "uniqueDNS"
         },
         "adminUserName": {
             "type": "string"
@@ -35,6 +36,7 @@
         "subnet1Ref" : "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]",
         "vmExtensionName" : "LinuxChefExtension",
         "location" : "West US",
+        "vmName": "[parameters('vmDnsName')]",
         "storageAccountType" : "Standard_LRS",
         "publicIPAddressName" : "myPublicIP",
         "publicIPAddressType" : "Dynamic",
@@ -67,7 +69,7 @@
         "properties": {
             "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
             "dnsSettings": {
-                "domainNameLabel": "[variables('dnsName')]"
+              "domainNameLabel": "[parameters('vmDnsName')]"
             }
         }
     },
@@ -127,7 +129,7 @@
     {
         "apiVersion": "2014-12-01-preview",
         "type": "Microsoft.Compute/virtualMachines",
-        "name": "[parameters('vmName')]",
+        "name": "[variables('vmName')]",
         "location": "[variables('location')]",
         "dependsOn": [
             "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
@@ -138,7 +140,7 @@
                 "vmSize": "[variables('vmSize')]"
             },
             "osProfile": {
-                "computername": "[parameters('vmName')]",
+                "computername": "[variables('vmName')]",
                 "adminUsername": "[parameters('adminUsername')]",
                 "adminPassword": "[parameters('adminPassword')]"
             },
@@ -159,11 +161,11 @@
     },
     {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(parameters('vmName'),'/', variables('vmExtensionName'))]",
+            "name": "[concat(variables('vmName'),'/', variables('vmExtensionName'))]",
             "apiVersion": "2014-12-01-preview",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
             ],
             "properties": {
                 "publisher": "Chef.Bootstrap.WindowsAzure",
