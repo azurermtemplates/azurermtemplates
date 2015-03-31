@@ -15,7 +15,7 @@
             "type": "securestring"
         },
         "subscriptionId":{
-            "type" : "string"
+            "type" : "securestring"
         },
         "client_rb": {
             "type": "string"
