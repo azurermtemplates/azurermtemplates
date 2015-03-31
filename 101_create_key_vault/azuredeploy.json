@@ -36,7 +36,7 @@
             }
         },
         "enableVaultforDeployment": {
-          "type": bool,
+          "type": "bool",
           "metadata": {
               "description": "Specifies if the vault is enabled for a VM deployment"
           }
