@@ -35,8 +35,9 @@
                 "description": "SKU Family for the vault"
             }
         },
-        "enableVaultforDeployment": {
-          "type": bool,
+        "enableVaultForDeployment": {
+          "type": "bool",
+          "allowedValues": [true, false],
           "metadata": {
               "description": "Specifies if the vault is enabled for a VM deployment"
           }
@@ -48,7 +49,6 @@
         "apiVersion": "2014-12-19-preview",
         "location": "[parameters('location')]",
         "properties": {
-            "enabledForDeployment": "[parameters('enableVaultforDeployment')]",
             "tenantid": "[parameters('tenantid')]",
             "accessPolicies": [],
             "sku": {
