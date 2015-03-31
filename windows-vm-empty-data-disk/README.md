@@ -1,4 +1,4 @@
-# Create a Virtual Machine from a Windows Image with VM Diagnostics Extension and Empty Data Disk
+# Create a Virtual Machine from a Windows Image with Empty Data Disk
 
 <a href="https://azuredeploy.net/" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
