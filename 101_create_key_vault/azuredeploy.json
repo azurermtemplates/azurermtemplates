@@ -24,7 +24,7 @@
         },
         "skuName": {
             "type": "string",
-            "allowedValues": ["standard", "premium"],
+            "allowedValues": ["Standard", "Premium"],
             "metadata": {
                 "description": "SKU for the vault"
             }
@@ -49,6 +49,7 @@
         "apiVersion": "2014-12-19-preview",
         "location": "[parameters('location')]",
         "properties": {
+            "enabledForDeployment": "[parameters('enableVaultForDeployment')]",
             "tenantid": "[parameters('tenantid')]",
             "accessPolicies": [],
             "sku": {
