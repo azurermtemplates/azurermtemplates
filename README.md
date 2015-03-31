@@ -11,7 +11,7 @@ To make sure your template is added to Azure.com index, please follow these guid
 3.	The template folder must host the **scripts** that are needed for successful template execution
 4.	The template folder must contain a **metadata.json** file to allow the template to be indexed on [Azure.com](http://azure.microsoft.com)
   *	Guidelines on the metadata file below
-5.	Every parameter in the template must have the **description** specified using the metadata property. See the starter template is provided [here](https://github.com/azurermtemplates/azurermtemplates/tree/master/_starter_template_with_validation) on how to do this
+5.	Every parameter in the template must have the **description** specified using the metadata property. See the starter template is provided [here](https://github.com/azurermtemplates/azurermtemplates/tree/master/100_starter_template_with_validation) on how to do this
 6.	OPTIONAL: The folder may contain a **Readme.md** file for any additional information about the template
 
 ## metadata.json file
@@ -47,7 +47,7 @@ The metadata.json file will be validated using these rules
 
 ## Starter template
 
-A starter template is provided [here](https://github.com/azurermtemplates/azurermtemplates/tree/master/_starter_template_with_validation) for you to follow
+A starter template is provided [here](https://github.com/azurermtemplates/azurermtemplates/tree/master/100_starter_template_with_validation) for you to follow
 
 
 ## Index
