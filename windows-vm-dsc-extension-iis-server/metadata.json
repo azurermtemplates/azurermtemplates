@@ -1,7 +1,7 @@
 {
-  "TemplateName": "Create an Availability Set",
-  "Description": "This template creates an availability set using the specified location and name",
-  "ShortDescription": "This template creates and availability set",
+  "TemplateName": "Create a Windows VM with IIS Server using DSC extension",
+  "Description": "This template creates a Windows VM and sets up an IIS server using the DSC extension",
+  "ShortDescription": "This template creates a VM with IIS server using DSC extension",
   "GithubUsername": "singhkay",
-  "DateUpdated": "2015-24-01"
+  "DateUpdated": "2015-03-30"
 }
