@@ -118,6 +118,7 @@
                 "count": "[parameters('numberOfInstances')]"
             },
             "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
                 "[concat('Microsoft.Network/publicIPAddresses/', 'publicIP', copyindex())]"
             ],
             "properties": {
