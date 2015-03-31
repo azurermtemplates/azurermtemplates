@@ -49,7 +49,6 @@
         "apiVersion": "2014-12-19-preview",
         "location": "[parameters('location')]",
         "properties": {
-            "enabledForDeployment": "[parameters('enableVaultforDeployment')]",
             "tenantid": "[parameters('tenantid')]",
             "accessPolicies": [],
             "sku": {
