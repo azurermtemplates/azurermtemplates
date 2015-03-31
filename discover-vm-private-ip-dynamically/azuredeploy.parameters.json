@@ -3,43 +3,43 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "newStorageAccountName": {
-            "value": "kaystore"
+            "value": ""
         },
         "location": {
-            "value": "West US"
+            "value": ""
         },
         "publicIPAddressType": {
             "value": "Dynamic"
         },
         "availabilitySetName": {
-            "value": "kayav"
+            "value": ""
         },
         "vmName": {
-            "value": "kayvm"
+            "value": ""
         },
         "vmSize": {
             "value": "Standard_A2"
         },
         "adminUserName": {
-            "value": "kay"
+            "value": ""
         },
         "adminPassword": {
-            "value": "Azure12345"
+            "value": ""
         },
         "virtualNetworkName": {
-            "value": "kayvnet"
+            "value": ""
         },
         "subscriptionId": {
             "value": ""
         },
         "nicName": {
-            "value": "kaynic"
+            "value": ""
         },
         "vmExtensionName": {
-            "value": "privateip"
+            "value": ""
         },
         "customScriptFilePath": {
-            "value": "https://raw.githubusercontent.com/singhkay/azurermtemplates/master/discover-vm-private-ip-dynamically/privateip.sh"
+            "value": ""
         },
         "customScriptCommandToExecute": {
             "value": "sh privateip.sh "

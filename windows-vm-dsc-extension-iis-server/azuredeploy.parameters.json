@@ -48,10 +48,10 @@
       "value": ""
     },
     "configurationFunction": {
-      "value": "MySample.ps1\\Main"
+      "value": "ContosoWebsite.ps1\ContosoWebsite.ps1"
     },
-    "destinationPath": {
-      "value": "c:\foo\\MySample.ps1.zip"
+    "MachineName": {
+      "value": ""
     }
   }
 }
