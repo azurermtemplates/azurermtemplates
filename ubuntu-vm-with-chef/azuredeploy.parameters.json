@@ -1,6 +1,6 @@
 {
     "newStorageAccountName": {
-        "value": "kpchefstorage"
+        "value": "your storagename"
     },
     "adminUserName": {
         "value": "username"
@@ -8,8 +8,8 @@
     "adminPassword": {
         "value": "password"
     },
-    "vmName": {
-        "value": "kpchefdemo2"
+    "vmDnsName": {
+        "value": "uniquedomainname"
     },
     "subscriptionId": {
         "value": "your subscription"
