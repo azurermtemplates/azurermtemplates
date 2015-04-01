@@ -180,8 +180,7 @@
                             "Uri" : "[variables('dataDisk1VhdName')]"
                         }
                     }
-                ],    
-
+                ],
                 "destinationVhdsContainer" : "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
             },
             "networkProfile": {
