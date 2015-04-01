@@ -1,0 +1,7 @@
+{
+  "TemplateName": "Spin up a Mesosphere cluster with a single master node”,
+  "Description": "Template spins up and configures a fully-functional mesosphere cluster with a SINGLE MASTER NODE. This is not a high-availability cluster”,
+  "ShortDescription": "Template spins up and configures a fully-functional mesosphere cluster. ",
+  "GithubUsername": "hausdorff",
+  "DateUpdated": "2015-04-08”
+}
