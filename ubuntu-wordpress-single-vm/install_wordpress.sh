@@ -19,7 +19,7 @@ gzip -d /usr/share/doc/wordpress/examples/setup-mysql.gz
 bash /usr/share/doc/wordpress/examples/setup-mysql -n wordpress localhost
 
 ln -s /usr/share/wordpress /var/www/html/wordpress
-mv /etc/wordpress/config-locahost.php /etc/wordpress/config-default.php
+mv /etc/wordpress/config-localhost.php /etc/wordpress/config-default.php
 
 # Restart Apache
 apachectl restart
