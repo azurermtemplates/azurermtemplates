@@ -3,25 +3,25 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "newStorageAccountName": {
-            "value": "tcowpstor"
+            "value": "storage"
         },
         "location": {
             "value": "West US"
         },
         "vmDnsName": {
-            "value": "tcowpvm"
+            "value": "dnsname"
         },
         "adminUsername": {
             "value": "azureuser"
         },
         "adminPassword": {
-            "value": "Pass123!"
+            "value": "password"
         },
         "mySqlPassword": {
-            "value": "SQL1234"
+            "value": "password"
         },
         "subscriptionId": {
-            "value": "252281c3-8a06-4af8-8f3f-d6af13e4fde3"
+            "value": "aaaaaaaa-xxxx-yyyy-xxxx-bbbbbbbbbbbb"
         }
    }
 }
