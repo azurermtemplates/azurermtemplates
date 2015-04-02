@@ -1,0 +1,27 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "newStorageAccountName": {
+            "value": "tcowpstor"
+        },
+        "location": {
+            "value": "West US"
+        },
+        "vmDnsName": {
+            "value": "tcowpvm"
+        },
+        "adminUsername": {
+            "value": "azureuser"
+        },
+        "adminPassword": {
+            "value": "Pass123!"
+        },
+        "mySqlPassword": {
+            "value": "SQL1234"
+        },
+        "subscriptionId": {
+            "value": "252281c3-8a06-4af8-8f3f-d6af13e4fde3"
+        }
+   }
+}
