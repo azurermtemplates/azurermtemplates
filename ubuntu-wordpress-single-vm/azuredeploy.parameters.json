@@ -1,0 +1,27 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "newStorageAccountName": {
+            "value": "storage"
+        },
+        "location": {
+            "value": "West US"
+        },
+        "vmDnsName": {
+            "value": "dnsname"
+        },
+        "adminUsername": {
+            "value": "azureuser"
+        },
+        "adminPassword": {
+            "value": "password"
+        },
+        "mySqlPassword": {
+            "value": "password"
+        },
+        "subscriptionId": {
+            "value": "aaaaaaaa-xxxx-yyyy-xxxx-bbbbbbbbbbbb"
+        }
+   }
+}
