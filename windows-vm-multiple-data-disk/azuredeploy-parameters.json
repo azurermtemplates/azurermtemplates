@@ -24,13 +24,10 @@
         "value": "myVNET"
     },
     "vmSize": {
-        "value": "Standard_A1"
+        "value": "Standard_D2"
     },
     "vmName" : {
       "value" : "myVM"
-    },
-    "numberOfDataDisks": {
-        "value": 3
     },
     "sizeOfEachDataDiskInGB" : {
         "value":"100"
