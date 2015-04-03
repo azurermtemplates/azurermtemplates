@@ -14,7 +14,7 @@
         },
         "numberOfInstances": {
             "type": "int",
-            "defaultValue": 2
+            "defaultValue": 5
         },
         "availabilitySetName" : {
             "type":"string",
