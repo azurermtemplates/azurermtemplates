@@ -14,7 +14,7 @@
         },
         "numberOfInstances": {
             "type": "int",
-            "defaultValue": 5
+            "defaultValue": 2
         },
         "availabilitySetName" : {
             "type":"string",
@@ -62,14 +62,6 @@
         "subnet2Prefix": {
             "type": "string",
             "defaultValue": "10.0.1.0/24"
-        },
-        "dnsName":{
-            "type":"string",
-            "defaultValue":"myDNS"
-        },
-        "publicIPAddressName" : {
-            "type" : "string",
-            "defaultValue" : "myPublicIP"
         }
     },
     "variables": {
@@ -118,13 +110,14 @@
         {
             "apiVersion": "2014-12-01-preview",
             "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[parameters('publicIPAddressName')]",
+            "name": "[concat('publicIP', copyIndex())]",
             "location": "[parameters('region')]",
+            "copy": {
+                "name": "publicIPLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
             "properties": {
-                "publicIPAllocationMethod": "Dynamic",
-                "dnsSettings": {
-                    "domainNameLabel": "[parameters('dnsName')]"
-                }
+                "publicIPAllocationMethod": "Dynamic"
             }
         },
         {
@@ -138,7 +131,7 @@
             },
             "dependsOn": [
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
-                "[concat('Microsoft.Network/publicIPAddresses/', parameters('publicIPAddressName'))]"
+                "[concat('Microsoft.Network/publicIPAddresses/', 'publicIP', copyindex())]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -147,7 +140,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat('publicIP', copyindex()))]"
                             },
                             "subnet": {
                                 "id": "[variables('subnet1Ref')]"

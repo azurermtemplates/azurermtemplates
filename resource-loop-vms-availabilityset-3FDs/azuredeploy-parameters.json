@@ -1,6 +1,6 @@
 ﻿{
     "storageAccountName" : {
-        "value":"storageAccountName"
+        "value":"uniqueStorageAccountName"
     },
     "adminUsername": {
         "value": ""
@@ -9,7 +9,7 @@
         "value": ""
     },
     "numberOfInstances": {
-        "value": 5
+        "value": 2
     },
     "availabilitySetName":{
         "value":"availabilitySetName"
@@ -20,8 +20,8 @@
     "updateDomainCount" :{
         "value": "5"
     },
-    "subscriptionId":{
-        "value": ""
+    "subscriptionId": {
+        "value": "98234d73-as24-466d-b9e0-d73235447c69"
     },
     "region": {
         "value": "West US"
@@ -30,7 +30,7 @@
         "value": "myVNET"
     },
     "vmSize": {
-        "value": "Standard_A1"
+        "value": "Standard_A0"
     },
     "subnet1Name": {
         "value": "Subnet-1"
@@ -46,11 +46,5 @@
     },
     "subnet2Prefix": {
         "value": "10.0.1.0/24"
-    },
-    "dnsName":{
-        "value":"myDNS"
-    },
-    "publicIPAddressName" : {
-        "value" : "myPublicIP"
     }
 }
