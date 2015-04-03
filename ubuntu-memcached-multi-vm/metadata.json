@@ -1,0 +1,7 @@
+{
+  "TemplateName": "Ubuntu 14.04 multiple VMs with memcached and apache cache test page",
+  "Description": "This template creates one oe more Ubuntu 14.04 VMs and installs memcached and apache cache test page",
+  "ShortDescription": "This template creates one oe more Ubuntu 14.04 VMs and installs memcached and apache cache test page",
+  "GithubUsername": "arsenvlad",
+  "DateUpdated": "2015-04-03"
+}

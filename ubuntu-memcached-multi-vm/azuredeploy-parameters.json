@@ -1,0 +1,27 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "newStorageAccountName": {
+            "value": "sa20150403"
+        },
+        "location": {
+            "value": "West US"
+        },
+        "domainName": {
+            "value": "memcached20150403"
+        },
+        "adminUsername": {
+            "value": "azureuser"
+        },
+        "adminPassword": {
+            "value": "MSrocks@2015"
+        },
+        "subscriptionId": {
+            "value": "d2553556-6ac3-4241-87e8-a66deba80362"
+        },
+        "numberOfMemcachedInstances": {
+            "value": 1
+        }
+    }
+}
