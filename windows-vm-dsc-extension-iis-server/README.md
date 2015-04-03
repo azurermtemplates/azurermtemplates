@@ -31,6 +31,6 @@ Below are the parameters that the template expects
 | subscriptionId | Your Azure Subscription Id |
 | nicName | Name for the Network Interface |
 | vmExtensionName | Name for the Extension |
-| modulesUrl | Url for the DSC configuration module |
+| modulesUrl | Url for the DSC configuration module <br> <ul> <li><b>Example:</b> https://xyz.blob.core.windows.net/abc/ContosoWebsite.ps1.zip</li></ul>|
 | sasToken | SAS Token for the DSC configuration module |
-| configurationFunction | Name of the function to run in the DSC configuration |
+| configurationFunction | Name of the function to run in the DSC configuration <br> <ul> <li><b>Example:</b> ContosoWebsite.ps1/ContosoWebsite </li></ul> |

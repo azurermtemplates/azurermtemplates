@@ -48,7 +48,7 @@
       "value": ""
     },
     "configurationFunction": {
-      "value": "ContosoWebsite.ps1\ContosoWebsite.ps1"
+      "value": "ContosoWebsite.ps1\ContosoWebsite"
     },
     "MachineName": {
       "value": ""
