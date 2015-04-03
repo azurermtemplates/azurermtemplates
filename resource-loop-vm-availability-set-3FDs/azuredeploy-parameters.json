@@ -12,10 +12,10 @@
         "value": 5
     },
     "faultDomainCount" : {
-        "value": 3
+        "value": "3"
     },
     "updateDomainCount" :{
-        "value": 5
+        "value": "5"
     },
     "subscriptionId":{
         "value": ""
