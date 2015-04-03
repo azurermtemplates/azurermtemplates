@@ -17,12 +17,12 @@
             "defaultValue": 5
         },
         "faultDomainCount" : {
-            "type":"int",
-            "defaultValue":3
+            "type":"string",
+            "defaultValue":"3"
         },
         "updateDomainCount" :{
-            "type":"int",
-            "defaultValue":5
+            "type":"string",
+            "defaultValue":"5"
         },
         "subscriptionId": {
             "type": "string"

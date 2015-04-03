@@ -8,6 +8,10 @@
     "location": {
       "type": "String",
       "defaultValue" : "West US",
+    },
+    "faultDomainCount":{
+      "type":"String",
+      "defaultValue":"3"
     }
   },
   "resources": [
@@ -17,7 +21,7 @@
       "apiVersion": "2014-12-01-preview",
       "location": "[parameters('location')]",
       "properties": {
-        "PlatformFaultDomainCount":"3"
+        "PlatformFaultDomainCount":"[parameters('faultDomainCount')]"
       }
     }
   ]
