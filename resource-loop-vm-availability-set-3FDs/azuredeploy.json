@@ -162,7 +162,7 @@
                 "PlatformFaultDomainCount":"[parameters('faultDomainCount')]",
                 "PlatformUpdateDomainCount":"[parameters('updateDomainCount')]"
             }
-        }
+        },
         {
             "apiVersion": "2014-12-01-preview",
             "type": "Microsoft.Compute/virtualMachines",
