@@ -16,6 +16,10 @@
             "type": "int",
             "defaultValue": 5
         },
+        "availabilitySetName" : {
+            "type":"string",
+            "defaultValue":"availabilitySetName"
+        },
         "faultDomainCount" : {
             "type":"string",
             "defaultValue":"3"

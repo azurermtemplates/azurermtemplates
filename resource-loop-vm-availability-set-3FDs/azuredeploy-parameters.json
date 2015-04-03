@@ -11,6 +11,9 @@
     "numberOfInstances": {
         "value": 5
     },
+    "availabilitySetName":{
+        "value":"availabilitySetName"
+    },
     "faultDomainCount" : {
         "value": "3"
     },
