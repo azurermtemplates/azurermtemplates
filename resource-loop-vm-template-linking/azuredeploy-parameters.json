@@ -7,5 +7,11 @@
     },
     "subscriptionId" : {
         "value" : "yourSubscriptionID"
+    },
+    "adminUsername" : {
+        "value" : ""
+    },
+    "adminPassword" : {
+        "value" : ""
     }
 }

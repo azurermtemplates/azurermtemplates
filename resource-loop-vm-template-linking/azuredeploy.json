@@ -23,15 +23,19 @@
         },
         "scaleNumberPerRegion" : {
             "type" : "int",
-            "defaultValue" : 50
+            "defaultValue" : 2
         },
         "subscriptionId" : {
+          "type" : "string"
+        },
+        "adminUsername" : {
+          "type" : "string"
+        },
+        "adminPassword" : {
           "type" : "string"
         }
     },
   	"variables" : {
-      "adminUsername" : "cloudguy",
-      "adminPassword" : "abc_123!",
       "baseTemplateUri" : "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/resource-loop-vm-template-linking/resourceloop-base-template.json",
 
   		"stgAcctName1" : "[concat(parameters('storageAccountNamePrefix'),'1')]",
@@ -77,8 +81,8 @@
             },
             "parameters": {
                 "storageAccountName": { "value": "[variables('stgAcctName1')]"},
-                "adminUsername" :  { "value": "[variables('adminUsername')]"},
-                "adminPassword" :  { "value": "[variables('adminPassword')]"},
+                "adminUsername" :  { "value": "[parameters('adminUsername')]"},
+                "adminPassword" :  { "value": "[parameters('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
                 "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
                 "region" : { "value": "West Europe"},
@@ -101,8 +105,8 @@
             },
             "parameters": {
                 "storageAccountName": { "value": "[variables('stgAcctName2')]"},
-                "adminUsername" :  { "value": "[variables('adminUsername')]"},
-                "adminPassword" :  { "value": "[variables('adminPassword')]"},
+                "adminUsername" :  { "value": "[parameters('adminUsername')]"},
+                "adminPassword" :  { "value": "[parameters('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
                 "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
                 "region" : { "value": "East Asia"},
@@ -125,8 +129,8 @@
             },
             "parameters": {
                 "storageAccountName": { "value": "[variables('stgAcctName3')]"},
-                "adminUsername" :  { "value": "[variables('adminUsername')]"},
-                "adminPassword" :  { "value": "[variables('adminPassword')]"},
+                "adminUsername" :  { "value": "[parameters('adminUsername')]"},
+                "adminPassword" :  { "value": "[parameters('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
                 "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
                 "region" : { "value": "West US"},
@@ -149,8 +153,8 @@
             },
             "parameters": {
                 "storageAccountName": { "value": "[variables('stgAcctName4')]"},
-                "adminUsername" :  { "value": "[variables('adminUsername')]"},
-                "adminPassword" :  { "value": "[variables('adminPassword')]"},
+                "adminUsername" :  { "value": "[parameters('adminUsername')]"},
+                "adminPassword" :  { "value": "[parameters('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
                 "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
                 "region" : { "value": "East US"},
@@ -173,8 +177,8 @@
             },
             "parameters": {
                 "storageAccountName": { "value": "[variables('stgAcctName5')]"},
-                "adminUsername" :  { "value": "[variables('adminUsername')]"},
-                "adminPassword" :  { "value": "[variables('adminPassword')]"},
+                "adminUsername" :  { "value": "[parameters('adminUsername')]"},
+                "adminPassword" :  { "value": "[parameters('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
                 "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
                 "region" : { "value": "Southeast Asia"},
