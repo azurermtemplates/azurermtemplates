@@ -46,6 +46,9 @@
         "vmSize": {
             "type": "string",
             "defaultValue": "Standard_A2"
+        },
+        "nicNamePrefix" : {
+          "type" : "string"
         }
     },
     "variables": {
@@ -61,7 +64,7 @@
         {
             "apiVersion": "2014-12-01-preview",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[concat('nic', copyindex())]",
+            "name": "[concat(parameters('nicNamePrefix'), copyindex())]",
             "location": "[parameters('region')]",
             "copy": {
                 "name": "nicLoop",
@@ -91,7 +94,7 @@
                 "count": "[parameters('numberOfInstances')]"
             },
             "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', 'nic', copyindex())]"
+                "[concat('Microsoft.Network/networkInterfaces/', parameters('nicNamePrefix'), copyindex())]"
             ],
             "properties": {
                 "hardwareProfile": {
@@ -118,7 +121,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('nic', copyindex()))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('nicNamePrefix'), copyindex()))]"
                         }
                     ]
                 }
