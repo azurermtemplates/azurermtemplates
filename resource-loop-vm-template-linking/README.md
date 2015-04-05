@@ -6,7 +6,7 @@
 
 This template allows you to create 'N' number of Virtual Machines based on the 'numberOfInstances' parameter specified during the template deployment. This template also deploys a Storage Account, Virtual Network, 'N' number of Public IP addresses/Network Inerfaces/Virtual Machines.
 
-Note: Please limit the number of VMs to 40 per Storage Account.
+Note: The Recommended limit of number of disks per Storage Account is 40.
 
 Below are the parameters that the template expects
 

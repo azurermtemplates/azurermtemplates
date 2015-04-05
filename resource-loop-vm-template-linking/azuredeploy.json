@@ -5,6 +5,15 @@
         "storageAccountNamePrefix": {
             "type": "string"
         },
+        "subscriptionId" : {
+          "type" : "string"
+        },
+        "adminUsername" : {
+          "type" : "string"
+        },
+        "adminPassword" : {
+          "type" : "string"
+        },
         "virtualNetworkNamePrefix" : {
             "type": "string",
             "defaultValue" : "myVNET"
@@ -24,15 +33,6 @@
         "scaleNumberPerRegion" : {
             "type" : "int",
             "defaultValue" : 2
-        },
-        "subscriptionId" : {
-          "type" : "string"
-        },
-        "adminUsername" : {
-          "type" : "string"
-        },
-        "adminPassword" : {
-          "type" : "string"
         }
     },
   	"variables" : {
