@@ -11,7 +11,7 @@ To make sure your template is added to Azure.com index, please follow these guid
 3.	The template folder must host the **scripts** that are needed for successful template execution
 4.	The template folder must contain a **metadata.json** file to allow the template to be indexed on [Azure.com](http://azure.microsoft.com)
   *	Guidelines on the metadata file below
-5.	Every parameter in the template must have the **description** specified using the metadata property. See the starter template is provided [here](https://github.com/azurermtemplates/azurermtemplates/tree/master/100_starter_template_with_validation) on how to do this
+5.	Every parameter in the template must have the **description** specified using the metadata property. See the starter template is provided [here](https://github.com/azurermtemplates/azurermtemplates/tree/master/100-starter-template-with-validation) on how to do this
 6.	OPTIONAL: The folder may contain a **Readme.md** file for any additional information about the template
 
 ## metadata.json file
@@ -47,7 +47,7 @@ The metadata.json file will be validated using these rules
 
 ## Starter template
 
-A starter template is provided [here](https://github.com/azurermtemplates/azurermtemplates/tree/master/100_starter_template_with_validation) for you to follow
+A starter template is provided [here](https://github.com/azurermtemplates/azurermtemplates/tree/master/100-starter-template-with-validation) for you to follow
 
 
 ## Index
@@ -97,3 +97,4 @@ You can deploy the template to Azure by clicking the "Deploy to Azure" button be
 | 40 | <a href="https://azuredeploy.net/?repository=https://github.com/azurermtemplates/azurermtemplates/tree/master/virtual-machine-from-user-image" target="_blank"><img src="http://azuredeploy.net/deploybutton_small.png"/></a> | [mahthi](https://github.com/mahthi) | [Deploy a Virtual Machine from a User Image](https://github.com/azurermtemplates/azurermtemplates/tree/master/virtual-machine-from-user-image) | This template allows you to create a Virtual Machines from a User image. Prerequisite - The Storage Account with the User Image VHD should already exist in the same resource group. |
 | 41 | <a href="https://azuredeploy.net/?repository=https://github.com/azurermtemplates/azurermtemplates/tree/master/resource-loop-virtualmachines-userimage" target="_blank"><img src="http://azuredeploy.net/deploybutton_small.png"/></a> | [mahthi](https://github.com/mahthi) | [Deploy 'n' Virtual Machines from a user image using Resource Loops](https://github.com/azurermtemplates/azurermtemplates/tree/master/resource-loop-virtualmachines-userimage) | This template allows you to create 'N' number of Virtual Machines from a User image based on the 'numberOfInstances' parameter specified during the template deployment.  |
 | 42 | <a href="https://azuredeploy.net/?repository=https://github.com/azurermtemplates/azurermtemplates/tree/master/resource-loop-vms-userimage-mutilplestorageaccounts" target="_blank"><img src="http://azuredeploy.net/deploybutton_small.png"/></a> | [mahthi](https://github.com/mahthi) | [Deploy 'n' Virtual Machines from a user image across 3 storage accounts in the same region](https://github.com/azurermtemplates/azurermtemplates/tree/master/resource-loop-vms-userimage-mutilplestorageaccounts) | This template allows you to create VMs from User image across 3 Storage accounts in the same region. You can also chose to specify the number of Virtual Machines that you want to spin up per storage accounts where the user image is placed [Recommended number is 40]. There are some critical pre-requisties for this template, please refer to the readme in the template folder for additional details.  |
+| 43 | <a href="https://azuredeploy.net/?repository=https://github.com/azurermtemplates/azurermtemplates/tree/master/2-vms-2-FDs-no-resource-loops" target="_blank"><img src="http://azuredeploy.net/deploybutton_small.png"/></a> | [singhkay](https://github.com/singhkay) | [Create 2 VMs in a Availability Set with 2 FDs without resource loops](https://github.com/azurermtemplates/azurermtemplates/tree/master/2-vms-2-FDs-no-resource-loops) | This template allows you to create 2 VMs in an Availabiltiy Set with 2 Fault Domains without resource loops |
