@@ -5,6 +5,15 @@
         "storageAccountNamePrefix": {
             "type": "string"
         },
+        "adminUsername" : {
+          "type" : "string"
+        },
+        "adminPassword" : {
+          "type" : "string"
+        },
+        "subscriptionId" : {
+          "type" : "string"
+        },
         "virtualNetworkNamePrefix" : {
             "type": "string",
             "defaultValue" : "myVNET"
@@ -24,19 +33,10 @@
         "scaleNumberPerRegion" : {
             "type" : "int",
             "defaultValue" : 2
-        },
-        "subscriptionId" : {
-          "type" : "string"
-        },
-        "adminUsername" : {
-          "type" : "string"
-        },
-        "adminPassword" : {
-          "type" : "string"
         }
     },
   	"variables" : {
-      "baseTemplateUri" : "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/resource-loop-vm-template-linking/resourceloop-base-template.json",
+      "baseTemplateUri" : "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/docker-containers-vm-resource-loops/resourceloop-base-template.json",
 
   		"stgAcctName1" : "[concat(parameters('storageAccountNamePrefix'),'1')]",
   		"stgAcctName2" : "[concat(parameters('storageAccountNamePrefix'),'2')]",
@@ -80,9 +80,9 @@
               "contentVersion": "1.0.0.0"
             },
             "parameters": {
-                "storageAccountName": { "value": "[variables('stgAcctName1')]"},
-                "adminUsername" :  { "value": "[parameters('adminUsername')]"},
-                "adminPassword" :  { "value": "[parameters('adminPassword')]"},
+                "stgAccountName": { "value": "[variables('stgAcctName1')]"},
+                "adminUsername" :  { "value": "[variables('adminUsername')]"},
+                "adminPassword" :  { "value": "[variables('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
                 "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
                 "region" : { "value": "West Europe"},
@@ -104,9 +104,9 @@
               "contentVersion": "1.0.0.0"
             },
             "parameters": {
-                "storageAccountName": { "value": "[variables('stgAcctName2')]"},
-                "adminUsername" :  { "value": "[parameters('adminUsername')]"},
-                "adminPassword" :  { "value": "[parameters('adminPassword')]"},
+                "stgAccountName": { "value": "[variables('stgAcctName2')]"},
+                "adminUsername" :  { "value": "[variables('adminUsername')]"},
+                "adminPassword" :  { "value": "[variables('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
                 "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
                 "region" : { "value": "East Asia"},
@@ -128,9 +128,9 @@
               "contentVersion": "1.0.0.0"
             },
             "parameters": {
-                "storageAccountName": { "value": "[variables('stgAcctName3')]"},
-                "adminUsername" :  { "value": "[parameters('adminUsername')]"},
-                "adminPassword" :  { "value": "[parameters('adminPassword')]"},
+                "stgAccountName": { "value": "[variables('stgAcctName3')]"},
+                "adminUsername" :  { "value": "[variables('adminUsername')]"},
+                "adminPassword" :  { "value": "[variables('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
                 "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
                 "region" : { "value": "West US"},
@@ -152,9 +152,9 @@
               "contentVersion": "1.0.0.0"
             },
             "parameters": {
-                "storageAccountName": { "value": "[variables('stgAcctName4')]"},
-                "adminUsername" :  { "value": "[parameters('adminUsername')]"},
-                "adminPassword" :  { "value": "[parameters('adminPassword')]"},
+                "stgAccountName": { "value": "[variables('stgAcctName4')]"},
+                "adminUsername" :  { "value": "[variables('adminUsername')]"},
+                "adminPassword" :  { "value": "[variables('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
                 "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
                 "region" : { "value": "East US"},
@@ -176,9 +176,9 @@
               "contentVersion": "1.0.0.0"
             },
             "parameters": {
-                "storageAccountName": { "value": "[variables('stgAcctName5')]"},
-                "adminUsername" :  { "value": "[parameters('adminUsername')]"},
-                "adminPassword" :  { "value": "[parameters('adminPassword')]"},
+                "stgAccountName": { "value": "[variables('stgAcctName5')]"},
+                "adminUsername" :  { "value": "[variables('adminUsername')]"},
+                "adminPassword" :  { "value": "[variables('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
                 "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
                 "region" : { "value": "Southeast Asia"},

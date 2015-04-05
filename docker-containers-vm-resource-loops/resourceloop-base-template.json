@@ -200,7 +200,10 @@
                 "typeHandlerVersion": "0.6",
                 "settings": {
                     "composeup": {
-                         "service": {
+                         "service1": {
+                             "image": "nginx"
+                         },
+                         "service2": {
                              "image": "redis"
                          }
                     },
