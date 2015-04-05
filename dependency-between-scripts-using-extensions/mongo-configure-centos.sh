@@ -8,4 +8,4 @@ echo "gpgcheck=0" >> /etc/yum.repos.d/mongodb.repo
 echo "enabled=1" >> /etc/yum.repos.d/mongodb.repo
 
 # Install updates
-yum -y update
+#yum -y update
