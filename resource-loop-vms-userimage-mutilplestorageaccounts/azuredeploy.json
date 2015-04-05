@@ -1,0 +1,125 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "userImageStorageAccountNamePrefix": {
+            "type": "string",
+            "defaultValue": "userImageStorageAccountName"
+        },
+        "userImageStorageContainerName": {
+            "type": "string",
+            "defaultValue": "userImageStorageContainerName"
+        },
+        "userImageVhdName": {
+            "type": "string",
+            "defaultValue": "userImageVhdName"
+        },
+        "userImageOsType": {
+            "type": "string",
+            "allowedValues": [
+                "windows",
+                "linux"
+            ]
+        },
+        "subscriptionId": {
+            "type": "string"
+        },
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPassword": {
+            "type": "string"
+        },
+        "region": {
+            "type": "string"
+        },
+        "virtualNetworkName": {
+            "type": "string"
+        },
+        "vmNamePrefix": {
+            "type": "string",
+            "defaultValue": "myVM"
+        },
+        "nicNamePrefix": {
+            "type": "string",
+            "defaultValue": "myNic"
+        },
+        "scaleNumberPerStorageAccount": {
+            "type": "int",
+            "defaultValue": 2
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_A2"
+        }
+    },
+    "variables": {
+        "baseTemplateUri": "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/resource-loop-vms-userimage-mutilplestorageaccounts/userimage-loop-basetemplate.json",
+        "storageAccountCount": 3,
+        "nicref0": "[concat(parameters('nicNamePrefix'),'0')]",
+        "nicref1": "[concat(parameters('nicNamePrefix'),'10')]",
+        "nicref2": "[concat(parameters('nicNamePrefix'),'20')]",
+        "vmref0": "[concat(parameters('vmNamePrefix'),'0')]",
+        "vmref1": "[concat(parameters('vmNamePrefix'),'10')]",
+        "vmref2": "[concat(parameters('vmNamePrefix'),'20')]"
+    },
+    "resources": [
+        {
+            "name": "[concat('instance',copyindex())]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "copy": {
+                "name": "deploymentloop",
+                "count": "[variables('storageAccountCount')]"
+            },
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('baseTemplateUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "userImageStorageAccountName": {
+                        "value": "[concat(parameters('userImageStorageAccountNamePrefix'),copyindex())]"
+                    },
+                    "userImageStorageContainerName": {
+                        "value": "[parameters('userImageStorageContainerName')]"
+                    },
+                    "userImageVhdName": {
+                        "value": "[parameters('userImageVhdName')]"
+                    },
+                    "osType": {
+                        "value": "[parameters('userImageOsType')]"
+                    },
+                    "adminUsername": {
+                        "value": "[parameters('adminUsername')]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('adminPassword')]"
+                    },
+                    "numberOfInstances": {
+                        "value": "[parameters('scaleNumberPerStorageAccount')]"
+                    },
+                    "subscriptionId": {
+                        "value": "[parameters('subscriptionId')]"
+                    },
+                    "region": {
+                        "value": "[parameters('region')]"
+                    },
+                    "nicNamePrefix": {
+                        "value": "[variables(concat('nicref',copyindex()))]"
+                    },
+                    "vmNamePrefix": {
+                        "value": "[variables(concat('vmref',copyindex()))]"
+                    },
+                    "virtualNetworkName": {
+                        "value": "[parameters('virtualNetworkName')]"
+                    },
+                    "vmSize": {
+                        "value": "[parameters('vmSize')]"
+                    }
+                }
+            }
+        }
+    ]
+}

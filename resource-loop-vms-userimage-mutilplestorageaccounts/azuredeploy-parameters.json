@@ -1,0 +1,41 @@
+﻿{
+    "userImageStorageAccountNamePrefix": {
+        "value" : "userImageStorageAccountNamePrefix"
+    },
+    "userImageStorageContainerName" : {
+        "value" : "userImageStorageContainerName"
+    },
+    "userImageVhdName" : {
+        "value" : "userImageVhdName"
+    },
+    "userImageOsType" : {
+        "value" : "userImageOsType"
+    },
+    "vmNamePrefix" : {
+        "value" : "cloudeeyvm"
+    },
+    "nicNamePrefix" : {
+        "value" : "cloudeeynic"
+    },
+    "adminUsername": {
+        "value": ""
+    },
+    "adminPassword": {
+        "value": ""
+    },
+    "scaleNumberPerStorageAccount": {
+        "value": 2
+    },
+    "subscriptionId": {
+        "value": "8459cd1c-aa24-346d-b7e0-d73955447c69"
+    },
+    "region": {
+        "value": "West US"
+    },
+    "virtualNetworkName": {
+        "value": "myVNETName"
+    },
+    "vmSize": {
+        "value": "Standard_A2"
+    }
+}
