@@ -286,7 +286,7 @@
                 "typeHandlerVersion": "1.2",
                 "settings": {
                     "fileUris": [
-                        "https://raw.githubusercontent.com/arsenvlad/azurermtemplates/memcached/ubuntu-memcached-multi-vm/install_memcached.sh"
+                        "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/ubuntu-memcached-multi-vm/install_memcached.sh"
                     ],
                     "commandToExecute": "[concat('sh install_memcached.sh ', copyindex(), ' ', reference(concat('nicmemcached', copyindex())).ipConfigurations[0].properties.privateIPAddress, ' ', reference('nicapache').ipConfigurations[0].properties.privateIPAddress)]"
                 }
@@ -306,7 +306,7 @@
                 "typeHandlerVersion": "1.2",
                 "settings": {
                     "fileUris": [
-                        "https://raw.githubusercontent.com/arsenvlad/azurermtemplates/memcached/ubuntu-memcached-multi-vm/install_apache.sh"
+                        "https://github.com/azurermtemplates/azurermtemplates/blob/master/ubuntu-memcached-multi-vm/install_apache.sh"
                     ],
                     "commandToExecute": "[concat('sh install_apache.sh ', parameters('numberOfMemcachedInstances'), ' ', parameters('subnetMemcachedPrefix'))]"
                 }
