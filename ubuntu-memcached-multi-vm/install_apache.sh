@@ -31,7 +31,7 @@ apt-get -y update
 # Currently installed packages are not removed.
 # Packages that are not already installed are not retrieved nor installed.
 # New versions of currently installed packages that cannot be upgraded without changing the install status of another package are left at their current version.
-# apt-get -y upgrade
+apt-get -y upgrade
  
 # Install apache, php5, and php5-memcached extension
 apt-get -y install apache2 php5 php5-memcached

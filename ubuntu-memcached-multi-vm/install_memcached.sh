@@ -16,7 +16,7 @@ apt-get -y update
 # Currently installed packages are not removed.
 # Packages that are not already installed are not retrieved nor installed.
 # New versions of currently installed packages that cannot be upgraded without changing the install status of another package are left at their current version.
-# apt-get -y upgrade
+apt-get -y upgrade
  
 # Memcached is a C program and depends on a recent version of GCC and a recent version of libevent.
 apt-get -y install memcached
