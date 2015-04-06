@@ -306,7 +306,7 @@
                 "typeHandlerVersion": "1.2",
                 "settings": {
                     "fileUris": [
-                        "https://github.com/azurermtemplates/azurermtemplates/blob/master/ubuntu-memcached-multi-vm/install_apache.sh"
+                        "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/ubuntu-memcached-multi-vm/install_apache.sh"
                     ],
                     "commandToExecute": "[concat('sh install_apache.sh ', parameters('numberOfMemcachedInstances'), ' ', parameters('subnetMemcachedPrefix'))]"
                 }
