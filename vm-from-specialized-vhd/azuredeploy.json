@@ -3,36 +3,48 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "osDiskVhdUri": {
-            "type": "string"
-        },
-        "adminUserName": {
-            "type": "string"
-        },
-        "adminPassword": {
-            "type": "securestring"
+            "type": "string",
+            "metadata": {
+                "Description": "Uri of the existing VHD"
+            }
         },
         "osType": {
             "type": "string",
             "allowedValues": [
                 "windows",
                 "linux"
-            ]
+            ],
+            "metadata": {
+                "Description": "Type of OS on the existing vhd"
+            }
         },
         "location": {
             "type": "String",
-            "defaultValue": "West US"
+            "defaultValue": "West US",
+            "metadata": {
+                "Description": "Location to create the VM in"
+            }
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "Standard_A2"
+            "defaultValue": "Standard_A2",
+            "metadata": {
+                "Description": "Size of the VM"
+            }
         },
         "vmName": {
             "type": "string",
-            "defaultValue": "myVM"
+            "defaultValue": "myVM",
+            "metadata": {
+                "Description": "Name of the VM"
+            }
         },
         "nicName": {
             "type": "string",
-            "defaultValue": "myNIC"
+            "defaultValue": "myNIC",
+            "metadata": {
+                "Description": "NIC to attach the new VM to"
+            }
         }
     },
     "resources": [{
@@ -43,11 +55,6 @@
         "properties": {
             "hardwareProfile": {
                 "vmSize": "[parameters('vmSize')]"
-            },
-            "osProfile": {
-                "computername": "[parameters('vmName')]",
-                "adminUsername": "[parameters('adminUsername')]",
-                "adminPassword": "[parameters('adminPassword')]"
             },
             "storageProfile": {
                 "osDisk": {

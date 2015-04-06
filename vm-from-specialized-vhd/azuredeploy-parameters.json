@@ -1,44 +1,26 @@
 ﻿{
     "adminUsername": {
-        "value": "cloudguy"
+        "value": ""
     },
     "adminPassword": {
-        "value": "abc_123!"
+        "value": ""
     },
-    "userImageStorageAccountName": {
-        "value" : "clodfed13"
-    },
-    "userImageStorageContainerName" : {
-        "value" : "vhds"
-    },
-    "userImageVhdName" : {
-        "value" : "sample.vhd"
-    },
-    "dnsNameForPublicIP": {
-        "value": "clodfed13"
+    "osDiskVhdUri": {
+        "value" : "https://test.blob.core.windows.net/vhds/example.vhd"
     },
     "osType" : {
-        "value" : "linux"
-    },
-    "subscriptionId": {
-        "value": "87a9cd1c-aa24-446d-b7e0-d73955447c69"
+        "value" : ""
     },
     "location": {
         "value": "West US"
-    },
-    "virtualNetworkName": {
-        "value": "myVNET"
     },
     "vmSize": {
         "value": "Standard_A2"
     },
     "vmName" : {
-      "value" : "myVM"
-    },
-    "publicIPAddressName" : {
-      "value" : "myPublicIP"
+      "value" : ""
     },
     "nicName" : {
-      "value" : "myNic"
+      "value" : ""
     }
 }
