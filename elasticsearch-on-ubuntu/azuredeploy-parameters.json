@@ -1,0 +1,32 @@
+{
+    "dnsNameforLBIP": {
+        "value":""
+    },
+    "storageAccountName" : {
+        "value":""
+    },
+    "adminUsername": {
+        "value": "trent"
+    },
+    "adminPassword": {
+        "value": ""
+    },
+    "dataNodes": {
+        "value": 2
+    },
+    "subscriptionId": {
+        "value": ""
+    },
+    "region": {
+        "value": "West US"
+    },
+    "virtualNetworkName": {
+        "value": "elasticsearch"
+    },
+    "esClusterName": {
+        "value": "elasticsearch-fullscale"
+    },
+    "vmSizeDataNodes": {
+        "value": "Standard_A1"
+    }
+}

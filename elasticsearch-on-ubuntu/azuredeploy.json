@@ -1,0 +1,496 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "type": "string",
+            "metadata": {
+                "Description": "Admin username used when provisioning virtual machines"
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "Description": "Admin password used when provisioning virtual machines"
+            }
+        },
+        "storageAccountName": {
+            "type": "string",
+            "defaultValue" : "uniqueStorageAccountName",
+            "metadata": {
+                "Description": "Unique namespace for the Storage Account where the Virtual Machine's disks will be placed"
+            }
+        },
+        "subscriptionId": {
+            "type": "string",
+            "metadata": {
+                "Description": "Microsoft Azure SubscriptionId to provision resources to"
+            }
+        },
+        "region": {
+            "type": "string",
+            "defaultValue": "West US",
+            "metadata": {
+                "Description": "Location where resources will be provisioned"
+            }
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "defaultValue": "myVNET",
+            "metadata": {
+                "Description": "Virtual Network"
+            }
+        },
+        "vmSizeMasterNodes": {
+            "type": "string",
+            "defaultValue": "Standard_A0",
+            "metadata": {
+                "Description": "Size of the Elasticsearch master nodes"
+            }
+        },
+        "vmSizeDataNodes": {
+            "type": "string",
+            "defaultValue": "Standard_A1",
+            "metadata": {
+                "Description": "Size of the Elasticsearch data nodes"
+            }
+        },
+        "dataNodes": {
+            "type": "int",
+            "defaultValue": 2,
+            "metadata": {
+                "Description": "Number of Elasticsearch data nodes (2 is the minimum)"
+            }
+        },
+        "addressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+                "Description": "Address space for the VNET"
+            }
+        },
+        "subnet1Name": {
+            "type": "string",
+            "defaultValue": "Data",
+            "metadata": {
+                "Description": "Subnet name for the VNET that resources will be provisionined in to"
+            }
+        },
+        "subnet1Prefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/24",
+            "metadata": {
+                "Description": "Address space for the subnet"
+            }
+        },
+        "dnsNameforLBIP": {
+            "type": "string",
+            "defaultValue":"uniqueName",
+            "metadata": {
+                "Description": "Load balancer subdomain name: for example (<subdomain>.westus.cloudapp.azure.com)"
+            }
+        },
+        "esClusterName": {
+            "type": "string",
+            "defaultValue": "elasticsearch",
+            "metadata": {
+                "Description": "The name of the elasticsearch cluster"
+            }
+        },
+        "esVersion": {
+            "type": "string",
+            "defaultValue": "1.5.0",
+            "allowedValues": ["1.5.0","1.4.4","1.3.8"],
+            "metadata": {
+                "Description": "Elasticsearch versino to install"
+            }
+        },
+        "dataDisksCount": {
+            "type": "int",
+            "defaultValue":2,
+            "metadata": {
+                "Description": "Number of data disks to attach to each data node (consider VM size limits when setting this - NOT IMPLEMENTED)"
+            }
+        },
+        "dataDiskSize": {
+            "type": "int",
+            "defaultValue":200,
+            "metadata": {
+                "Description": "Size of each data disk attached to data nodes in (Gb)"
+            }
+        },
+        "installMarvel": {
+            "type": "string",
+            "defaultValue": "no",
+            "allowedValues": ["yes","no"],
+            "metadata": {
+                "Description": "Install the marvel plugin"
+            }
+        }
+    },
+    "variables": {
+        "vmStorageAccountContainerName": "vhd",
+        "vmSourceImageName": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+        "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',parameters('subnet1Name'))]",
+        "sourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',variables('vmSourceImageName'))]",
+        "scriptUrl":"https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/elasticsearch-on-ubuntu/elasticsearch-azure-install.sh"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('storageAccountName')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('region')]",
+            "properties": {
+                "accountType": "Standard_LRS"
+            }
+        },
+        {
+          "apiVersion": "2014-12-01-preview",
+          "type": "Microsoft.Compute/availabilitySets",
+          "name": "elasticsearchData",
+          "location": "[parameters('region')]",
+          "properties": {
+          }
+        },
+        {
+          "apiVersion": "2014-12-01-preview",
+          "type": "Microsoft.Compute/availabilitySets",
+          "name": "elasticsearchMaster",
+          "location": "[parameters('region')]",
+          "properties": {
+          }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('virtualNetworkName')]",
+            "location": "[parameters('region')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('subnet1Name')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnet1Prefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "publicIp",
+            "location": "[parameters('region')]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('dnsNameforLBIP')]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[concat('nic', copyindex())]",
+            "location": "[parameters('region')]",
+            "copy": {
+                "name": "nicLoop",
+                "count": "[parameters('dataNodes')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnet1Ref')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[concat('myvm', copyindex())]",
+            "location": "[parameters('region')]",
+            "copy": {
+                "name": "virtualMachineLoop",
+                "count": "[parameters('dataNodes')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', 'nic', copyindex())]",
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
+                "[concat('Microsoft.Compute/availabilitySets/', 'elasticsearchData')]",
+                "[concat('Microsoft.Network/networkInterfaces/', 'nic', copyindex())]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', 'elasticsearchData')]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSizeDataNodes')]"
+                },
+                "osProfile": {
+                    "computername": "[concat('esData', copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                "sourceImage": {
+                    "id": "[variables('sourceImageName')]"
+                },
+                "dataDisks" : [
+                    {
+                        "name" : "datadisk1",
+                        "diskSizeGB" : "[parameters('dataDiskSize')]",
+                        "lun" : 0,
+                        "vhd":{
+                            "Uri" : "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/','myvm', copyindex(),'dataDisk1' ,'.vhd')]"
+                        }
+                    },{
+                        "name" : "datadisk2",
+                        "diskSizeGB" : "[parameters('dataDiskSize')]",
+                        "lun" : 1,
+                        "vhd":{
+                            "Uri" : "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/','myvm', copyindex() ,'dataDisk2','.vhd')]"
+                        }
+                    }
+                ],
+                "destinationVhdsContainer" : "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
+            },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('nic', copyindex()))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat('myvm', copyindex(), '/installelasticsearch')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('region')]",
+            "copy": {
+                "name": "virtualMachineExtensionsLoop",
+                "count": "[parameters('dataNodes')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', 'myvm', copyindex())]",
+                "[concat('Microsoft.Network/networkInterfaces/', 'masterNodeNic0')]",
+                "[concat('Microsoft.Network/networkInterfaces/', 'masterNodeNic1')]",
+                "[concat('Microsoft.Network/networkInterfaces/', 'masterNodeNic2')]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.OSTCExtensions",
+                "type": "CustomScriptForLinux",
+                "typeHandlerVersion": "1.2",
+                "settings": {
+                    "fileUris": [
+                        "[variables('scriptUrl')]"
+                    ],
+                    "commandToExecute": "[concat('bash elasticsearch-azure-install.sh -zn ', parameters('esClusterName'), ' -v ', parameters('esVersion'), ' -l ', parameters('installMarvel') ,' -d ', reference('masterNodeNic0').ipConfigurations[0].properties.privateIPAddress,'-',reference('masterNodeNic1').ipConfigurations[0].properties.privateIPAddress,'-',reference('masterNodeNic2').ipConfigurations[0].properties.privateIPAddress)]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[concat('masterNodeNic', copyindex())]",
+            "location": "[parameters('region')]",
+            "copy": {
+                "name": "masterNodesNicLoop",
+                "count": 3
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnet1Ref')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[concat('masterVm', copyindex())]",
+            "location": "[parameters('region')]",
+            "copy": {
+                "name": "masterVmLoop",
+                "count": 3
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', 'masterNodeNic', copyindex())]",
+                "[concat('Microsoft.Compute/availabilitySets/', 'elasticsearchMaster')]",
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', 'elasticsearchMaster')]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSizeMasterNodes')]"
+                },
+                "osProfile": {
+                    "computername": "[concat('esMaster', copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                "sourceImage": {
+                    "id": "[variables('sourceImageName')]"
+                },
+                "destinationVhdsContainer" : "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
+            },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('masterNodeNic', copyindex()))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat('masterVm', copyindex(), '/installelasticsearch')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('region')]",
+            "copy": {
+                "name": "masterVMExtensionsLoop",
+                "count": 3
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', 'masterVm', copyindex())]",
+                "[concat('Microsoft.Network/networkInterfaces/', 'masterNodeNic', copyindex())]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.OSTCExtensions",
+                "type": "CustomScriptForLinux",
+                "typeHandlerVersion": "1.2",
+                "settings": {
+                    "fileUris": [
+                        "[variables('scriptUrl')]"
+                    ],
+                    "commandToExecute": "[concat('bash elasticsearch-azure-install.sh -xn ', parameters('esClusterName'), ' -v ', parameters('esVersion'), ' -l ', parameters('installMarvel'), ' -d ', reference('masterNodeNic0').ipConfigurations[0].properties.privateIPAddress,'-',reference('masterNodeNic1').ipConfigurations[0].properties.privateIPAddress,'-',reference('masterNodeNic2').ipConfigurations[0].properties.privateIPAddress)]"
+                }
+            }
+        },
+        {
+          "apiVersion": "2014-12-01-preview",
+          "name": "loadBalancer",
+          "type": "Microsoft.Network/loadBalancers",
+          "location": "[parameters('region')]",
+          "dependsOn": [
+              "[concat('Microsoft.Network/networkInterfaces/', 'nic0')]",
+              "[concat('Microsoft.Network/publicIPAddresses/', 'publicIp')]"
+          ],
+          "properties": {
+              "frontendIPConfigurations": [
+                  {
+                      "name": "LBFE",
+                      "properties": {
+                          "publicIPAddress": {
+                              "id": "[resourceId('Microsoft.Network/publicIPAddresses','publicIp')]"
+                          }
+                      }
+                  }
+              ],
+              "backendAddressPools": [
+                  {
+                      "name": "LBBE",
+                      "properties": {
+                          "backendIPConfigurations": [
+                              {
+                                  "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', 'nic0'),'/ipConfigurations/ipconfig1')]"
+                              },
+                              {
+                                  "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', 'nic1'),'/ipConfigurations/ipconfig1')]"
+                              }
+                          ]
+                      }
+                  }
+                ],
+                "inboundNatRules": [
+                  {
+                      "name": "ssh1",
+                      "properties": {
+                          "frontendIPConfigurations": [
+                              {
+                                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'loadBalancer'),'/frontendIPConfigurations/LBFE')]"
+                              }
+                          ],
+                          "backendIPConfiguration": {
+                              "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', 'nic0'),'/ipConfigurations/ipconfig1')]"
+                          },
+                          "protocol": "tcp",
+                          "frontendPort": 22,
+                          "backendPort": 22,
+                          "enableFloatingIP": false
+                      }
+                  },
+                  {
+                      "name": "ssh2",
+                      "properties": {
+                          "frontendIPConfigurations": [
+                              {
+                                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'loadBalancer'),'/frontendIPConfigurations/LBFE')]"
+                              }
+                          ],
+                          "backendIPConfiguration": {
+                              "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', 'nic1'),'/ipConfigurations/ipconfig1')]"
+                          },
+                          "protocol": "tcp",
+                          "frontendPort": 22322,
+                          "backendPort": 22,
+                          "enableFloatingIP": false
+                      }
+                  }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "LBRule",
+                        "properties": {
+                            "frontendIPConfigurations": [
+                                {
+                                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers','loadBalancer'),'/frontendIPConfigurations/LBFE')]"
+                                }
+                            ],
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers','loadBalancer'),'/backendAddressPools/LBBE')]"
+                            },
+                            "protocol": "tcp",
+                            "frontendPort": 9200,
+                            "backendPort": 9200,
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 5
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
