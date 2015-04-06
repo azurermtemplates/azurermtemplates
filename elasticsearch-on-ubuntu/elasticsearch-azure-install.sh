@@ -18,7 +18,8 @@
 log()
 {
     # If you want to enable this logging add a un-comment the line below and add your account id
-    curl -X POST -H "content-type:text/plain" --data-binary "${HOSTNAME} - $1" https://logs-01.loggly.com/inputs/d17b3933-b2ed-439c-827c-c7047d992745/tag/es-extension,${HOSTNAME}
+    #curl -X POST -H "content-type:text/plain" --data-binary "${HOSTNAME} - $1" https://logs-01.loggly.com/inputs/<key>/tag/es-extension,${HOSTNAME}
+    echo "$1"
 }
 
 log "Begin execution of elasticsearch script extension on ${HOSTNAME}"
