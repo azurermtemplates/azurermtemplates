@@ -1,12 +1,12 @@
 ﻿{
     "storageAccountNamePrefix" : {
-        "value":"clodfe1"
+        "value":"df45d"
     },
     "scaleNumberPerRegion" : {
         "value" : 2
     },
     "subscriptionId" : {
-        "value" : "yourSubscriptionID"
+        "value" : "8459cd1c-aa24-346d-b7e0-d73955447c69"
     },
     "adminUsername" : {
         "value" : ""

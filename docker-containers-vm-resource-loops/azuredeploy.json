@@ -5,13 +5,13 @@
         "storageAccountNamePrefix": {
             "type": "string"
         },
-        "subscriptionId" : {
-          "type" : "string"
-        },
         "adminUsername" : {
           "type" : "string"
         },
         "adminPassword" : {
+          "type" : "string"
+        },
+        "subscriptionId" : {
           "type" : "string"
         },
         "virtualNetworkNamePrefix" : {
@@ -36,33 +36,33 @@
         }
     },
   	"variables" : {
-      "baseTemplateUri" : "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/resource-loop-vm-template-linking/resourceloop-base-template.json",
+      "baseTemplateUri" : "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/docker-containers-vm-resource-loops/resourceloop-base-template.json",
 
-  		"stgAcctName1" : "[concat(parameters('storageAccountNamePrefix'),'0')]",
-  		"stgAcctName2" : "[concat(parameters('storageAccountNamePrefix'),'1')]",
-      "stgAcctName3" : "[concat(parameters('storageAccountNamePrefix'),'2')]",
-      "stgAcctName4" : "[concat(parameters('storageAccountNamePrefix'),'3')]",
-      "stgAcctName5" : "[concat(parameters('storageAccountNamePrefix'),'4')]",
+  		"stgAcctName1" : "[concat(parameters('storageAccountNamePrefix'),'1')]",
+  		"stgAcctName2" : "[concat(parameters('storageAccountNamePrefix'),'2')]",
+      "stgAcctName3" : "[concat(parameters('storageAccountNamePrefix'),'3')]",
+      "stgAcctName4" : "[concat(parameters('storageAccountNamePrefix'),'4')]",
+      "stgAcctName5" : "[concat(parameters('storageAccountNamePrefix'),'5')]",
 
-      "vnetName1" : "[concat(parameters('virtualNetworkNamePrefix'),'0')]",
-      "vnetName2" : "[concat(parameters('virtualNetworkNamePrefix'),'1')]",
-      "vnetName3" : "[concat(parameters('virtualNetworkNamePrefix'),'2')]",
-      "vnetName4" : "[concat(parameters('virtualNetworkNamePrefix'),'3')]",
-      "vnetName5" : "[concat(parameters('virtualNetworkNamePrefix'),'4')]",
+      "vnetName1" : "[concat(parameters('virtualNetworkNamePrefix'),'1')]",
+      "vnetName2" : "[concat(parameters('virtualNetworkNamePrefix'),'2')]",
+      "vnetName3" : "[concat(parameters('virtualNetworkNamePrefix'),'3')]",
+      "vnetName4" : "[concat(parameters('virtualNetworkNamePrefix'),'4')]",
+      "vnetName5" : "[concat(parameters('virtualNetworkNamePrefix'),'5')]",
 
-      "publicippref1" : "[concat(parameters('publicIPAddressNamePrefix'),'0')]",
+      "publicippref1" : "[concat(parameters('publicIPAddressNamePrefix'),'1')]",
       "publicippref2" : "[concat(parameters('publicIPAddressNamePrefix'),'10')]",
       "publicippref3" : "[concat(parameters('publicIPAddressNamePrefix'),'20')]",
       "publicippref4" : "[concat(parameters('publicIPAddressNamePrefix'),'30')]",
       "publicippref5" : "[concat(parameters('publicIPAddressNamePrefix'),'40')]",
 
-      "nicref1" : "[concat(parameters('nicNamePrefix'),'0')]",
+      "nicref1" : "[concat(parameters('nicNamePrefix'),'1')]",
       "nicref2" : "[concat(parameters('nicNamePrefix'),'10')]",
       "nicref3" : "[concat(parameters('nicNamePrefix'),'20')]",
       "nicref4" : "[concat(parameters('nicNamePrefix'),'30')]",
       "nicref5" : "[concat(parameters('nicNamePrefix'),'40')]",
 
-      "vmref1" : "[concat(parameters('vmNamePrefix'),'0')]",
+      "vmref1" : "[concat(parameters('vmNamePrefix'),'1')]",
       "vmref2" : "[concat(parameters('vmNamePrefix'),'10')]",
       "vmref3" : "[concat(parameters('vmNamePrefix'),'20')]",
       "vmref4" : "[concat(parameters('vmNamePrefix'),'30')]",
@@ -80,7 +80,7 @@
               "contentVersion": "1.0.0.0"
             },
             "parameters": {
-                "storageAccountName": { "value": "[variables('stgAcctName1')]"},
+                "stgAccountName": { "value": "[variables('stgAcctName1')]"},
                 "adminUsername" :  { "value": "[parameters('adminUsername')]"},
                 "adminPassword" :  { "value": "[parameters('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
@@ -104,7 +104,7 @@
               "contentVersion": "1.0.0.0"
             },
             "parameters": {
-                "storageAccountName": { "value": "[variables('stgAcctName2')]"},
+                "stgAccountName": { "value": "[variables('stgAcctName2')]"},
                 "adminUsername" :  { "value": "[parameters('adminUsername')]"},
                 "adminPassword" :  { "value": "[parameters('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
@@ -128,7 +128,7 @@
               "contentVersion": "1.0.0.0"
             },
             "parameters": {
-                "storageAccountName": { "value": "[variables('stgAcctName3')]"},
+                "stgAccountName": { "value": "[variables('stgAcctName3')]"},
                 "adminUsername" :  { "value": "[parameters('adminUsername')]"},
                 "adminPassword" :  { "value": "[parameters('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
@@ -152,7 +152,7 @@
               "contentVersion": "1.0.0.0"
             },
             "parameters": {
-                "storageAccountName": { "value": "[variables('stgAcctName4')]"},
+                "stgAccountName": { "value": "[variables('stgAcctName4')]"},
                 "adminUsername" :  { "value": "[parameters('adminUsername')]"},
                 "adminPassword" :  { "value": "[parameters('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
@@ -176,7 +176,7 @@
               "contentVersion": "1.0.0.0"
             },
             "parameters": {
-                "storageAccountName": { "value": "[variables('stgAcctName5')]"},
+                "stgAccountName": { "value": "[variables('stgAcctName5')]"},
                 "adminUsername" :  { "value": "[parameters('adminUsername')]"},
                 "adminPassword" :  { "value": "[parameters('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},

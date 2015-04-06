@@ -1,10 +1,10 @@
-# Deploying Virtual Machines across 5 regions using Template Linking & Loops
+# Deploy Docker Containers on Virtual Machines across 5 regions using Loops & Template Linking
 
 <a href="https://azuredeploy.net/" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
-This template allows you to create 'N' number of Virtual Machines based on the 'numberOfInstances' parameter specified during the template deployment. This template also deploys a Storage Account, Virtual Network, 'N' number of Public IP addresses/Network Inerfaces/Virtual Machines.
+This template allows you to create 'N' number of Virtual Machines based on the 'numberOfInstances' parameter specified during the template deployment and deploys 2 docker containers [nginx & redis] on each VM. This template also deploys a Storage Account, Virtual Network, 'N' number of Public IP addresses/Network Inerfaces/Virtual Machines.
 
 Note: The Recommended limit of number of disks per Storage Account is 40.
 

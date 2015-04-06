@@ -1,0 +1,38 @@
+﻿{
+    "userImageStorageAccountName": {
+        "value" : "cloudey0"
+    },
+    "userImageStorageContainerName" : {
+        "value" : "vhds"
+    },
+    "userImageVhdName" : {
+        "value" : "sample.vhd"
+    },
+    "osType" : {
+        "value" : "linux"
+    },
+    "vmNamePrefix" : {
+        "value" : "cloudee"
+    },
+    "adminUsername": {
+        "value": "cloudguy"
+    },
+    "adminPassword": {
+        "value": "abc_123!"
+    },
+    "numberOfInstances": {
+        "value": 2
+    },
+    "subscriptionId": {
+        "value": "79d35904-6ebb-471a-93c0-4e81261b8077"
+    },
+    "region": {
+        "value": "West US"
+    },
+    "virtualNetworkName": {
+        "value": "cloudey0"
+    },
+    "vmSize": {
+        "value": "Standard_A2"
+    }
+}
