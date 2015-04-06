@@ -1,0 +1,7 @@
+{
+  "TemplateName": "Create Elasticsearch Cluster - With Dedicated Masters",
+  "Description": "This template creates and Elasticsearch clsuter with dedicated master nodes using the specified location and name",
+  "ShortDescription": "This template creates an Elasticsearch cluster with dedicated master nodes",
+  "GithubUsername": "trentmswanson",
+  "DateUpdated": "2015-04-06"
+}
