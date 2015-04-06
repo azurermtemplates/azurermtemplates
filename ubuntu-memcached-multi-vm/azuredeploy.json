@@ -24,7 +24,7 @@
         "domainName": {
             "type": "string",
             "metadata": {
-                "Description": "Domain name of the Apache test webserver"
+                "Description": "Domain name of the publicly accessible Apache test web server"
             }
         },
         "adminUsername": {
@@ -95,7 +95,7 @@
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "subnetDmzRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetDmzName'))]",
         "subnetMemcachedRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetMemcachedName'))]",
-        "memcachedMachineNamePrefix": "memcached",
+        "memcachedMachineNamePrefix": "memcached"
     },
     "resources": [
         {
@@ -286,7 +286,7 @@
                 "typeHandlerVersion": "1.2",
                 "settings": {
                     "fileUris": [
-                        "https://gist.githubusercontent.com/arsenvlad/34dfa1c49e957cce68a1/raw/50abe7b0bb732b7bcbeed7993273c3a5892b89a4/install_memcached.sh"
+                        "https://raw.githubusercontent.com/arsenvlad/azurermtemplates/memcached/ubuntu-memcached-multi-vm/install_memcached.sh"
                     ],
                     "commandToExecute": "[concat('sh install_memcached.sh ', copyindex(), ' ', reference(concat('nicmemcached', copyindex())).ipConfigurations[0].properties.privateIPAddress, ' ', reference('nicapache').ipConfigurations[0].properties.privateIPAddress)]"
                 }
@@ -306,7 +306,7 @@
                 "typeHandlerVersion": "1.2",
                 "settings": {
                     "fileUris": [
-                        "https://gist.githubusercontent.com/arsenvlad/c5f25bc24b32ccd630b2/raw/9d9c34ce8434e7df39327e766c824092a54f751f/install_apache.sh"
+                        "https://github.com/arsenvlad/azurermtemplates/blob/memcached/ubuntu-memcached-multi-vm/install_apache.sh"
                     ],
                     "commandToExecute": "[concat('sh install_apache.sh ', parameters('numberOfMemcachedInstances'), ' ', parameters('subnetMemcachedPrefix'))]"
                 }

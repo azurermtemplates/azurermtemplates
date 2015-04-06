@@ -1,7 +1,7 @@
 {
-  "TemplateName": "Ubuntu 14.04 multiple VMs with memcached and apache cache test page",
-  "Description": "This template creates one oe more Ubuntu 14.04 VMs and installs memcached and apache cache test page",
-  "ShortDescription": "This template creates one oe more Ubuntu 14.04 VMs and installs memcached and apache cache test page",
+  "TemplateName": "Multiple Ubuntu 14.04 VMs with memcached service and one VM with Apache and PHP test page",
+  "Description": "This template creates one or more Ubuntu 14.04 VMs in a private-only subnet and install and configures memcached service. It also creates one publicly accessible Apache VM with a PHP test page to confirm that memcached is installed and accessible.",
+  "ShortDescription": "Multiple VMs in a private subnet with memcached and one publicly accessible VM with Apache test page.",
   "GithubUsername": "arsenvlad",
-  "DateUpdated": "2015-04-03"
+  "DateUpdated": "2015-04-06"
 }
