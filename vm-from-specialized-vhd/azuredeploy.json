@@ -40,9 +40,6 @@
         "type": "Microsoft.Compute/virtualMachines",
         "name": "[parameters('vmName')]",
         "location": "[parameters('location')]",
-        "dependsOn": [
-            "[concat('Microsoft.Network/networkInterfaces/', parameters('nicName'))]"
-        ],
         "properties": {
             "hardwareProfile": {
                 "vmSize": "[parameters('vmSize')]"
