@@ -44,6 +44,6 @@ Below are the parameters that the template expects
 | adModulesURL |The URL to the zip containing the DSC package that creates and installs AD <br> <ul> <li>**https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/activedirectorynewdomain/CreateADPDC.ps1.zip (default)**</li></ul>|
 | adConfigurationFunction | The name of the DSC Configuration Function that configures the VM , creates the AD Domain etc.<br> <ul> <li>**CreateADPDC.ps1\\CreateADPDC(default)** </li></ul> |
 | addnsName | The DNS prefix for the public IP address used by the Load Balancer |
-| DNSServerAddress | The DNS address of the first DNS Server used by the VNET <br> <ul><li>127.0.0.1 **(default)**</li></ul>|
+| DNSServerAddress | The DNS address of the first DNS Server used by the VNET <br> <ul><li>8.8.8.8 **(default)**</li></ul>|
 
 
