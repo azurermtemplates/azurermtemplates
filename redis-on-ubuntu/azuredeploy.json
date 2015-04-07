@@ -118,7 +118,7 @@
         "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',parameters('subnet1Name'))]",
         "sourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',variables('vmSourceImageName'))]",
         "computerNamePrefix": "redisnode_",
-        "scriptUrl": "https://fs180.blob.core.windows.net/public/"
+        "scriptUrl": "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/redis-on-ubuntu/"
     },
     "resources": [
         {
