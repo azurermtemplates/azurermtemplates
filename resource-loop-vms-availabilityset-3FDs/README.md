@@ -1,10 +1,10 @@
-# Create Virtual Machines using Resource Loops
+# Create multiple VMs in Availability Set with 3 Fault Domains 
 
 <a href="https://azuredeploy.net/" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
-This template allows you to create 'N' number of Virtual Machines based on the 'numberOfInstances' parameter specified during the template deployment. This template also deploys a Storage Account, Virtual Network, 'N' number of Public IP addresses/Network Inerfaces/Virtual Machines.
+This template allows you to create 'N' number of Virtual Machines based on the 'numberOfInstances' parameter specified during the template deployment. This template also deploys a Storage Account, Virtual Network, 'N' number of Public IP addresses/Network Inerfaces/Virtual Machines. The template will deploy these VMs into an Availability Set and configure it to deploy across 3 Fault Domains. For more information on fault domains and managing your availability, please see this <a href="http://azure.microsoft.com/en-us/documentation/articles/virtual-machines-manage-availability/">article</a>. 
 
 Note: Please limit the number of VMs to 40 per Storage Account.
 
@@ -17,6 +17,8 @@ Below are the parameters that the template expects
 | adminPassword  | Password for the Virtual Machine  |
 | subscriptionId  | Subscription ID where the template will be deployed |
 | numberOfInstances  | Number of Virtual Machine instances to create  |
+| faultDomainCount | Number of Fault Domains to spread VMs across | 
+| updateDomainCount | Number of Update Domains to spread VMs across |
 | region | Region where the resources will be deployed |
 | virtualNetworkName | Name of Virtual Network |
 | vmSize | Size of the Virtual Machine |
