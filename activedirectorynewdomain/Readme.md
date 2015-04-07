@@ -4,7 +4,7 @@ This templae will deploy a new VM (along with a new VNet, Storage Account and Lo
 
 There are a number of issues\workarounds in this template and the associated DSC Script:
 
-1. There is no way (that I can find) to modify a VNet (or any other resource) after it has been created in a template, this template creates a DNS Server and therefore the IP address of that server needs to be specified as a DNS Server in the VNet, however in order for this VM to sucessfully deploy and be configured there needs to be a DNS Server available, this DNS Server is specified as a parameter () ideally we would update the VNet with the IP Address of the new VM once it has been deployed instead. **This valu should be provided in the DNSServerAddress parameter, the default value is 8.8.8.8**.
+1. There is no way (that I can find) to modify a VNet (or any other resource) after it has been created in a template, this template creates a DNS Server and therefore the IP address of that server needs to be specified as a DNS Server in the VNet, however in order for this VM to sucessfully deploy and be configured there needs to be a DNS Server available, this DNS Server is specified as a parameter () ideally we would update the VNet with the IP Address of the new VM once it has been deployed instead. **This value should be provided in the DNSServerAddress parameter, the default value is 8.8.8.8**.
 
 2. Version 1.7 of the DSC Extension has a problem whereby the script execution policy will not allow scripts to be executed , therefore the DSC script provided updates the execution policy before the DSC extension is run and then sets it back to default once the configuration has been applied.
 
