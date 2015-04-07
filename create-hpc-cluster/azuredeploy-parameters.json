@@ -1,0 +1,44 @@
+﻿{
+    "location": {
+        "value": "West US"
+    },
+    "storageAccountType" : {
+        "value":"Standard_LRS"
+    },
+    "publicIPAddressType" : {
+        "value":"Dynamic"
+    },
+    "vmStorageAccountContainerName" : {
+        "value":"vhds"
+    },
+    "vmExtensionName" : {
+        "value":"customScriptExtension"
+    },
+    "vmSize" : {
+        "value":"Standard_A3"
+    },
+    "HNSourceImageName" : {
+        "value":"96316178b0644ae08bc4e037635ce104__HPC-Pack-2012R2-Update1-4.3.4660.0-WS2012R2-ENU"
+    },
+    "adminUsername": {
+        "value": "azureuser"
+    },
+    "adminPassword": {
+        "value": "!!123abc"
+    },
+    "addressPrefix":{
+        "value" : "10.0.0.0/16"
+    },
+    "subnet1Name": {
+        "value" : "Subnet-1"
+    },
+    "subnet1Prefix" : {
+        "value" : "10.0.0.0/24"
+    },
+    "subscriptionId":{
+        "value" : "a486e243-747b-42de-8c4c-379f8295a746"
+    },
+    "namePrefix" : {
+        "value": "hpcrg"
+    }
+}
