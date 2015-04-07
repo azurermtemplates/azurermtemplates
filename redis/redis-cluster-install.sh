@@ -56,8 +56,8 @@ done
 log "Installing Redis v${VERSION}... "
 
 # Installing build essentials (if missing)
-apt-get update
-apt-get install build-essential
+apt-get -y update
+apt-get -y install build-essential
 
 wget http://download.redis.io/releases/redis-$VERSION.tar.gz
 tar xzf redis-$VERSION.tar.gz
