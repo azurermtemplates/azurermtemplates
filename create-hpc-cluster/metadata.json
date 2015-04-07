@@ -1,0 +1,7 @@
+{
+  "TemplateName": "Create one HPC cluster",
+  "Description": "This template creates one all in one HPC cluster, head node is acted as domain controller, database is also hosted on head node",
+  "ShortDescription": "This template creates one allinone HPC cluster",
+  "GithubUsername": "justintian",
+  "DateUpdated": "2015-04-07"
+}

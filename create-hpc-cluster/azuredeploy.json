@@ -10,7 +10,10 @@
             "allowedValues": [
               "West US",
               "East US"
-            ]
+            ],
+            "metadata": {
+                "Description": "Location where resources will be deployed"
+            }
         },
         "storageAccountType": {
             "type": "string",
@@ -19,21 +22,33 @@
                 "Standard_LRS",
                 "Standard_GRS"
             ],
+            "metadata": {
+                "Description": "storage account type"
+            }
         },
         "publicIPAddressType" : {
             "type" : "string",
             "defaultValue" : "Dynamic",
             "allowedValues" : [
                 "Dynamic"
-            ]
+            ],
+            "metadata": {
+                "Description": "public IP address type, default is dynamic"
+            }
         },
         "vmStorageAccountContainerName": {
             "type": "string",
-            "defaultValue": "vhds"
+            "defaultValue": "vhds",
+            "metadata": {
+                "Description": "name of storage container to store VM vhd"
+            }
         },
         "vmExtensionName":{
 	    "type": "string",
-            "defaultValue":"customScriptExtension"
+            "defaultValue":"customScriptExtension",
+            "metadata": {
+                "Description": "customer extension name"
+            }
         },
         "vmSize": {
             "type": "string",
@@ -44,38 +59,65 @@
                 "Standard_A2",
                 "Standard_A3",
                 "Standard_A4"
-            ]
+            ],
+            "metadata": {
+                "Description": "VM role size"
+            }
         },
 	"HNSourceImageName": {
             "type": "string",
-            "defaultValue": "96316178b0644ae08bc4e037635ce104__HPC-Pack-2012R2-Update1-4.3.4660.0-WS2012R2-ENU"
+            "defaultValue": "96316178b0644ae08bc4e037635ce104__HPC-Pack-2012R2-Update1-4.3.4660.0-WS2012R2-ENU",
+            "metadata": {
+                "Description": "HPC Cluster image name, default is HPC pack 2012 R2 Update 1 (4.3.4660)"
+            }
         },
 	"adminUserName": {
             "type": "string",
-            "defaultValue": "azureuser"
+            "defaultValue": "azureuser",
+            "metadata": {
+                "Description": "admin user name"
+            }
         },
         "adminPassword": {
             "type": "securestring",
-            "defaultValue": "!!123abc"
+            "defaultValue": "!!123abc",
+            "metadata": {
+                "Description": "admin password"
+            }
         },
         "addressPrefix":{
             "type" : "string",
-            "defaultValue" : "10.0.0.0/16"
+            "defaultValue" : "10.0.0.0/16",
+            "metadata": {
+                "Description": "internal IP address prefix"
+            }
         },
         "subnet1Name": {
             "type" : "string",
-            "defaultValue" : "Subnet-1"
+            "defaultValue" : "Subnet-1",
+            "metadata": {
+                "Description": "subnet name under ther virtual network"
+            }
         },
         "subnet1Prefix" : {
             "type" : "string",
-            "defaultValue" : "10.0.0.0/24"
+            "defaultValue" : "10.0.0.0/24",
+            "metadata": {
+                "Description": "IP address prefix for subnet"
+            }
         },
         "subscriptionId":{
             "type" : "string",
-            "defaultValue": "a486e243-747b-42de-8c4c-379f8295a746"
+            "defaultValue": "a486e243-747b-42de-8c4c-379f8295a746",
+            "metadata": {
+                "Description": "subscription Id"
+            }
         },
         "namePrefix" : {
-      		"type": "string"
+      	    "type": "string",
+            "metadata": {
+                "Description": "name prefix for all new resources"
+            }
     	}
     },
 
