@@ -2,6 +2,12 @@
     "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
     "contentVersion": "1.0.0.0",
     "parameters" : {
+        "namePrefix" : {
+      	    "type": "string",
+            "metadata": {
+                "Description": "name prefix for all new resources"
+            }
+    	},
         "location": {
             "type": "String",
             "defaultValue" : "West US",
@@ -103,25 +109,12 @@
             "metadata": {
                 "Description": "IP address prefix for subnet"
             }
-        },
-        "subscriptionId":{
-            "type" : "string",
-            "defaultValue": "a486e243-747b-42de-8c4c-379f8295a746",
-            "metadata": {
-                "Description": "subscription Id"
-            }
-        },
-        "namePrefix" : {
-      	    "type": "string",
-            "metadata": {
-                "Description": "name prefix for all new resources"
-            }
-    	}
+        }
     },
 
     "variables": {
         "storageAccountName": "[concat(parameters('namePrefix'), 'sa')]",
-	"HNsourceImageName" : "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('HNSourceImageName'))]",
+	"HNsourceImageName" : "[concat('/',subscription().subscriptionId,'/services/images/',parameters('HNSourceImageName'))]",
         "virtualNetworkName": "[concat(parameters('namePrefix'), 'VNet')]",
 	"vnetID":"[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
         "subnetRef" : "[concat(variables('vnetID'),'/subnets/',parameters('subnet1Name'))]",
