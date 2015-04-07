@@ -1,12 +1,12 @@
 {
     "storageAccountName": {
-        "value": "funwitharm"
+        "value": "armdeploy1"
     },
     "adminUsername": {
-        "value": "RedisAdmin"
+        "value": ""
     },
     "adminPassword": {
-        "value": ""
+        "value": "J5zA3Fgxh8CrR9CcUHjNvGJ8A6xPPrxu"
     },
     "numberOfInstances": {
         "value": 2
@@ -18,25 +18,19 @@
         "value": "West US"
     },
     "virtualNetworkName": {
-        "value": "RedisClustVnet"
+        "value": "redisClustVnet"
     },
     "vmSize": {
         "value": "Standard_A0"
     },
-    "subnet1Name": {
-        "value": "Subnet-1"
-    },
-    "subnet2Name": {
-        "value": "Subnet-2"
+    "subnetName": {
+        "value": "Subnet1"
     },
     "addressPrefix": {
         "value": "10.0.0.0/16"
     },
-    "subnet1Prefix": {
+    "subnetPrefix": {
         "value": "10.0.0.0/24"
-    },
-    "subnet2Prefix": {
-        "value": "10.0.1.0/24"
     },
     "redisVersion": {
         "value": "3.0.0"
