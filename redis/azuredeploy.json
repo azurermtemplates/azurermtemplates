@@ -99,8 +99,9 @@
         },
         "redisVersion": {
             "type": "string",
+			"defaultValue": "stable",
             "metadata": {
-                "Description": "The version of the Redis package to be deployed on the cluster"
+                "Description": "The version of the Redis package to be deployed on the cluster (or use 'stable' to pull in the latest and greatest)"
             }
         },
         "redisClusterName": {
