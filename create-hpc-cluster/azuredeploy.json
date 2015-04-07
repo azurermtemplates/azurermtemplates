@@ -1,8 +1,6 @@
 {
-    /* Template Schema & Version Definition */
     "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
     "contentVersion": "1.0.0.0",
-    /* Parameters Definitions for building re-Usable Templates */
     "parameters" : {
         "location": {
             "type": "String",
@@ -121,7 +119,6 @@
     	}
     },
 
-    /* Variable Definitions for simpler Template Definition */
     "variables": {
         "storageAccountName": "[concat(parameters('namePrefix'), 'sa')]",
 	"HNsourceImageName" : "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('HNSourceImageName'))]",
@@ -140,7 +137,6 @@
     },
 
     "resources": [
-    /* Storage Account for VM OS Disk Blobs */
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('storageAccountName')]",
@@ -151,7 +147,6 @@
       }
     },
  
-    /* Virtual Network Defintion */    
     {
       "apiVersion": "2014-12-01-preview",
       "type": "Microsoft.Network/virtualNetworks",
@@ -178,7 +173,6 @@
       }
     },
 
-    /* headnode Virtual Machine with Public IP Address & Deployed into the Virtual Network */
     {
       "apiVersion": "2014-12-01-preview",
       "type": "Microsoft.Network/publicIPAddresses",
@@ -256,7 +250,6 @@
         }
     },
 
-    /* Custom Script Extension for Virtual Machine*/
     {
         "type": "Microsoft.Compute/virtualMachines/extensions",
         "name": "[concat(variables('vmNameHN'),'/', parameters('vmExtensionName'))]",
