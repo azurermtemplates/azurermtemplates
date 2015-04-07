@@ -257,9 +257,9 @@
             "typeHandlerVersion": "1.2",
             "settings": {
                     "fileUris": [
-			"https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/create-hpc-cluster/PrepareHN.ps1",
-			"https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/create-hpc-cluster/HPCHNPrepare.ps1",
-			"https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/create-hpc-cluster/HpcPrepareUtil.ps1"
+			"http://yongjun.blob.core.windows.net/scripts/PrepareHN.ps1",
+			"http://yongjun.blob.core.windows.net/scripts/HPCHNPrepare.ps1",
+			"http://yongjun.blob.core.windows.net/scripts/HpcPrepareUtil.ps1"
 		    ],
                     "commandToExecute": "[variables('HNcommandStr')]"
                 }
