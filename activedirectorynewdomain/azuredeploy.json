@@ -1,0 +1,428 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"newStorageAccountName": {
+			"type": "string",
+			 "metadata": { 
+         		"Description": "The name of the new storage account created to store the VMs disks" 
+	     	},
+	     	"defaultValue":"New Storage Account Name"
+	    },
+		"storageAccountType": {
+			"type": "string",
+			"allowedValues": [
+				"Standard_LRS",
+				"Standard_GRS",
+				"Standard_ZRS"        
+			],
+			"metadata": { 
+         		"Description": "The type of the Storage Account created" 
+	     	},
+	     	"defaultValue":"Standard_LRS"
+		},
+		"deploymentLocation": {
+			"type": "string",
+			"allowedValues": [
+				"West US",
+				"East US",
+				"West Europe", 
+				"East Asia",
+				"Southeast Asia"
+			],
+			"metadata": { 
+         		"Description": "The region to deploy the resources into" 
+	     	},
+	     	"defaultValue":"West Europe"
+		},
+		"subscriptionId": {
+			"type": "string",
+			"metadata": { 
+         		"Description": "The subscription Id to deploy the resources into" 
+	     	}
+		},
+		"virtualNetworkName": {
+		 	"type": "string",
+			"metadata": { 
+         		"Description": "The name of the Virtual Network to Create" 
+	     	},
+	     	"defaultValue":"adVNET"
+		},
+		"virtualNetworkAddressRange": {
+		 	"type": "string",
+			"metadata": { 
+         		"Description": "The address range of the new VNET in CIDR format" 
+	     	},
+	     	"defaultValue":"10.0.0.0/16"
+		},
+		"adSubnetName": {
+		 	"type": "string",
+		 	"metadata": { 
+         		"Description": "The name of the subnet created in the new VNET" 
+	     	},
+		 	"defaultValue":"adSubnet"
+		},
+		"adSubnet": {
+		 	"type": "string",
+		 	"metadata": { 
+         		"Description": "The address range of the subnet created in the new VNET" 
+	     	},
+		 	"defaultValue":"10.0.0.0/24" 	
+		},
+		"adNicName": {
+		 	"type": "string",
+		 	"metadata": { 
+         		"Description": "The name of the NIC attached to the new VM" 
+	     	},
+		 	"defaultValue":"adNic"
+		},
+		"adNicIPAddress": {
+		 	"type": "string",
+		 	"metadata": { 
+         		"Description": "The IP address of the new AD VM" 
+	     	},
+		 	"defaultValue":"10.0.0.4"
+		},
+		"publicIPAddressName": {
+			"type": "string",
+			"metadata": { 
+         		"Description": "The name of the public IP address used by the Load Balancer" 
+	     	},
+		 	"defaultValue":"adpublicIP"
+		},
+		"publicIPAddressType": {
+			"type": "string",
+			"allowedValues": [
+				"Dynamic",
+				"Static"
+			],
+			"metadata": { 
+         		"Description": "The type of the public IP address used by the Load Balancer" 
+	     	},
+		 	"defaultValue":"Dynamic"
+		},
+		"adVMName": {
+			"type": "string",
+			"metadata": { 
+         		"Description": "The name of the VM created" 
+	     	},
+		 	"defaultValue":"adarmtestDC"
+		},
+		"adminUsername": {
+			"type": "string",
+			"metadata": { 
+         		"Description": "The name of the Administrator of the new VM and Domain" 
+	     	},
+		 	"defaultValue":"adAdministrator"
+		},
+		"adminPassword": {
+			"type": "securestring",
+			"metadata": { 
+         		"Description": "The password forthe Administrator account of the new VM and Domain" 
+	     	}
+		},
+		"adVMSize": {
+			"type": "string",
+			"allowedValues": [
+				"Standard_A0",
+				"Standard_A1",
+				"Standard_A2",
+				"Standard_A3",
+				"Standard_A4"
+			],
+			"metadata": { 
+         		"Description": "The size of the VM Created" 
+	     	},
+	     	"defaultValue": "Standard_A1"
+		},
+		"adImageName": {
+			"type": "string",
+			"metadata": { 
+         		"Description": "The name of the VM Image to create the AD VM from" 
+	     	},
+	     	"defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-Datacenter-201502.01-en.us-127GB.vhd"
+		},
+		"vmContainerName": {
+			"type":"string",
+			"metadata": { 
+         		"Description": "The container name in the storage account where VM disks are stored" 
+	     	},
+	     	"defaultValue": "vhds"
+		},
+		"adAvailabilitySetName": {
+			"type":"string",
+			"metadata": { 
+         		"Description": "The name of the availability set that the AD VM is created in" 
+	     	},
+			"defaultValue":"adAvailabiltySet"
+		},
+		"domainName":{
+			"type":"string",
+			"metadata": { 
+         		"Description": "The FQDN of the AD Domain created " 
+	     	},
+			"defaultValue":"adarmtest.com"
+		},
+		"domainNetbiosName":{
+			"type":"string",
+			"metadata": { 
+         		"Description": "The NetBIOS name of the AD Domain created " 
+	     	},
+			"defaultValue":"adarmtest"
+		},
+		"adModulesURL":{
+			"type":"string",
+			"metadata": { 
+         		"Description": "The URL to the zip containing the DSC package that creates and installs AD" 
+	     	},
+			"defaultValue":"https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/activedirectorynewdomain/CreateADPDC.ps1.zip"
+		},
+		"adConfigurationFunction":{
+			"type":"string",
+			"metadata": { 
+         		"Description": "The name of the DSC Configuration Function that configures the VM , creates the AD Domain etc." 
+	     	},
+			"defaultValue":"CreateADPDC.ps1\\CreateADPDC"
+		},
+		"addnsName":{
+			"type":"string",
+			"metadata": { 
+         		"Description": "The DNS prefix for the public IP address used by the Load Balancer" 
+	     	},
+			"defaultValue":"adarmtest"
+		},
+		"DNSServerAddress":{
+			"type":"string",
+			"metadata": { 
+         		"Description": "The DNS address of the first DNS Server used by the VNET" 
+	     	},
+	     	"defaultValue":"8.8.8.8"
+		}
+	},
+	"variables": {
+		"VnetID": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+     	"adSubnetRef": "[concat(variables('VnetID'),'/subnets/',parameters('adSubnetName'))]",
+     	"adSourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('adImageName'))]",
+     	"adNicId" : "[resourceId('Microsoft.Network/networkInterfaces',parameters('adNicName'))]",
+        "adIPConfigID": "[concat(variables('adNicId'),'/ipConfigurations/ipconfig1')]",
+        "adLBName" : "adLoadBalancer",
+		"adIPConfigID": "[concat(variables('adNicId'),'/ipConfigurations/ipconfig1')]",
+        "adlbID":"[resourceId('Microsoft.Network/loadBalancers',variables('adLBName'))]",
+        "adlbFEConfigID":"[concat(variables('adlbID'),'/frontendIPConfigurations/LBFE')]",
+        "adDataDisk":"ADDataDisk",
+		"adDataDiskSize":1000
+    },
+	"resources": [
+		{
+	      "type": "Microsoft.Storage/storageAccounts",
+	      "name": "[parameters('newStorageAccountName')]",
+	      "apiVersion": "2014-12-01-preview",
+	      "location": "[parameters('deploymentLocation')]",
+	      "properties": {
+	        "accountType": "[parameters('storageAccountType')]"
+	      }
+	    },
+		{
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[parameters('publicIPAddressName')]",
+            "location": "[parameters('deploymentLocation')]",
+            "properties": {
+                "publicIPAllocationMethod": "[parameters('publicIPAddressType')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('addnsName')]"
+                }
+            }
+        },
+		{
+			"type": "Microsoft.Compute/availabilitySets",
+			"name": "[parameters('adAvailabilitySetName')]",
+			"apiVersion": "2014-12-01-preview",
+			"location": "[parameters('deploymentLocation')]"
+		},
+		{
+			"name": "[parameters('virtualNetworkName')]",
+			"type": "Microsoft.Network/virtualNetworks",
+			"location": "[parameters('deploymentLocation')]",
+			"apiVersion": "2014-12-01-preview",
+			"properties": {
+				"addressSpace": {
+				"addressPrefixes": [
+					"[parameters('virtualNetworkAddressRange')]"
+				]
+				},
+				"dhcpOptions": {
+					"dnsServers": ["[parameters('adNicIPAddress')]","[parameters('DNSServerAddress')]"]
+				},
+				"subnets": [
+					{
+						"name": "[parameters('adSubnetName')]",
+						"properties": {
+							"addressPrefix": "[parameters('adSubnet')]"
+						}
+					}
+				]
+			}
+		},
+		{
+		 "name": "[parameters('adNicName')]",
+		 "type": "Microsoft.Network/networkInterfaces",
+		 "location": "[parameters('deploymentLocation')]",
+		 "dependsOn": ["[parameters('virtualNetworkName')]"],
+		 "apiVersion": "2014-12-01-preview",
+		 "properties": {
+		     "ipConfigurations": [
+		         {
+		             "name": "ipconfig1",
+		             "properties": {
+						"privateIPAllocationMethod": "Static",
+						"privateIPAddress" :"[parameters('adNicIPAddress')]",
+						"subnet": {
+							"id": "[variables('adSubnetRef')]"
+		                 }
+		             }
+		         }
+		     ]
+		 }
+		},
+		{
+	      "apiVersion": "2014-12-01-preview",
+	      "name": "[variables('adlbName')]",
+	      "type": "Microsoft.Network/loadBalancers",
+	      "location": "[parameters('deploymentLocation')]",
+	      "dependsOn": [
+	          "[concat('Microsoft.Network/networkInterfaces/', parameters('adNicName'))]",
+	          "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName'))]"
+	      ],
+	      "properties": {
+	          "frontendIPConfigurations": [
+	              {
+	                  "name": "LBFE",
+	                  "properties": {
+						"publicIPAddress": {
+							"id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName'))]"
+						},
+	                  }                
+	              }
+	          ],
+	          "backendAddressPools": [
+	              {
+	                  "name": "LBBE",
+	                  "properties": {
+	                      "backendIPConfigurations": [
+	                          {
+	                          	"id" : "[variables('adIPConfigID')]"
+	                          }
+	                      ]
+	                  }                
+	              }
+	          ],
+	          "inboundNatRules": [
+	              {
+	                  "name": "adRDP",
+	                  "properties": {
+	                      "frontendIPConfigurations": [
+		                      {
+		                      		"id": "[variables('adlbFEConfigID')]"
+	                          }
+	                      ],
+	                      "backendIPConfiguration": {
+	                          "id" : "[variables('adIPConfigID')]"
+	                      },
+	                      "protocol": "tcp",
+	                      "frontendPort": 3389,
+	                      "backendPort": 3389,
+	                      "enableFloatingIP": false
+	                  }                
+	              }
+	            
+	          ]
+	      }
+	    },
+		{
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('adVMName')]",
+            "location": "[parameters('deploymentLocation')]",
+            "dependsOn": [
+            	"[resourceId('Microsoft.Storage/storageAccounts',parameters('newStorageAccountName'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces',parameters('adNicName'))]",
+                "[resourceId('Microsoft.Compute/availabilitySets', parameters('adAvailabilitySetName'))]",
+                "[resourceId('Microsoft.Network/loadBalancers',variables('adlbName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('adVMSize')]"
+                },
+                "availabilitySet": {
+					"id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('adAvailabilitySetName'))]"
+				},
+                "osProfile": {
+                    "computername": "[parameters('adVMName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+					"windowsProfile": {
+						"provisionVMAgent": "true"
+					}
+                },
+                "storageProfile": {
+                    "sourceImage": {
+                        "id": "[variables('adSourceImageName')]"
+                    },
+                    "destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',parameters('vmContainerName'),'/')]",
+                    "dataDisks": [
+                        {
+                            "vhd": {
+                            	"uri":"[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',parameters('vmContainerName'),'/', variables('adDataDisk'),'-1.vhd')]"
+                            	},
+                            "name":"[concat(parameters('adVMName'),'-data-disk1')]",
+                            "caching" : "None",
+                            "diskSizeGB": "[variables('adDataDiskSize')]",
+                            "lun": 0
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('adNicName'))]"
+                        }
+                    ]
+                }
+            },
+            "resources" :[
+	            {
+		            "type": "Microsoft.Compute/virtualMachines/extensions",
+		            "name": "[concat(parameters('adVMName'),'/CreateADForest')]",
+		            "apiVersion": "2014-12-01-preview",
+		            "location": "[parameters('deploymentLocation')]",
+		            "dependsOn":[
+		            	"[resourceId('Microsoft.Compute/virtualMachines', parameters('adVMName'))]"
+		            ],
+		            "properties": {
+		                "publisher": "Microsoft.Powershell",
+		                "type": "DSC",
+		                "typeHandlerVersion": "1.7",
+		                "settings": {
+		                    "ModulesUrl": "[parameters('adModulesURL')]",
+		                   	"ConfigurationFunction": "[parameters('adConfigurationFunction')]",
+		                    "Properties": {
+		                        "DomainName": "[parameters('domainName')]", 
+		                        "DomainNetBiosName":"[parameters('domainNetbiosName')]", 
+			                    "AdminCreds":{
+						            "UserName": "[parameters('adminUserName')]",
+						            "Password": "PrivateSettingsRef:AdminPassword"
+							    }
+		           			}           
+		                },
+		                "protectedSettings": {
+				            "Items": {
+				                "AdminPassword": "[parameters('adminPassword')]"
+				            }
+		        		}	
+		            }
+		        }
+	        ]
+    	}
+	]
+}
