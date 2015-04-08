@@ -282,13 +282,19 @@
                     "dataDisks": [
                         {
                             "name": "datadisk1",
-                            "diskSizeGB": "[parameters('diskSizeGB')]",
-                            "lun": 0
+                            "diskSizeGB": "[parameters('dataDiskSizeGB')]",
+                            "lun": 0,
+                            "vhd": {
+                                "Uri": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/',parameters('dbMasterName'),'-datadisk1.vhd')]"
+                            }
                         },
                         {
                             "name": "datadisk2",
-                            "diskSizeGB": "[parameters('diskSizeGB')]",
-                            "lun": 1
+                            "diskSizeGB": "[parameters('dataDiskSizeGB')]",
+                            "lun": 1,
+                            "vhd": {
+                                "Uri": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/',parameters('dbMasterName'),'-datadisk2.vhd')]"
+                            }
                         }
                     ]
                 },
@@ -332,13 +338,19 @@
                     "dataDisks": [
                         {
                             "name": "datadisk1",
-                            "diskSizeGB": "[parameters('diskSizeGB')]",
-                            "lun": 0
+                            "diskSizeGB": "[parameters('dataDiskSizeGB')]",
+                            "lun": 0,
+                            "vhd": {
+                                "Uri": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/',parameters('dbSlaveNamePrefix'), copyindex(),'-datadisk1.vhd')]"
+                            }
                         },
                         {
                             "name": "datadisk2",
-                            "diskSizeGB": "[parameters('diskSizeGB')]",
-                            "lun": 1
+                            "diskSizeGB": "[parameters('dataDiskSizeGB')]",
+                            "lun": 1,
+                            "vhd": {
+                                "Uri": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/',parameters('dbSlaveNamePrefix'), copyindex(),'-datadisk2.vhd')]"
+                            }
                         }
                     ]
                 },
@@ -397,6 +409,6 @@
             }
         }
     ],
-    "outputs": {
-    }
-}
+            "outputs": {
+            }
+        }
