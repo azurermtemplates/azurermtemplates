@@ -36,7 +36,6 @@
         },
         "adminPassword": {
             "type": "securestring",
-            "defaultValue": "MSrocks@2015",
             "metadata": {
                 "Description": "Virtual machine administrator password"
             }
@@ -52,10 +51,10 @@
             }
         },
         "numberOfSlaveInstances": {
-            "type": "string",
-            "defaultValue": "1",
+            "type": "int",
+            "defaultValue": 1,
             "metadata": {
-                "Description": "Number of read-only PostgreSQL slave instances to provision"
+                "Description": "Number of PostgreSQL slave instances to provision"
             }
         },
         "dbMasterName": {
