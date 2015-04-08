@@ -1,0 +1,7 @@
+{
+  "TemplateName": "Spin up a Mesosphere cluster with 3 master nodes”,
+  "Description": "Template spins up and configures a fully-functional mesosphere cluster with a THREE MASTER NODES. This makes Mesos more high-availability than in the single-master setup.”,
+  "ShortDescription": "Template spins up and configures a fully-functional mesosphere cluster. ",
+  "GithubUsername": "hausdorff",
+  "DateUpdated": "2015-04-08”
+}
