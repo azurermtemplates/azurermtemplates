@@ -1,4 +1,4 @@
-# Create multiple Ubuntu 14.04 VMs with PostgreSQL 9.3 service and one jumpbox VM with a public IP
+# Create multiple Ubuntu 14.04 VMs with PostgreSQL 9.3 master-slave replication and one jumpbox VM with a public IP
 
 <a href="https://azuredeploy.net/" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
