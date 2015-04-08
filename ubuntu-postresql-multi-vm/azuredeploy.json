@@ -36,9 +36,14 @@
         },
         "adminPassword": {
             "type": "securestring",
+            "defaultValue": "MSrocks@2015",
             "metadata": {
                 "Description": "Virtual machine administrator password"
             }
+        },
+        "replicatorPassword": {
+            "type": "securestring",
+            "defaultValue": "bSxuUNL3"
         },
         "vmSize": {
             "type": "string",
@@ -61,6 +66,21 @@
         "dbSlaveNamePrefix": {
             "type": "string",
             "defaultValue": "dbslave"
+        },
+        "dbAvailabilitySetName": {
+            "type": "string",
+            "defaultValue": "dbavailabilityset",
+            "metadata": {
+                "Description": "Name of the availability set containing the PostgreSQL master and slave database servers"
+            }
+        },
+        "platformFaultDomainCount": {
+            "type": "string",
+            "defaultValue": "2"
+        },
+        "platformUpdateDomainCount": {
+            "type": "string",
+            "defaultValue": "2"
         },
         "dataDiskSizeGB": {
             "type": "int",
@@ -109,6 +129,16 @@
             "location": "[parameters('location')]",
             "properties": {
                 "accountType": "Standard_LRS"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[parameters('dbAvailabilitySetName')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "properties": {
+                "platformFaultDomainCount": "[parameters('platformFaultDomainCount')]",
+                "platformUpdateDomainCount": "[parameters('platformUpdateDomainCount')]"
             }
         },
         {
@@ -263,9 +293,13 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', 'nicmaster')]",
-                "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]"
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
+                "[concat('Microsoft.Compute/availabilitySets/', parameters('dbAvailabilitySetName'))]"
             ],
             "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('dbAvailabilitySetName'))]"
+                },
                 "hardwareProfile": {
                     "vmSize": "[parameters('vmSize')]"
                 },
@@ -319,9 +353,13 @@
             "dependsOn": [
                 "[concat('Microsoft.Network/networkInterfaces/', 'nicslave', copyindex())]",
                 "[concat('Microsoft.Compute/virtualMachines/', parameters('dbMasterName'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]"
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
+                "[concat('Microsoft.Compute/availabilitySets/', parameters('dbAvailabilitySetName'))]"
             ],
             "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('dbAvailabilitySetName'))]"
+                },
                 "hardwareProfile": {
                     "vmSize": "[parameters('vmSize')]"
                 },
@@ -377,9 +415,9 @@
                 "typeHandlerVersion": "1.2",
                 "settings": {
                     "fileUris": [
-                        "https://gist.githubusercontent.com/arsenvlad/6126331f4a307eed2d16/raw/53469d8287440dc22d1975bedc0f90e7b4c51183/install_postgresql.sh"
+                        "https://gist.githubusercontent.com/arsenvlad/6126331f4a307eed2d16/raw/7d1fea26739304486ff557c1110bce4a3d2c87b6/install_postgresql.sh"
                     ],
-                    "commandToExecute": "[concat('sh install_postgresql.sh ', reference('nicmaster').ipConfigurations[0].properties.privateIPAddress, ' ', parameters('subnetDbPrefix'), ' MASTER ', reference('nicmaster').ipConfigurations[0].properties.privateIPAddress, ' ', parameters('numberOfSlaveInstances'))]"
+                    "commandToExecute": "[concat('bash install_postgresql.sh ', reference('nicmaster').ipConfigurations[0].properties.privateIPAddress, ' ', parameters('subnetDbPrefix'), ' MASTER ', reference('nicmaster').ipConfigurations[0].properties.privateIPAddress, ' ', parameters('numberOfSlaveInstances'), ' ', parameters('replicatorPassword'))]"
                 }
             }
         },
@@ -402,13 +440,13 @@
                 "typeHandlerVersion": "1.2",
                 "settings": {
                     "fileUris": [
-                        "https://gist.githubusercontent.com/arsenvlad/6126331f4a307eed2d16/raw/53469d8287440dc22d1975bedc0f90e7b4c51183/install_postgresql.sh"
+                        "https://gist.githubusercontent.com/arsenvlad/6126331f4a307eed2d16/raw/7d1fea26739304486ff557c1110bce4a3d2c87b6/install_postgresql.sh"
                     ],
-                    "commandToExecute": "[concat('sh install_postgresql.sh ', reference('nicmaster').ipConfigurations[0].properties.privateIPAddress, ' ', parameters('subnetDbPrefix'), ' SLAVE ', reference(concat('nicslave', copyindex())).ipConfigurations[0].properties.privateIPAddress, ' ', parameters('numberOfSlaveInstances'))]"
+                    "commandToExecute": "[concat('bash install_postgresql.sh ', reference('nicmaster').ipConfigurations[0].properties.privateIPAddress, ' ', parameters('subnetDbPrefix'), ' SLAVE ', reference(concat('nicslave', copyindex())).ipConfigurations[0].properties.privateIPAddress, ' ', parameters('numberOfSlaveInstances'), ' ', parameters('replicatorPassword'))]"
                 }
             }
         }
     ],
-            "outputs": {
-            }
-        }
+    "outputs": {
+    }
+}
