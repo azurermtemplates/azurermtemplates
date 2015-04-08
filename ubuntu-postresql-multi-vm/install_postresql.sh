@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Log to /var/log/syslog
-
 # Get today's date into YYYYMMDD format
 now=$(date +"%Y%m%d")
  
@@ -29,6 +27,87 @@ install_postgresql_service() {
 	fi
 	
 	logger "Done installing PostreSQL..."
+}
+
+stripe_datadisks() {
+	logger "Install mdadm"
+
+	export DEBIAN_FRONTEND=noninteractive
+	apt-get -y install mdadm
+
+	RAIDDISK="/dev/md127"
+	RAIDPARTITION="/dev/md127p1"
+	MOUNTPOINT="/datadrive"
+
+	ls -l $RAIDPARTITION >/dev/null 2>&1
+	if [ ${?} -eq 0 ];
+	then
+		logger "$RAIDPARTITION is already created"
+		echo "$RAIDPARTITION is already created"
+	else
+		# Create RAID-0 array to stripe the partitions together
+		logger "Create RAID-0 $RAIDDISK"
+		echo "yes" | mdadm --create "$RAIDDISK" --name=data --level=0 --chunk=64 --raid-devices=2 /dev/sdc /dev/sdd
+
+	# Create partition on the RAID disk
+	logger "Create partition on RAID $RAIDDISK"
+echo "n
+p
+1
+
+
+w
+" | fdisk $RAIDDISK
+	fi
+
+	# Create filesystem and mount point
+	ls -l $MOUNTPOINT >/dev/null 2>&1
+	if [ ${?} -eq 0 ];
+	then
+		logger "$MOUNTPOINT already exists"
+		echo "$MOUNTPOINT already exists"
+	else
+		logger "Create ext4 file system on $RAIDPARTITION"
+		mkfs -t ext4 $RAIDPARTITION
+		mkdir $MOUNTPOINT
+	fi
+
+	# This redirection is specific to the bash shell
+	read UUID FS_TYPE < <(blkid -u filesystem ${RAIDPARTITION} | awk -F "[= ]" '{print $3" "$5}' | tr -d "\"")
+
+	grep "${UUID}" /etc/fstab >/dev/null 2>&1
+	if [ ${?} -eq 0 ];
+	then
+		logger "$UUID is already in /etc/fstab"
+        echo "$UUID is already in /etc/fstab"
+	else
+        LINE="UUID=$UUID $MOUNTPOINT ext4 defaults,nobootwait 0 0"
+        logger "Added $LINE to /etc/fstab"
+        echo "Added $LINE to /etc/fstab"
+        echo $LINE >> /etc/fstab
+	fi
+
+	# Mount based on what is defined in /etc/fstab
+	logger "Mounting disk $RAIDPARTITION on $MOUNTPOINT"
+	mount -a
+
+	# Move database files to the stripped disk
+	if [ -L /var/lib/postgresql/9.3 ];
+	then
+		logger "Symbolic link from /var/lib/postgresql/9.3 already exists"
+		echo "Symbolic link from /var/lib/postgresql/9.3 already exists"
+	else
+		logger "Moving PostgreSQL data to the $MOUNTPOINT/pgdata/9.3"
+		echo "Moving PostgreSQL data to the $MOUNTPOINT/pgdata/9.3"
+		service postgresql stop
+		mkdir $MOUNTPOINT/pgdata
+		mv /var/lib/postgresql/9.3 $MOUNTPOINT/pgdata
+
+		# Create symbolic link so that configuration files continue to use the default folders
+		logger "Create symbolic link from /var/lib/postgresql/9.3 to $MOUNTPOINT/pgdata/9.3"
+		ln -s $MOUNTPOINT/pgdata/9.3 /var/lib/postgresql/9.3
+		service postgresql start
+	fi
 }
 
 configure_streaming_replication() {
@@ -120,4 +199,5 @@ configure_streaming_replication() {
 
 # MAIN ROUTINE
 install_postgresql_service
+stripe_datadisks
 configure_streaming_replication
