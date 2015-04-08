@@ -1,0 +1,26 @@
+﻿{
+    "adminUsername": {
+        "value": ""
+    },
+    "adminPassword": {
+        "value": ""
+    },
+    "osDiskVhdUri": {
+        "value" : "https://test.blob.core.windows.net/vhds/example.vhd"
+    },
+    "osType" : {
+        "value" : ""
+    },
+    "location": {
+        "value": "West US"
+    },
+    "vmSize": {
+        "value": "Standard_A2"
+    },
+    "vmName" : {
+      "value" : ""
+    },
+    "nicName" : {
+      "value" : ""
+    }
+}

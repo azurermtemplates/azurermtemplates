@@ -3,10 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "location": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+          "Description": "Location of resources"
+      }
     },
     "newStorageAccountName": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+          "Description": "Storage Account Name"
+      }
     },
     "storageAccountType": {
       "type": "string",
@@ -14,24 +20,39 @@
       "allowedValues": [
         "Standard_LRS",
         "Standard_GRS"
-      ]
+      ],
+      "metadata": {
+          "Description": "Type of the Storage Account"
+      }
     },
     "publicIPAddressName": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+          "Description": "Public IP Address Name"
+      }
     },
     "publicIPAddressType": {
       "type": "string",
       "defaultValue": "Dynamic",
       "allowedValues": [
         "Dynamic"
-      ]
+      ],
+      "metadata": {
+          "Description": "Public IP Address Type"
+      }
     },
     "vmStorageAccountContainerName": {
       "type": "string",
-      "defaultValue": "vhds"
+      "defaultValue": "vhds",
+      "metadata": {
+          "Description": "Storage container for disks"
+      }
     },
     "vmName": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+          "Description": "Name of the VM"
+      }
     },
     "vmSize": {
       "type": "string",
@@ -42,62 +63,104 @@
         "Standard_A2",
         "Standard_A3",
         "Standard_A4"
-      ]
+      ],
+      "metadata": {
+          "Description": "Size of the VM"
+      }
     },
     "vmSourceImageName": {
       "type": "string",
-      "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201412.01-en.us-127GB.vhd"
+      "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201412.01-en.us-127GB.vhd",
+      "metadata": {
+          "Description": "VM Image to use"
+      }
     },
     "adminUsername": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+          "Description": "Admin username"
+      }
     },
     "adminPassword": {
-      "type": "securestring"
+      "type": "securestring",
+      "metadata": {
+          "Description": "Admin password"
+      }
     },
     "virtualNetworkName": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+          "Description": "VNET Name"
+      }
     },
     "addressPrefix": {
       "type": "string",
-      "defaultValue": "10.0.0.0/16"
+      "defaultValue": "10.0.0.0/16",
+      "metadata": {
+          "Description": "VNET address space"
+      }
     },
     "subnet1Name": {
       "type": "string",
-      "defaultValue": "Subnet-1"
+      "defaultValue": "Subnet-1",
+      "metadata": {
+          "Description": "Subnet 1 name"
+      }
     },
     "subnet2Name": {
       "type": "string",
-      "defaultValue": "Subnet-2"
+      "defaultValue": "Subnet-2",
+      "metadata": {
+          "Description": "Subnet 2 name"
+      }
     },
     "subnet1Prefix": {
       "type": "string",
-      "defaultValue": "10.0.0.0/24"
+      "defaultValue": "10.0.0.0/24",
+      "metadata": {
+          "Description": "Subnet 1 adress space"
+      }
     },
     "subnet2Prefix": {
       "type": "string",
-      "defaultValue": "10.0.1.0/24"
+      "defaultValue": "10.0.1.0/24",
+      "metadata": {
+          "Description": "Subnet 2 address space"
+      }
     },
     "dnsName": {
-      "type": "string"
-    },
-    "subscriptionId": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+          "Description": "DNS name for the Public IP"
+      }
     },
     "nicName": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+          "Description": "Name of the NIC"
+      }
     },
     "vmExtensionName": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+          "Description": "Extension name"
+      }
     },
     "modulesUrl": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+          "Description": "URL for the DSC configuration module. NOTE: Can be a Github url(raw) to the zip file"
+      }
     },
     "configurationFunction": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+          "Description": "DSC configuration function to call"
+      }
     }
   },
   "variables": {
-    "sourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('vmSourceImageName'))]",
+    "sourceImageName": "[concat('/', subscription().subscriptionId,'/services/images/',parameters('vmSourceImageName'))]",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
     "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',parameters('subnet1Name'))]"
   },
