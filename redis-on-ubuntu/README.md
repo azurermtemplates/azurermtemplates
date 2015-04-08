@@ -10,20 +10,18 @@ Below are the parameters that the template expects:
 
 | Name   | Description    |
 |:--- |:---|
-| storageAccountName  | Unique DNS Name for the Storage Account where the Virtual Machine's disks will be placed. |
-| adminUsername  | Username for the Virtual Machines  |
-| adminPassword  | Password for the Virtual Machine  |
+| storageAccountName  | Unique DNS Name for the Storage Account where the Virtual Machine's disks will be placed |
+| adminUsername  | Admin user name for the Virtual Machines  |
+| adminPassword  | Admin password for the Virtual Machine  |
 | numberOfInstances | The number of VM instances to be configured for the Redis cluster |
 | subscriptionId  | Subscription ID where the template will be deployed |
 | region | Region name where the corresponding Azure artifacts will be created |
 | virtualNetworkName | Name of Virtual Network |
 | vmSize | Size of the Virtual Machine |
 | dataDiskSize | Size of each disk attached to Redis nodes (in GB) |
-| subnet1Name | Name of the primary Virtual Network subnet |
-| subnet2Name | Name of the secondary Virtual Network subnet |
+| subnetName | Name of the Virtual Network subnet |
 | addressPrefix | The IP address mask used by the Virtual Network |
-| subnet1Prefix | The subnet mask used by primary Virtual Network subnet |
-| subnet2Prefix | The subnet mask used by secondary Virtual Network subnet |
+| subnetPrefix | The subnet mask used by the Virtual Network subnet |
 | redisVersion | Redis version number to be installed |
 | redisClusterName | Name of the Redis cluster |
 
@@ -32,4 +30,5 @@ Topology
 
 The deployment topology is comprised of _numberOfInstances_ nodes joined into a cluster.
 The AOF persistence is enabled by default, whereas the RDB persistence is tuned to perform less-frequent dumps (once every 60 minutes).
+In addition, some critical memory- and network-specific optimizations are applied to ensure the optimal performance and throughput.
 
