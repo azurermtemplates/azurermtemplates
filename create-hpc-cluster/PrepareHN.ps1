@@ -347,6 +347,16 @@ function NodeStateCheck
 
     $datetimestr = (Get-Date).ToString('yyyyMMdd')
     $script:PrepareNodeLogFile = "$env:windir\Temp\HpcNodeCheckLog-$datetimestr.txt"
+
+    $unapprovedNodes = @()
+    $unapprovedNodes += Get-HpcNode -State Unknown -ErrorAction SilentlyContinue
+    if($unapprovedNodes.Count -gt 0)
+    {
+        TraceInfo 'Start to assign template to unknown nodes'
+        PrintNodes $unapprovedNodes
+        Assign-HpcNodeTemplate -Name "Default ComputeNode Template" -Node $unapprovedNodes -Confirm:$false        
+    }
+
     $offlineNodes = @()
     $offlineNodes += Get-HpcNode -State Offline -ErrorAction SilentlyContinue
     if($offlineNodes.Count -gt 0)

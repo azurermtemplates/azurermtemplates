@@ -14,12 +14,12 @@ function PrintNodes
     Param(
     $nodes = @()
     )
-    $formatString = '{0,16}{1,12}{2,15}{3,10}{4,20}';
-    TraceInfo ($formatString -f 'NetBiosName','NodeState','NodeHealth','Weight','Groups')
-    TraceInfo ($formatString -f '-----------','---------','----------','------','------')
+    $formatString = '{0,16}{1,12}{2,15}{3,10}';
+    TraceInfo ($formatString -f 'NetBiosName','NodeState','NodeHealth','Groups')
+    TraceInfo ($formatString -f '-----------','---------','----------','------')
     foreach ($node in $nodes)
     {
-        TraceInfo ($formatString -f $node.NetBiosName,$node.NodeState,$node.NodeHealth,$node.RequestedWeight,$node.Groups)
+        TraceInfo ($formatString -f $node.NetBiosName,$node.NodeState,$node.NodeHealth,$node.Groups)
     }
 }
 

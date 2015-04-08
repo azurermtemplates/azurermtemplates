@@ -1,22 +1,103 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
     "contentVersion": "1.0.0.0",
-    "parameters" : {
-        "namePrefix" : {
-      	    "type": "string",
+    "parameters": {
+        "namePrefix": {
+            "type": "string",
             "metadata": {
-                "Description": "name prefix for all new resources"
+                "Description": "Name prefix for all new resources"
             }
-    	},
+        },
         "location": {
-            "type": "String",
-            "defaultValue" : "West US",
+            "type": "string",
+            "defaultValue": "West US",
             "allowedValues": [
-              "West US",
-              "East US"
+                "West US",
+                "East US",
+                "East Asia",
+                "Southeast Asia",
+                "West Europe"
             ],
             "metadata": {
                 "Description": "Location where resources will be deployed"
+            }
+        },
+        "headNodeVMSize": {
+            "type": "string",
+            "defaultValue": "Standard_A4",
+            "allowedValues": [
+                "Standard_A3",
+                "Standard_A4",
+                "A5",
+                "A6",
+                "A7",
+                "A8",
+                "A9",
+                "A10",
+                "A11",
+                "Standard_D3",
+                "Standard_D4",
+                "Standard_D12",
+                "Standard_D13",
+                "Standard_D14",
+                "Standard_DS3",
+                "Standard_DS4",
+                "Standard_DS12",
+                "Standard_DS13",
+                "Standard_DS14"
+            ],
+            "metadata": {
+                "Description": "Headnode VM role size"
+            }
+        },
+        "computeNodeNumber": {
+            "type": "int",
+            "defaultValue": 1,
+            "metadata": {
+                "Description": "Compute nodes number"
+            }
+        },
+        "computeNodeVMSize": {
+            "type": "string",
+            "defaultValue": "Standard_A3",
+            "allowedValues": [
+                "Standard_A1",
+                "Standard_A2",
+                "Standard_A3",
+                "Standard_A4",
+                "A5",
+                "A6",
+                "A7",
+                "A8",
+                "A9",
+                "A10",
+                "A11",
+                "Standard_D1",
+                "Standard_D2",
+                "Standard_D3",
+                "Standard_D4",
+                "Standard_D11",
+                "Standard_D12",
+                "Standard_D13",
+                "Standard_D14",
+                "Standard_DS1",
+                "Standard_DS2",
+                "Standard_DS3",
+                "Standard_DS4",
+                "Standard_DS11",
+                "Standard_DS12",
+                "Standard_DS13",
+                "Standard_DS14"
+            ],
+            "metadata": {
+                "Description": "Compute node VM role size"
+            }
+        },
+        "computeNamePrefix": {
+            "type": "string",
+            "defaultValue": "AzureCN-",
+            "metadata": {
+                "Description": "Compute node VM name prefix"
             }
         },
         "storageAccountType": {
@@ -27,243 +108,307 @@
                 "Standard_GRS"
             ],
             "metadata": {
-                "Description": "storage account type"
-            }
-        },
-        "publicIPAddressType" : {
-            "type" : "string",
-            "defaultValue" : "Dynamic",
-            "allowedValues" : [
-                "Dynamic"
-            ],
-            "metadata": {
-                "Description": "public IP address type, default is dynamic"
+                "Description": "Storage account type"
             }
         },
         "vmStorageAccountContainerName": {
             "type": "string",
             "defaultValue": "vhds",
             "metadata": {
-                "Description": "name of storage container to store VM vhd"
+                "Description": "Name of storage container to store VM vhd"
             }
         },
-        "vmExtensionName":{
-	    "type": "string",
-            "defaultValue":"customScriptExtension",
-            "metadata": {
-                "Description": "customer extension name"
-            }
-        },
-        "vmSize": {
-            "type": "string",
-            "defaultValue": "Standard_A3",
-            "allowedValues" : [
-                "Standard_A0",
-                "Standard_A1",
-                "Standard_A2",
-                "Standard_A3",
-                "Standard_A4"
-            ],
-            "metadata": {
-                "Description": "VM role size"
-            }
-        },
-	"HNSourceImageName": {
+        "HNSourceImageName": {
             "type": "string",
             "defaultValue": "96316178b0644ae08bc4e037635ce104__HPC-Pack-2012R2-Update1-4.3.4660.0-WS2012R2-ENU",
             "metadata": {
-                "Description": "HPC Cluster image name, default is HPC pack 2012 R2 Update 1 (4.3.4660)"
+                "Description": "HPC Cluster image name, default is HPC Pack 2012 R2 Update 1 (4.3.4660)"
             }
         },
-	"adminUserName": {
+        "CNSourceImageName": {
+            "type": "string",
+            "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201503.01-en.us-127GB.vhd",
+            "metadata": {
+                "Description": "HPC Compute Node base image"
+            }
+        },
+        "adminUsername": {
             "type": "string",
             "defaultValue": "azureuser",
             "metadata": {
-                "Description": "admin user name"
+                "Description": "Admin user name"
             }
         },
         "adminPassword": {
             "type": "securestring",
             "defaultValue": "!!123abc",
             "metadata": {
-                "Description": "admin password"
-            }
-        },
-        "addressPrefix":{
-            "type" : "string",
-            "defaultValue" : "10.0.0.0/16",
-            "metadata": {
-                "Description": "internal IP address prefix"
-            }
-        },
-        "subnet1Name": {
-            "type" : "string",
-            "defaultValue" : "Subnet-1",
-            "metadata": {
-                "Description": "subnet name under ther virtual network"
-            }
-        },
-        "subnet1Prefix" : {
-            "type" : "string",
-            "defaultValue" : "10.0.0.0/24",
-            "metadata": {
-                "Description": "IP address prefix for subnet"
+                "Description": "Admin password"
             }
         }
     },
 
     "variables": {
         "storageAccountName": "[concat(parameters('namePrefix'), 'sa')]",
-	"HNsourceImageName" : "[concat('/',subscription().subscriptionId,'/services/images/',parameters('HNSourceImageName'))]",
+        "HNsourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('HNSourceImageName'))]",
+        "CNsourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('CNSourceImageName'))]",
         "virtualNetworkName": "[concat(parameters('namePrefix'), 'VNet')]",
-	"vnetID":"[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
-        "subnetRef" : "[concat(variables('vnetID'),'/subnets/',parameters('subnet1Name'))]",
+        "addressPrefix": "10.0.0.0/16",
+        "subnet1Name": "Subnet-1",
+        "subnet1Prefix":"10.0.0.0/24",
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
+        "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]",
+        "publicIPAddressType":  "Dynamic",
         "publicIPAddressName": "[concat(parameters('namePrefix'), '-PublicIP-VM')]",
-	"publicIPAddressNameHN": "[concat(variables('publicIPAddressName'),'-HN')]",
+        "publicIPAddressNameHN": "[concat(variables('publicIPAddressName'),'-HN')]",
         "dnsName": "[concat(parameters('namePrefix'), 'ep')]",
-	"domainNameHN": "[concat(variables('dnsName'),'-hn')]",
+        "domainNameHN": "[concat(variables('dnsName'),'-hn')]",
         "nicName": "[concat(parameters('namePrefix'),'-nic')]",
-	"nicNameHN": "[concat(variables('nicName'),'-hn')]",
-	"vmNameHN": "[concat(parameters('namePrefix'),'hn')]",
+        "nicNameHN": "[concat(variables('nicName'),'-hn')]",
+        "vmNameHN": "[concat(parameters('namePrefix'),'hn')]",
         "dcName": "[concat(parameters('namePrefix'),'dc.local')]",
-	"HNcommandStr": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File PrepareHN.ps1 -DomainFQDN ', variables('dcName'),' -AdminUserName ', parameters('adminUsername'), ' -AdminPassword ', parameters('adminPassword'), ' -NodePrepare')]"
+        "vmExtensionName":  "customScriptExtension",
+        "HNcommandStr": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File PrepareHN.ps1 -DomainFQDN ', variables('dcName'),' -AdminUserName ', parameters('adminUsername'), ' -AdminPassword ', parameters('adminPassword'), ' -NodePrepare')]",
+        "CNcommandStr": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File PrepareCN.ps1 -DomainFQDN ', variables('dcName'),' -ClusterName ', variables('vmNameHN'),' -AdminUserName ', parameters('adminUsername'), ' -AdminPassword ', parameters('adminPassword'))]"
     },
 
     "resources": [
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('storageAccountName')]",
-      "apiVersion": "2014-12-01-preview",
-      "location": "[parameters('location')]",
-      "properties": {
-        "accountType": "[parameters('storageAccountType')]"
-      }
-    },
- 
-    {
-      "apiVersion": "2014-12-01-preview",
-      "type": "Microsoft.Network/virtualNetworks",
-      "name": "[variables('virtualNetworkName')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[parameters('addressPrefix')]"
-          ]
-        },
-        "dhcpOptions": 
         {
-            "dnsServers": ["8.8.8.8", "10.0.0.4"]
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageAccountName')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "properties": {
+                "accountType": "[parameters('storageAccountType')]"
+            }
         },
-        "subnets": [
-          {
-            "name": "[parameters('subnet1Name')]",
+
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('virtualNetworkName')]",
+            "location": "[parameters('location')]",
             "properties": {
-              "addressPrefix": "[parameters('subnet1Prefix')]"
-            }
-          }
-        ]
-      }
-    },
-
-    {
-      "apiVersion": "2014-12-01-preview",
-      "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[variables('publicIPAddressNameHN')]",
-      "location": "[parameters('location')]",
-      "properties": {
-        "publicIPAllocationMethod": "[parameters('publicIPAddressType')]",
-        "dnsSettings": {
-          "domainNameLabel": "[variables('domainNameHN')]"
-        }
-      }
-    },
-
-    {
-      "apiVersion": "2014-12-01-preview",
-      "type": "Microsoft.Network/networkInterfaces",
-      "name": "[variables('nicNameHN')]",
-      "location": "[parameters('location')]",
-      "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressNameHN'))]"	
-      ],
-      "properties": {
-        "ipConfigurations": [
-          {
-            "name": "IPConfig",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "privateIPAddress": "10.0.0.4",
-              "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressNameHN'))]"
-              },
-              "subnet": {
-                "id": "[variables('subnetRef')]"
-              },
-            }
-          }
-        ]
-      }
-    },
-
-    {
-        "apiVersion": "2014-12-01-preview",
-        "type": "Microsoft.Compute/virtualMachines",
-        "name": "[variables('vmNameHN')]",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-	    "[concat('Microsoft.Network/networkInterfaces/', variables('nicNameHN'))]",
-	    "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
-        ],
-        "properties": {
-            "hardwareProfile": {
-                "vmSize": "[parameters('vmSize')]"
-            },
-            "osProfile": {
-                "computername": "[variables('vmNameHN')]",
-                "adminUsername": "[parameters('adminUsername')]",
-                "adminPassword": "[parameters('adminPassword')]",
-                "windowsProfile": {
-                    "provisionVMAgent": "true"
-                }
-            },
-            "storageProfile": {
-                "sourceImage": {
-                    "id": "[variables('HNsourceImageName')]"
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('addressPrefix')]"
+                    ]
                 },
-                "destinationVhdsContainer" : "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/')]"
-            },
-            "networkProfile": {
-                "networkInterfaces" : [
-                {
-                    "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicNameHN'))]"
-                }
-                ]        
+                "dhcpOptions": {
+                    "dnsServers": [ "10.0.0.4", "8.8.8.8" ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnet1Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnet1Prefix')]"
+                        }
+                    }
+                ]
             }
-        }
-    },
+        },
 
-    {
-        "type": "Microsoft.Compute/virtualMachines/extensions",
-        "name": "[concat(variables('vmNameHN'),'/', parameters('vmExtensionName'))]",
-        "apiVersion": "2014-12-01-preview",
-        "location": "[parameters('location')]",
-        "dependsOn": [            
-            "[concat('Microsoft.Compute/virtualMachines/', variables('vmNameHN'))]"
-        ],
-        "properties": {
-            "publisher": "Microsoft.Compute",
-            "type" : "CustomScriptExtension",
-            "typeHandlerVersion": "1.2",
-            "settings": {
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIPAddressNameHN')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[variables('domainNameHN')]"
+                }
+            }
+        },
+
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('nicNameHN')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressNameHN'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "IPConfig",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "10.0.0.4",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressNameHN'))]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('vmNameHN')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicNameHN'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('headNodeVMSize')]"
+                },
+                "osProfile": {
+                    "computername": "[variables('vmNameHN')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsProfile": {
+                        "provisionVMAgent": "true"
+                    }
+                },
+                "storageProfile": {
+                    "sourceImage": {
+                        "id": "[variables('HNsourceImageName')]"
+                    },
+                    "destinationVhdsContainer": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/')]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicNameHN'))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmNameHN'),'/', variables('vmExtensionName'))]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmNameHN'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.2",
+                "settings": {
                     "fileUris": [
-			"http://yongjun.blob.core.windows.net/scripts/PrepareHN.ps1",
-			"http://yongjun.blob.core.windows.net/scripts/HPCHNPrepare.ps1",
-			"http://yongjun.blob.core.windows.net/scripts/HpcPrepareUtil.ps1"
-		    ],
+                        "http://yongjun.blob.core.windows.net/scripts/PrepareHN.ps1",
+                        "http://yongjun.blob.core.windows.net/scripts/HPCHNPrepare.ps1",
+                        "http://yongjun.blob.core.windows.net/scripts/HpcPrepareUtil.ps1"
+                    ],
                     "commandToExecute": "[variables('HNcommandStr')]"
                 }
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[concat(variables('publicIPAddressName'), copyIndex())]",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "CN",
+                "count": "[parameters('computeNodeNumber')]"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "[variables('publicIPAddressType')]"
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[concat(variables('nicName'), copyIndex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'), copyIndex())]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicNameHN'))]"
+            ],
+            "copy": {
+                "name": "CN",
+                "count": "[parameters('computeNodeNumber')]"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "IPConfig",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[concat(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName')), copyIndex())]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[concat(parameters('computeNamePrefix'), copyIndex())]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmNameHN'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'), copyIndex())]"
+            ],
+            "copy": {
+                "name": "CN",
+                "count": "[parameters('computeNodeNumber')]"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('computeNodeVMSize')]"
+                },
+                "osProfile": {
+                    "computername": "[concat(parameters('computeNamePrefix'), copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "windowsProfile": {
+                        "provisionVMAgent": "true"
+                    }
+                },
+                "storageProfile": {
+                    "sourceImage": {
+                        "id": "[variables('CNsourceImageName')]"
+                    },
+                    "destinationVhdsContainer": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/')]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('nicName'), copyIndex()))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(concat(parameters('computeNamePrefix'), copyIndex()),'/', variables('vmExtensionName'))]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('computeNamePrefix'), copyIndex())]"
+            ],
+            "copy": {
+                "name": "CN",
+                "count": "[parameters('computeNodeNumber')]"
+            },
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.2",
+                "settings": {
+                    "fileUris": [ "http://yongjun.blob.core.windows.net/scripts/PrepareCN.ps1" ],
+                    "commandToExecute": "[variables('CNcommandStr')]"
+                }
+            }
         }
-    }
     ]
-} 
+}
