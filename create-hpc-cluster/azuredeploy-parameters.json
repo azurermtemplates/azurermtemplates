@@ -1,44 +1,38 @@
 ﻿{
+    "namePrefix" : {
+        "value": "hpcrg"
+    }
     "location": {
         "value": "West US"
     },
-    "storageAccountType" : {
+    "headNodeVMSize": {
+        "value": "Standard_A4"
+    },
+    "computeNodeNumber": {
+        "value": 2
+    },
+    "computeNodeVMSize": {
+        "value": "Standard_A3"
+    },
+    "computeNamePrefix": {
+        "value": "AzureCN-"
+    },
+    "storageAccountType": {
         "value":"Standard_LRS"
     },
-    "publicIPAddressType" : {
-        "value":"Dynamic"
-    },
-    "vmStorageAccountContainerName" : {
+    "vmStorageAccountContainerName": {
         "value":"vhds"
     },
-    "vmExtensionName" : {
-        "value":"customScriptExtension"
-    },
-    "vmSize" : {
-        "value":"Standard_A3"
-    },
-    "HNSourceImageName" : {
+    "HNSourceImageName":  {
         "value":"96316178b0644ae08bc4e037635ce104__HPC-Pack-2012R2-Update1-4.3.4660.0-WS2012R2-ENU"
+    },
+    "CNSourceImageName": {
+        "value":"a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201503.01-en.us-127GB.vhd"
     },
     "adminUsername": {
         "value": "azureuser"
     },
     "adminPassword": {
         "value": "!!123abc"
-    },
-    "addressPrefix":{
-        "value" : "10.0.0.0/16"
-    },
-    "subnet1Name": {
-        "value" : "Subnet-1"
-    },
-    "subnet1Prefix" : {
-        "value" : "10.0.0.0/24"
-    },
-    "subscriptionId":{
-        "value" : "a486e243-747b-42de-8c4c-379f8295a746"
-    },
-    "namePrefix" : {
-        "value": "hpcrg"
-    }
+    }        
 }

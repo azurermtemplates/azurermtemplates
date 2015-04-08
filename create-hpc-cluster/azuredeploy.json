@@ -52,7 +52,7 @@
         },
         "computeNodeNumber": {
             "type": "int",
-            "defaultValue": 1,
+            "defaultValue": 2,
             "metadata": {
                 "Description": "Compute nodes number"
             }

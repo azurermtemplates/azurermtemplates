@@ -7,6 +7,7 @@ Create HPC Cluster - <a href="https://azuredeploy.net/" target="_blank">
 This template allows you to create one HPC Cluster
 
 Below are the parameters that the template expectes.
+
 | Name   | Description    |
 |:--- |:---|
 | namePrefix | The prefix of the resources(storage account, virtual network, virtual machine etc) to be created. |
@@ -20,4 +21,4 @@ Below are the parameters that the template expectes.
 | HNSourceImageName | Head node source image, default is HPC Pack 2012 R2 Update 1 |
 | CNSourceImageName | Compute node base image, default it Windows Server 2012 R2 |
 | adminUsername  | Username for the Virtual Machines  |
-| adminPassword  | Password for the Virtual Machine  |
+| adminPassword  | Password for the Virtual Machines  |
