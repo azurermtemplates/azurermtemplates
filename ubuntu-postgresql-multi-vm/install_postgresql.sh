@@ -16,7 +16,7 @@ export PGPASSWORD=$REPLICATORPASSWORD
 logger "NOW=$now MASTERIP=$MASTERIP SUBNETADDRESS=$SUBNETADDRESS NODETYPE=$NODETYPE NODEIP=$NODEIP NUMBEROFSLAVES=$NUMBEROFSLAVES"
 
 install_postgresql_service() {
-	logger "Start installing PostreSQL..."
+	logger "Start installing PostgreSQL..."
 	# Re-synchronize the package index files from their sources. An update should always be performed before an upgrade.
 	apt-get -y update
 
@@ -26,7 +26,7 @@ install_postgresql_service() {
 	  apt-get -y install postgresql=9.3* postgresql-contrib=9.3* postgresql-client=9.3*
 	fi
 	
-	logger "Done installing PostreSQL..."
+	logger "Done installing PostgreSQL..."
 }
 
 stripe_datadisks() {
