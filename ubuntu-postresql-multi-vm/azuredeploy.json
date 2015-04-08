@@ -42,8 +42,7 @@
             }
         },
         "replicatorPassword": {
-            "type": "securestring",
-            "defaultValue": "bSxuUNL3"
+            "type": "string"
         },
         "vmSize": {
             "type": "string",
@@ -80,11 +79,11 @@
         },
         "platformUpdateDomainCount": {
             "type": "string",
-            "defaultValue": "2"
+            "defaultValue": "5"
         },
         "dataDiskSizeGB": {
             "type": "int",
-            "defaultValue": 1023
+            "defaultValue": 1000
         },
         "virtualNetworkName": {
             "type": "string",
@@ -176,7 +175,7 @@
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
                 "dnsSettings": {
-                    "domainNameLabel": "[concat(parameters('domainName'),'0')]"
+                    "domainNameLabel": "[parameters('domainName')]"
                 }
             }
         },
@@ -237,7 +236,8 @@
                 "count": "[parameters('numberOfSlaveInstances')]"
             },
             "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', 'nicmaster')]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -415,7 +415,7 @@
                 "typeHandlerVersion": "1.2",
                 "settings": {
                     "fileUris": [
-                        "https://gist.githubusercontent.com/arsenvlad/6126331f4a307eed2d16/raw/d46a3ab51ee38ee6ed46e9173f40b314e8d0ae87/install_postgresql.sh"
+                        "https://raw.githubusercontent.com/arsenvlad/azurermtemplates/postresql/ubuntu-postresql-multi-vm/install_postgresql.sh"
                     ],
                     "commandToExecute": "[concat('bash install_postgresql.sh ', reference('nicmaster').ipConfigurations[0].properties.privateIPAddress, ' ', parameters('subnetDbPrefix'), ' MASTER ', reference('nicmaster').ipConfigurations[0].properties.privateIPAddress, ' ', parameters('numberOfSlaveInstances'), ' ', parameters('replicatorPassword'))]"
                 }
@@ -440,7 +440,7 @@
                 "typeHandlerVersion": "1.2",
                 "settings": {
                     "fileUris": [
-                        "https://gist.githubusercontent.com/arsenvlad/6126331f4a307eed2d16/raw/d46a3ab51ee38ee6ed46e9173f40b314e8d0ae87/install_postgresql.sh"
+                        "https://raw.githubusercontent.com/arsenvlad/azurermtemplates/postresql/ubuntu-postresql-multi-vm/install_postgresql.sh"
                     ],
                     "commandToExecute": "[concat('bash install_postgresql.sh ', reference('nicmaster').ipConfigurations[0].properties.privateIPAddress, ' ', parameters('subnetDbPrefix'), ' SLAVE ', reference(concat('nicslave', copyindex())).ipConfigurations[0].properties.privateIPAddress, ' ', parameters('numberOfSlaveInstances'), ' ', parameters('replicatorPassword'))]"
                 }
