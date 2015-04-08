@@ -118,14 +118,14 @@
                 "Description": "Name of storage container to store VM vhd"
             }
         },
-        "HNSourceImageName": {
+        "headNodeSourceImage": {
             "type": "string",
             "defaultValue": "96316178b0644ae08bc4e037635ce104__HPC-Pack-2012R2-Update1-4.3.4660.0-WS2012R2-ENU",
             "metadata": {
                 "Description": "HPC Cluster image name, default is HPC Pack 2012 R2 Update 1 (4.3.4660)"
             }
         },
-        "CNSourceImageName": {
+        "computeNodeSourceImage": {
             "type": "string",
             "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201503.01-en.us-127GB.vhd",
             "metadata": {
@@ -150,8 +150,8 @@
 
     "variables": {
         "storageAccountName": "[concat(parameters('namePrefix'), 'sa')]",
-        "HNsourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('HNSourceImageName'))]",
-        "CNsourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('CNSourceImageName'))]",
+        "HNsourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('headNodeSourceImage'))]",
+        "CNsourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('computeNodeSourceImage'))]",
         "virtualNetworkName": "[concat(parameters('namePrefix'), 'VNet')]",
         "addressPrefix": "10.0.0.0/16",
         "subnet1Name": "Subnet-1",
