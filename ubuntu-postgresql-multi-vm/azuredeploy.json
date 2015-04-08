@@ -52,8 +52,8 @@
             }
         },
         "numberOfSlaveInstances": {
-            "type": "int",
-            "defaultValue": 1,
+            "type": "string",
+            "defaultValue": "1",
             "metadata": {
                 "Description": "Number of read-only PostgreSQL slave instances to provision"
             }
@@ -82,8 +82,8 @@
             "defaultValue": "5"
         },
         "dataDiskSizeGB": {
-            "type": "int",
-            "defaultValue": 1000
+            "type": "string",
+            "defaultValue": "1000"
         },
         "virtualNetworkName": {
             "type": "string",
