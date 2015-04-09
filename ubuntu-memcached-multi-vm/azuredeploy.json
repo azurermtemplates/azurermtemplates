@@ -2,12 +2,6 @@
     "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "subscriptionId": {
-            "type": "string",
-            "metadata": {
-                "Description": "Subscription Id"
-            }
-        },
         "location": {
             "type": "string",
             "defaultValue": "West US",
@@ -91,7 +85,7 @@
     },
     "variables": {
         "vmSourceImageName": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
-        "sourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',variables('vmSourceImageName'))]",
+        "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]",
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "subnetDmzRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetDmzName'))]",
         "subnetMemcachedRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetMemcachedName'))]",
