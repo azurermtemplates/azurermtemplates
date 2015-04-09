@@ -21,7 +21,6 @@ Template expects the following parameters
 
 | Name   | Description    |
 |:--- |:---|
-| subscriptionId  | Subscription ID where the template will be deployed |
 | newStorageAccountName  | Unique DNS name for the Storage Account where the Virtual Machines' disks will be placed |
 | location | Location where the resources will be deployed |
 | domainName | Domain name of the publicly accessible Apache test web server |
