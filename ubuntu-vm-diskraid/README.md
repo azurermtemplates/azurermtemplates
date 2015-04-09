@@ -1,4 +1,4 @@
-# Install Elasticsearch cluster on Ubuntu Virtual Machines using Custom Script Linux Extension
+# Create Ubuntu vm data disk raid0
 
 <a href="https://azuredeploy.net/" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
