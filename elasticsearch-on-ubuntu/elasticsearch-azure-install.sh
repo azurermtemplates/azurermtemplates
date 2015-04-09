@@ -9,10 +9,25 @@
 ### Remaining work items
 ### -Alternate discovery options (Azure Storage)
 ### -Implement Idempotency and Configuration Change Support
-### -Implement OS Disk Striping Option (Currenlty use Elasticsearch Disk Striping)
+### -Implement OS Disk Striping Option (Currenlty using multiple Elasticsearch data paths)
 ### -Implement Non-Durable Option (Put data on resource disk)
-### -Configure Data/Work Paths
-### -Recovery Settings (Not critical as they can be changed via API)
+### -Configure Work/Log Paths
+### -Recovery Settings (These can be changed via API)
+
+help()
+{
+    #TODO: Add help text here
+    echo "This script installs Elasticsearch cluster on Ubuntu"
+    echo "Parameters:"
+    echo "-n elasticsearch cluster name"
+    echo "-d static discovery endpoints 10.0.0.2-10.0.0.3-10.0.0.4"
+    echo "-v elasticsearch version 1.5.0"
+    echo "-l install marvel yes/no"
+    echo "-x configure as a dedicated master node"
+    echo "-y configure as client only node (no master, no data)"
+    echo "-z configure as data node (no master)"
+    echo "-h view this help content"
+}
 
 # Log method to control/redirect log output
 log()
@@ -31,8 +46,8 @@ then
     exit 3
 fi
 
-# TEMP FIX 
-# This is an interim fix for hostname resolution in preview VM
+# TEMP FIX - Re-evaluate and remove when possible
+# This is an interim fix for hostname resolution in current VM
 grep -q "${HOSTNAME}" /etc/hosts
 if [ $? -eq $SUCCESS ]
 then
@@ -53,6 +68,7 @@ CLIENT_ONLY_NODE=0
 DATA_NODE=0
 MASTER_ONLY_NODE=0
 
+#Loop through options passed
 while getopts :n:d:v:l:xyzsh optname; do
     log "Option $optname set with value ${OPTARG}"
   case $optname in
@@ -78,7 +94,7 @@ while getopts :n:d:v:l:xyzsh optname; do
       DATA_NODE=1
       ;;
     s) #use OS striped disk volumes
-	  OS_STRIPED_DISK=1
+      OS_STRIPED_DISK=1
       ;;
     d) #place data on local resource disk
       NON_DURABLE=1
@@ -95,23 +111,12 @@ while getopts :n:d:v:l:xyzsh optname; do
   esac
 done
 
-help()
-{
-    #TODO: Add help text here
-	echo "HELP Me! This script has no help documentation yet =("
-}
-
-#Validate Configurations
-
+#Static settings
 #A set of disks to ignore from partitioning and formatting
 BLACKLIST="/dev/sda|/dev/sdb"
 
 # Base path for data disk mount points
 DATA_BASE="/datadisks"
-
-usage() {
-    echo "Some udate details: $(basename $0)"
-}
 
 is_partitioned() {
 # Checks if there is a valid partition table on the
@@ -222,38 +227,38 @@ scan_partition_format()
 
     DISKS=($(scan_for_new_disks))
 
-	if [ "${#DISKS}" -eq 0 ];
-	then
-	    log "No unpartitioned disks without filesystems detected"
-	    return
-	fi
-	echo "Disks are ${DISKS[@]}"
-	for DISK in "${DISKS[@]}";
-	do
-	    echo "Working on ${DISK}"
-	    is_partitioned ${DISK}
-	    if [ ${?} -ne 0 ];
-	    then
-	        echo "${DISK} is not partitioned, partitioning"
-	        do_partition ${DISK}
-	    fi
-	    PARTITION=$(fdisk -l ${DISK}|grep -A 1 Device|tail -n 1|awk '{print $1}')
-	    has_filesystem ${PARTITION}
-	    if [ ${?} -ne 0 ];
-	    then
-	        echo "Creating filesystem on ${PARTITION}."
-	#        echo "Press Ctrl-C if you don't want to destroy all data on ${PARTITION}"
-	#        sleep 10
-	        mkfs -j -t ext4 ${PARTITION}
-	    fi
-	    MOUNTPOINT=$(get_next_mountpoint)
-	    echo "Next mount point appears to be ${MOUNTPOINT}"
-	    [ -d "${MOUNTPOINT}" ] || mkdir -p "${MOUNTPOINT}"
-	    read UUID FS_TYPE < <(blkid -u filesystem ${PARTITION}|awk -F "[= ]" '{print $3" "$5}'|tr -d "\"")
-	    add_to_fstab "${UUID}" "${MOUNTPOINT}"
-	    echo "Mounting disk ${PARTITION} on ${MOUNTPOINT}"
-	    mount "${MOUNTPOINT}"
-	done
+    if [ "${#DISKS}" -eq 0 ];
+    then
+        log "No unpartitioned disks without filesystems detected"
+        return
+    fi
+    echo "Disks are ${DISKS[@]}"
+    for DISK in "${DISKS[@]}";
+    do
+        echo "Working on ${DISK}"
+        is_partitioned ${DISK}
+        if [ ${?} -ne 0 ];
+        then
+            echo "${DISK} is not partitioned, partitioning"
+            do_partition ${DISK}
+        fi
+        PARTITION=$(fdisk -l ${DISK}|grep -A 1 Device|tail -n 1|awk '{print $1}')
+        has_filesystem ${PARTITION}
+        if [ ${?} -ne 0 ];
+        then
+            echo "Creating filesystem on ${PARTITION}."
+    #        echo "Press Ctrl-C if you don't want to destroy all data on ${PARTITION}"
+    #        sleep 10
+            mkfs -j -t ext4 ${PARTITION}
+        fi
+        MOUNTPOINT=$(get_next_mountpoint)
+        echo "Next mount point appears to be ${MOUNTPOINT}"
+        [ -d "${MOUNTPOINT}" ] || mkdir -p "${MOUNTPOINT}"
+        read UUID FS_TYPE < <(blkid -u filesystem ${PARTITION}|awk -F "[= ]" '{print $3" "$5}'|tr -d "\"")
+        add_to_fstab "${UUID}" "${MOUNTPOINT}"
+        echo "Mounting disk ${PARTITION} on ${MOUNTPOINT}"
+        mount "${MOUNTPOINT}"
+    done
 }
 
 # Configure Elasticsearch Data Disk Folder and Permissions
@@ -296,11 +301,11 @@ install_es()
     sudo dpkg -i elasticsearch.deb
 }
 
+# Primary Install Tasks
 #########################
-#########################
-
 #NOTE: These first three could be changed to run in parallel
 #      Future enhancement - (export the functions and use background/wait to run in parallel)
+
 #Install Oracle Java
 #------------------------
 install_java
@@ -310,12 +315,11 @@ install_java
 #-----------------------
 install_es
 
-#Format data disks
+#Format data disks (Find data disks then partition, format, and mount them as seperate drives)
 #------------------------
-# Find data disks then partition, format, and mount them as seperate drives
 scan_partition_format
 
-#
+#Prepare configuratino information
 #Configure permissions on data disks for elasticsearch user:group
 #--------------------------
 DATAPATH_CONFIG=""
@@ -329,16 +333,13 @@ done
 #Remove the extra trailing comma
 DATAPATH_CONFIG="${DATAPATH_CONFIG%?}"
 
-#D=`find ~ -mindepth 1 -maxdepth 1 -type d`
-#DISKS=$(echo "$D" | tr '\n' ',')
-
 #Get a list of my local IP addresses so we can trim this machines IP out of the discovery list
 MY_IPS=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
 
-#Format the static host endpooints for elasticsearch configureion ["",""] format
+#Format the static discovery host endpooints for elasticsearch configureion ["",""] format
 HOSTS_CONFIG="[\"${DISCOVERY_ENDPOINTS//-/\",\"}\"]"
 
-#Configure Elasticsearch
+#Configure Elasticsearch settings
 #---------------------------
 #Backup the current elasticsearch configuration file
 mv /etc/elasticsearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.bak
@@ -347,19 +348,21 @@ mv /etc/elasticsearch/elasticsearch.yml /etc/elasticsearch/elasticsearch.bak
 echo "cluster.name: $CLUSTER_NAME" >> /etc/elasticsearch/elasticsearch.yml
 echo "node.name: ${HOSTNAME}" >> /etc/elasticsearch/elasticsearch.yml
 
-# If we have data disks defined then use those in elasticsearch.yml
+# Configure paths - if we have data disks attached then use them
 if [ -n "$DATAPATH_CONFIG" ]; then
     log "Update configuration with data path list of $DATAPATH_CONFIG"
     echo "path.data: $DATAPATH_CONFIG" >> /etc/elasticsearch/elasticsearch.yml
 fi
 
-# Set to static node discovery and add static hosts
+# Configure discovery
 log "Update configuration with hosts configuration of $HOSTS_CONFIG"
 echo "discovery.zen.ping.multicast.enabled: false" >> /etc/elasticsearch/elasticsearch.yml
 echo "discovery.zen.ping.unicast.hosts: $HOSTS_CONFIG" >> /etc/elasticsearch/elasticsearch.yml
 
-log "Configure master/client/data node type flags mater-$MASTER_ONLY_NODE data-$DATA_NODE"
+
 # Configure elaticsearch node type
+log "Configure master/client/data node type flags mater-$MASTER_ONLY_NODE data-$DATA_NODE"
+
 if [ ${MASTER_ONLY_NODE} -ne 0 ]; then
     log "Configure node as master only"
     echo "node.master: true" >> /etc/elasticsearch/elasticsearch.yml
@@ -378,23 +381,12 @@ else
     echo "node.data: true" >> /etc/elasticsearch/elasticsearch.yml
 fi
 
-#--------------- TEMP (We will use this for the update path yet) ---------------
-#Updating the properties in the existing configuraiton has been a bit sensitve and requires more testing
-#sed -i -e "/cluster\.name/s/^#//g;s/^\(cluster\.name\s*:\s*\).*\$/\1${CLUSTER_NAME}/" /etc/elasticsearch/elasticsearch.yml
-#sed -i -e "/bootstrap\.mlockall/s/^#//g;s/^\(bootstrap\.mlockall\s*:\s*\).*\$/\1true/" /etc/elasticsearch/elasticsearch.yml
-#sed -i -e "/path\.data/s/^#//g;s/^\(path\.data\s*:\s*\).*\$/\1${DATAPATH_CONFIG}/" /etc/elasticsearch/elasticsearch.yml
+# DNS Retry
+echo "options timeout:1 attempts:5" >> /etc/resolvconf/resolv.conf.d/head
+resolvconf -u
 
-#Disable multicast and set master node endpoints
-#sed -i -e "/discovery\.zen\.ping\.multicast\.enabled/s/^#//g;s/^\(discovery\.zen\.ping\.multicast\.enabled\s*:\s*\).*\$/\1false/" /etc/elasticsearch/elasticsearch.yml
-#sed -i -e "/discovery\.zen\.ping\.unicast\.hosts/s/^#//g;s/^\(discovery\.zen\.ping\.unicast\.hosts\s*:\s*\).*\$/\1${HOSTS_CONFIG}/" /etc/elasticsearch/elasticsearch.yml
-
-# Minimum master nodes nodes/2+1
-# These can be configured via API as well - (_cluster/settings)
-# discovery.zen.minimum_master_nodes: 2
-# gateway.expected_nodes: 10
-# gateway.recover_after_time: 5m
-#----------------------
-
+#"action.disable_delete_all_indices: ${DISABLE_DELETE_ALL}" >> /etc/elasticsearch/elasticsearch.yml
+#"action.auto_create_index: ${AUTOCREATE_INDEX}" >> /etc/elasticsearch/elasticsearch.yml
 
 # Configure Environment
 #----------------------
@@ -414,7 +406,7 @@ if [ ${INSTALL_MARVEL} -eq "yes" ];
 fi
 
 #Install Monit
-#TODO
+#TODO - Install Monit to monitor the process (Although load balancer probes can accomplish this)
 
 #and... start the service
 log "Starting Elasticsearch on ${HOSTNAME}"
@@ -423,3 +415,28 @@ sudo service elasticsearch start
 log "complete elasticsearch setup and started"
 exit 0
 
+#Script Extras
+
+#Configure open file and memory limits
+#Swap is disabled by default in Ubuntu Azure VMs
+#echo "bootstrap.mlockall: true" >> /etc/elasticsearch/elasticsearch.yml
+
+# Verify this is necessary on azure
+#echo "elasticsearch    -    nofile    65536" >> /etc/security/limits.conf
+#echo "elasticsearch     -    memlock   unlimited" >> /etc/security/limits.conf
+#echo "session    required    pam_limits.so" >> /etc/pam.d/su
+#echo "session    required    pam_limits.so" >> /etc/pam.d/common-session
+#echo "session    required    pam_limits.so" >> /etc/pam.d/common-session-noninteractive
+#echo "session    required    pam_limits.so" >> /etc/pam.d/sudo
+
+#--------------- TEMP (We will use this for the update path yet) ---------------
+#Updating the properties in the existing configuraiton has been a bit sensitve and requires more testing
+#sed -i -e "/cluster\.name/s/^#//g;s/^\(cluster\.name\s*:\s*\).*\$/\1${CLUSTER_NAME}/" /etc/elasticsearch/elasticsearch.yml
+#sed -i -e "/bootstrap\.mlockall/s/^#//g;s/^\(bootstrap\.mlockall\s*:\s*\).*\$/\1true/" /etc/elasticsearch/elasticsearch.yml
+#sed -i -e "/path\.data/s/^#//g;s/^\(path\.data\s*:\s*\).*\$/\1${DATAPATH_CONFIG}/" /etc/elasticsearch/elasticsearch.yml
+
+# Minimum master nodes nodes/2+1 (These can be configured via API as well - (_cluster/settings))
+# discovery.zen.minimum_master_nodes: 2
+# gateway.expected_nodes: 10
+# gateway.recover_after_time: 5m
+#----------------------
