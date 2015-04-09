@@ -18,6 +18,7 @@ To make sure your template is added to Azure.com index, please follow these guid
 
 Here are the required parameters for a valid metadata.json file
 
+<del>
     {
       "TemplateName": "",
       "Description": "",
@@ -25,23 +26,35 @@ Here are the required parameters for a valid metadata.json file
       "GithubUsername": "",
       "DateUpdated": "<e.g. 2015-12-20>"
     }
+</del>
+
+####Update 4/9####
+To be more consistent with the Visual Studio and Gallery experience we're updating the metadata.json file structure. The new structure looks like below
+
+    {
+      "itemDisplayName": "",
+      "description": "",
+      "summary": "",
+      "githubUsername": "",
+      "dateUpdated": "<e.g. 2015-12-20>"
+    }
 
 The metadata.json file will be validated using these rules
 
-**TemplateName**
+**itemDisplayName**
 *	Cannot be more than 60 characters
 
-**Description**
+**description**
 *	Cannot be more than 1000 characters
 *	Cannot contain HTML
 
-**ShortDescription**
+**summary**
 *	Cannot be more than 200 characters
 
-**GithubUsername**
+**githubUsername**
 *	Username must be the same as the username of the author submitting the Pull Request
 
-**DateUpdated**
+**dateUpdated**
 *	Must be in yyyy-mm-dd format.
 *	The date must not be in the future to the date of the pull request
 
