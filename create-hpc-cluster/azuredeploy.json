@@ -190,6 +190,7 @@
         "vmNameHN": "[concat(parameters('namePrefix'),'hn')]",
         "dcName": "[concat(parameters('namePrefix'),'dc.local')]",
         "vmExtensionName": "customScriptExtension",
+        "customScriptLocation": "http://yongjun.blob.core.windows.net/scripts/",
         "iaasInfoArg": "[concat('-SubscriptionId ', subscription().subscriptionId, ' -VNet ', variables('virtualNetworkName'), ' -Subnet ', variables('subnet1Name'), ' -Location \"', parameters('location'), '\"')]",
         "HNcommandStr": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File PrepareHN.ps1 -DomainFQDN ', variables('dcName'), ' -AdminUserName ', parameters('adminUsername'), ' -AdminPassword \"', parameters('adminPassword'), '\" -NodePrepare ', variables('iaasInfoArg'))]",
         "CNcommandStr": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File PrepareCN.ps1 -DomainFQDN ', variables('dcName'), ' -ClusterName ', variables('vmNameHN'),' -AdminUserName ', parameters('adminUsername'), ' -AdminPassword ', parameters('adminPassword'))]"
@@ -320,9 +321,9 @@
                 "typeHandlerVersion": "1.2",
                 "settings": {
                     "fileUris": [
-                        "http://yongjun.blob.core.windows.net/scripts/PrepareHN.ps1",
-                        "http://yongjun.blob.core.windows.net/scripts/HPCHNPrepare.ps1",
-                        "http://yongjun.blob.core.windows.net/scripts/HpcPrepareUtil.ps1"
+                        "[concat(variables('customScriptLocation'), 'PrepareHN.ps1')]",
+                        "[concat(variables('customScriptLocation'), 'HPCHNPrepare.ps1')]",
+                        "[concat(variables('customScriptLocation'), 'HpcPrepareUtil.ps1')]"
                     ],
                     "commandToExecute": "[variables('HNcommandStr')]"
                 }
@@ -428,7 +429,7 @@
                 "type": "CustomScriptExtension",
                 "typeHandlerVersion": "1.2",
                 "settings": {
-                    "fileUris": [ "http://yongjun.blob.core.windows.net/scripts/PrepareCN.ps1" ],
+                    "fileUris": [ "[concat(variables('customScriptLocation'), 'PrepareCN.ps1')]" ],
                     "commandToExecute": "[variables('CNcommandStr')]"
                 }
             }
