@@ -21,12 +21,6 @@
                 "Description": "Unique namespace for the Storage Account where the Virtual Machine's disks will be placed"
             }
         },
-        "subscriptionId": {
-            "type": "string",
-            "metadata": {
-                "Description": "Microsoft Azure SubscriptionId to provision resources to"
-            }
-        },
         "region": {
             "type": "string",
             "defaultValue": "West US",
@@ -89,7 +83,7 @@
         "vmSourceImageName": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',parameters('subnet1Name'))]",
-        "sourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',variables('vmSourceImageName'))]",
+        "sourceImageName": "[concat('/', subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]",
         "scriptUrl":"https://raw.githubusercontent.com/fullscale180/scripts/master/linux/azure-vm-utils-0.1.sh"
     },
     "resources": [

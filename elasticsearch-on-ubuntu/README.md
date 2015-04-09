@@ -16,7 +16,6 @@ Below are the parameters that the template expects
 | adminUsername  | Username for the Virtual Machines  |
 | adminPassword  | Password for the Virtual Machine  |
 | dnsNameforLBIP  | Unique DNS Name for the Public IP used for load balancer. |
-| subscriptionId  | Subscription ID where the template will be deployed |
 | region | region where the resources will be deployed |
 | virtualNetworkName | Name of Virtual Network |
 | vmSizeMasterNodes | Size of the Cluster Master Virtual Machine Instances |
@@ -33,7 +32,7 @@ Below are the parameters that the template expects
 ##Known Issues and Limitations
 - Fixed number of data disks (This is due to a current template feature limitation and is fixed at 2 in order to all A0 instances for testing)
 - Only first two data instances are added to the load balancer and only the first two are accessible via SSH (This is due to a current limitation in the template providers)
-- No security control on the external endpoint or internal load balancing (This is due to some current limitations and requirements that need to further defined)
+- No security control on the external endpoint or internal load balancing (This is due to some current limitations)
 - Scripts are not yet idempotent and cannot handle updates (This currently works for create ONLY)
 - Not yet monitoring the instances or Elasticsearch process using probes or monit
 - Fixed configuration of data, master, and client nodes
