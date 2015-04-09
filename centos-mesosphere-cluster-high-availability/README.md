@@ -1,4 +1,4 @@
-# Spin up a single-Master (aka "dev") Mesosphere cluster
+# Spin up a 3-master ("high-availability") Mesosphere cluster
 
 <a href="https://azuredeploy.net" target="_blank">
 <img src="http://azuredeploy.net/deploybutton.png"/>
