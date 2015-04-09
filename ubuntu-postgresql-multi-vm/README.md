@@ -4,7 +4,7 @@
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
-This template allows you to create one master PostgreSQL 9.3 server with streaming-replication to multiple (based on the 'numberOfSlaveInstances' parameter) slave servers in a private-only subnet. Each database server is configured with 2 data disks that are stripped into RAID-0 configuration using mdadm. The template also creates one publicly accessible VM to serve as a jumpbox for ssh into the backend database servers.
+This template allows you to create one master PostgreSQL 9.3 server with streaming-replication to multiple (based on the 'numberOfSlaveInstances' parameter) slave servers in a private-only subnet. Each database server is configured with 2 data disks that are striped into RAID-0 configuration using mdadm. The template also creates one publicly accessible VM to serve as a jumpbox for ssh into the backend database servers.
 
 The template creates the following deployment resources:
 * Virtual Network with two subnets: Subnet-DMZ for the jumpbox VM and Subnet-DB for the PostgreSQL master and slave VMs
@@ -46,7 +46,7 @@ Template expects the following parameters
 | subscriptionId  | Subscription ID where the template will be deployed |
 | newStorageAccountName  | Unique DNS name for the Storage Account where the Virtual Machines' disks will be placed |
 | location | Location where the resources will be deployed |
-| domainName | Domain name of the publicly accessible jumpbox VM |
+| domainName | Domain name of the publicly accessible jumpbox VM {domainName}.{location}.cloudapp.com (e.g. mydomainname.westus.cloudapp.azure.com)|
 | adminUsername  | Username for the Virtual Machines  |
 | adminPassword  | Password for the Virtual Machine  |
 | numberOfSlaveInstances  | Number of PostgreSQL slave servers to deploy |
@@ -57,7 +57,7 @@ Template expects the following parameters
 | dbAvailabilitySetName | Name of the availability set into which master and slave servers will be deployed |
 | platformFaultDomainCount | Number of fault domains within the availability set |
 | platformUpdateDomainCount | Number of update domains within the availability set |
-| dataDiskSizeGB | Size of the data disks that will be attached to the PostgreSQL database servers and stripped together |
+| dataDiskSizeGB | Size of the data disks that will be attached to the PostgreSQL database servers and striped together |
 | virtualNetworkName | Virtual network name |
 | addressPrefix | Address prefix for the virtual network specified in CIDR format |
 | subnetDmzName | Name of Subnet-DMZ where the jumpbox server is deployed |

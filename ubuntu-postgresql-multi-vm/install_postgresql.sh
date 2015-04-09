@@ -91,7 +91,7 @@ w
 	logger "Mounting disk $RAIDPARTITION on $MOUNTPOINT"
 	mount -a
 
-	# Move database files to the stripped disk
+	# Move database files to the striped disk
 	if [ -L /var/lib/postgresql/9.3 ];
 	then
 		logger "Symbolic link from /var/lib/postgresql/9.3 already exists"
