@@ -16,7 +16,6 @@ Below are the parameters that the template expects
 | adminUsername  | Username for the Virtual Machines  |
 | adminPassword  | Password for the Virtual Machine  |
 | dnsName  | Unique DNS Name for the Public IP (dnsName.westus.cloudapp.azure.com) |
-| subscriptionId  | Subscription ID where the template will be deployed |
 | region | region where the resources will be deployed |
 | virtualNetworkName | Name of Virtual Network |
 | vmSize | Size of the Virtual Machine Instance |

@@ -11,9 +11,6 @@
     "adminPassword": {
         "value": ""
     },
-    "subscriptionId": {
-        "value": ""
-    },
     "region": {
         "value": "West US"
     },
