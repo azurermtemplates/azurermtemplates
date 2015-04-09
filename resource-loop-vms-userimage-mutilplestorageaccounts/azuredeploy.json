@@ -40,6 +40,7 @@
             "type": "string",
             "defaultValue": "myVM"
         },
+
         "nicNamePrefix": {
             "type": "string",
             "defaultValue": "myNic"
@@ -54,6 +55,12 @@
         }
     },
     "variables": {
+        "addressPrefix" : "10.0.0.0/16",
+        "subnet1Name" : "Subnet-1",
+        "subnet1Prefix" : "10.0.0.0/24",
+        "subnet2Name" : "Subnet-2",
+        "subnet2Prefix" : "10.0.1.0/24",
+
         "baseTemplateUri": "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/resource-loop-vms-userimage-mutilplestorageaccounts/userimage-loop-basetemplate.json",
         "storageAccountCount": 3,
         "nicref0": "[concat(parameters('nicNamePrefix'),'0')]",
@@ -65,6 +72,33 @@
     },
     "resources": [
         {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('virtualNetworkName')]",
+            "location": "[parameters('region')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnet1Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnet1Prefix')]"
+                        }
+                    },
+                    {
+                        "name": "[variables('subnet2Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnet2Prefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
             "name": "[concat('instance',copyindex())]",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2015-01-01",
@@ -72,6 +106,9 @@
                 "name": "deploymentloop",
                 "count": "[variables('storageAccountCount')]"
             },
+            "dependsOn" : [
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+            ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {

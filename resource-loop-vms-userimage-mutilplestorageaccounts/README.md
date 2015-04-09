@@ -8,8 +8,8 @@ This template allows you to create VMs from User image across 3 Storage accounts
 
 Prerequisite:
 
-1) The Storage Accounts with the User Image VHD should already exist in the same resource group with correct prefixes. For example: The Storage Accounts could 'mystgacct0', 'mystgacct1' & 'mystgacct2'. The Storage account suffixes should end in 0, 1 & 2.
-2) The Virtual Network already exists in the same resource group.
+The Storage Accounts with the User Image VHD should already exist in the same resource group with correct prefixes. For example: The Storage Accounts could 'mystgacct0', 'mystgacct1' & 'mystgacct2'. The Storage account suffixes should end in 0, 1 & 2.
+
 
 Note: The Recommended limit of number of disks per Storage Account is 40.
 
