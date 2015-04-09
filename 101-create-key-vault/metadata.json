@@ -1,7 +1,7 @@
 {
-  "TemplateName": "Create a Key Vault",
-  "Description": "This template creates a Key Vault",
-  "ShortDescription": "This template creates a Key Vault",
-  "GithubUsername": "singhkay",
-  "DateUpdated": "2015-03-30"
+  "itemDisplayName": "Create a Key Vault",
+  "description": "This template creates a Key Vault",
+  "summary": "This template creates a Key Vault",
+  "githubUsername": "singhkay",
+  "dateUpdated": "2015-03-30"
 }

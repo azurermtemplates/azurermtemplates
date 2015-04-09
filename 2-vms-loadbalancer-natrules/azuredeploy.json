@@ -19,9 +19,6 @@
             "type": "string",
             "defaultValue" : "uniqueDnsNameforLBIP"
         },
-        "subscriptionId": {
-            "type": "string"
-        },
         "backendPort": {
             "type": "int",
             "defaultValue": 3389
@@ -83,7 +80,7 @@
         "frontEndIPConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/LBFE')]",
         "backEndIPConfigID1": "[concat(variables('nicId1'),'/ipConfigurations/ipconfig1')]",
         "backEndIPConfigID2": "[concat(variables('nicId2'),'/ipConfigurations/ipconfig1')]",
-        "sourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('vmSourceImageName'))]"
+        "sourceImageName": "[concat('/', subscription().subscriptionId,'/services/images/',parameters('vmSourceImageName'))]"
     },
     "resources": [
         {
