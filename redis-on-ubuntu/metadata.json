@@ -1,7 +1,7 @@
 {
   "TemplateName": "Provisions a Redis Cluster on Ubuntu Virtual Machines",
-  "Description": "This template creates a Redis cluster on Ubuntu virtual machine image, enables persistence node (by default) and applies all well-known optimizations and best practices",
-  "ShortDescription": "This template creates a Redis cluster with persistence enabled",
+  "Description": "This template creates a Redis cluster on Ubuntu virtual machine image, enables persistence (by default) and applies all well-known optimizations and best practices",
+  "ShortDescription": "This template creates a Redis Cluster on Ubuntu virtual machines",
   "GithubUsername": "thecaterminator",
   "DateUpdated": "2015-04-06"
 }
