@@ -1,7 +1,7 @@
 ﻿{
     "namePrefix" : {
-        "value": "hpcrg"
-    }
+        "value": "hpc"
+    },
     "location": {
         "value": "West US"
     },
