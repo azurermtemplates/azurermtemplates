@@ -9,6 +9,18 @@
     [Parameter(Mandatory=$true, ParameterSetName='Prepare')]
     [String] $AdminPassword,
 
+    [Parameter(Mandatory=$false, ParameterSetName='Prepare')]
+    [String] $SubscriptionId,
+
+    [Parameter(Mandatory=$false, ParameterSetName='Prepare')]
+    [String] $VNet,
+
+    [Parameter(Mandatory=$false, ParameterSetName='Prepare')]
+    [String] $Subnet,
+
+    [Parameter(Mandatory=$false, ParameterSetName='Prepare')]
+    [String] $Location,
+
     [Parameter(Mandatory=$true, ParameterSetName='Prepare')]
     [switch] $NodePrepare,
 
@@ -371,6 +383,19 @@ function NodeStateCheck
 Set-StrictMode -Version 3
 if ($PsCmdlet.ParameterSetName -eq 'Prepare')
 {
+    if($SubscriptionId -ne $null)
+    {
+        New-Item -Path HKLM:\SOFTWARE\Microsoft\HPC -Name IaaSInfo -Force | Out-Null
+        Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\HPC\IaaSInfo -Name SubscriptionId -Value $SubscriptionId
+        $deployId = [System.Guid]::NewGuid().ToString()
+        Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\HPC\IaaSInfo -Name DeploymentId -Value $deployId
+        Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\HPC\IaaSInfo -Name VNet -Value $VNet
+        Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\HPC\IaaSInfo -Name Subnet -Value $Subnet
+        Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\HPC\IaaSInfo -Name AffinityGroup -Value ""
+        Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\HPC\IaaSInfo -Name Location -Value $Location
+        TraceInfo "The information needed for in-box management scripts succcessfully configured."
+    }
+
     PrepareHeadNode -DomainFQDN $DomainFQDN -AdminUserName $AdminUserName -AdminPassword $AdminPassword
 }
 else
