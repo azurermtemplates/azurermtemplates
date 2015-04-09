@@ -28,23 +28,18 @@
             "allowedValues": [
                 "Standard_A3",
                 "Standard_A4",
-                "A5",
-                "A6",
-                "A7",
-                "A8",
-                "A9",
-                "A10",
-                "A11",
+                "Standard_A5",
+                "Standard_A6",
+                "Standard_A7",
+                "Standard_A8",
+                "Standard_A9",
+                "Standard_A10",
+                "Standard_A11",
                 "Standard_D3",
                 "Standard_D4",
                 "Standard_D12",
                 "Standard_D13",
-                "Standard_D14",
-                "Standard_DS3",
-                "Standard_DS4",
-                "Standard_DS12",
-                "Standard_DS13",
-                "Standard_DS14"
+                "Standard_D14"
             ],
             "metadata": {
                 "Description": "Headnode VM role size"
@@ -53,6 +48,28 @@
         "computeNodeNumber": {
             "type": "int",
             "defaultValue": 2,
+            "allowedValues": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20
+            ],
             "metadata": {
                 "Description": "Compute nodes number"
             }
@@ -65,13 +82,13 @@
                 "Standard_A2",
                 "Standard_A3",
                 "Standard_A4",
-                "A5",
-                "A6",
-                "A7",
-                "A8",
-                "A9",
-                "A10",
-                "A11",
+                "Standard_A5",
+                "Standard_A6",
+                "Standard_A7",
+                "Standard_A8",
+                "Standard_A9",
+                "Standard_A10",
+                "Standard_A11",
                 "Standard_D1",
                 "Standard_D2",
                 "Standard_D3",
@@ -79,15 +96,7 @@
                 "Standard_D11",
                 "Standard_D12",
                 "Standard_D13",
-                "Standard_D14",
-                "Standard_DS1",
-                "Standard_DS2",
-                "Standard_DS3",
-                "Standard_DS4",
-                "Standard_DS11",
-                "Standard_DS12",
-                "Standard_DS13",
-                "Standard_DS14"
+                "Standard_D14"
             ],
             "metadata": {
                 "Description": "Compute node VM role size"
@@ -167,9 +176,11 @@
         "nicNameHN": "[concat(variables('nicName'),'-hn')]",
         "vmNameHN": "[concat(parameters('namePrefix'),'hn')]",
         "dcName": "[concat(parameters('namePrefix'),'dc.local')]",
-        "vmExtensionName":  "customScriptExtension",
-        "HNcommandStr": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File PrepareHN.ps1 -DomainFQDN ', variables('dcName'),' -AdminUserName ', parameters('adminUsername'), ' -AdminPassword ', parameters('adminPassword'), ' -NodePrepare')]",
-        "CNcommandStr": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File PrepareCN.ps1 -DomainFQDN ', variables('dcName'),' -ClusterName ', variables('vmNameHN'),' -AdminUserName ', parameters('adminUsername'), ' -AdminPassword ', parameters('adminPassword'))]"
+        "vmExtensionName": "customScriptExtension",
+        "customScriptLocation": "http://yongjun.blob.core.windows.net/scripts/",
+        "iaasInfoArg": "[concat('-SubscriptionId ', subscription().subscriptionId, ' -VNet ', variables('virtualNetworkName'), ' -Subnet ', variables('subnet1Name'), ' -Location \"', parameters('location'), '\"')]",
+        "HNcommandStr": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File PrepareHN.ps1 -DomainFQDN ', variables('dcName'), ' -AdminUserName ', parameters('adminUsername'), ' -AdminPassword \"', parameters('adminPassword'), '\" -NodePrepare ', variables('iaasInfoArg'))]",
+        "CNcommandStr": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File PrepareCN.ps1 -DomainFQDN ', variables('dcName'), ' -ClusterName ', variables('vmNameHN'),' -AdminUserName ', parameters('adminUsername'), ' -AdminPassword ', parameters('adminPassword'))]"
     },
 
     "resources": [
@@ -297,25 +308,12 @@
                 "typeHandlerVersion": "1.2",
                 "settings": {
                     "fileUris": [
-                        "http://yongjun.blob.core.windows.net/scripts/PrepareHN.ps1",
-                        "http://yongjun.blob.core.windows.net/scripts/HPCHNPrepare.ps1",
-                        "http://yongjun.blob.core.windows.net/scripts/HpcPrepareUtil.ps1"
+                        "[concat(variables('customScriptLocation'), 'PrepareHN.ps1')]",
+                        "[concat(variables('customScriptLocation'), 'HPCHNPrepare.ps1')]",
+                        "[concat(variables('customScriptLocation'), 'HpcPrepareUtil.ps1')]"
                     ],
                     "commandToExecute": "[variables('HNcommandStr')]"
                 }
-            }
-        },
-        {
-            "apiVersion": "2014-12-01-preview",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[concat(variables('publicIPAddressName'), copyIndex())]",
-            "location": "[parameters('location')]",
-            "copy": {
-                "name": "CN",
-                "count": "[parameters('computeNodeNumber')]"
-            },
-            "properties": {
-                "publicIPAllocationMethod": "[variables('publicIPAddressType')]"
             }
         },
         {
@@ -324,7 +322,6 @@
             "name": "[concat(variables('nicName'), copyIndex())]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'), copyIndex())]",
                 "[concat('Microsoft.Network/networkInterfaces/', variables('nicNameHN'))]"
             ],
             "copy": {
@@ -337,9 +334,6 @@
                         "name": "IPConfig",
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIPAddress": {
-                                "id": "[concat(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName')), copyIndex())]"
-                            },
                             "subnet": {
                                 "id": "[variables('subnetRef')]"
                             }
@@ -405,7 +399,7 @@
                 "type": "CustomScriptExtension",
                 "typeHandlerVersion": "1.2",
                 "settings": {
-                    "fileUris": [ "http://yongjun.blob.core.windows.net/scripts/PrepareCN.ps1" ],
+                    "fileUris": [ "[concat(variables('customScriptLocation'), 'PrepareCN.ps1')]" ],
                     "commandToExecute": "[variables('CNcommandStr')]"
                 }
             }

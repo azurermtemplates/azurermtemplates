@@ -9,6 +9,18 @@
     [Parameter(Mandatory=$true, ParameterSetName='Prepare')]
     [String] $AdminPassword,
 
+    [Parameter(Mandatory=$false, ParameterSetName='Prepare')]
+    [String] $SubscriptionId,
+
+    [Parameter(Mandatory=$false, ParameterSetName='Prepare')]
+    [String] $VNet,
+
+    [Parameter(Mandatory=$false, ParameterSetName='Prepare')]
+    [String] $Subnet,
+
+    [Parameter(Mandatory=$false, ParameterSetName='Prepare')]
+    [String] $Location,
+
     [Parameter(Mandatory=$true, ParameterSetName='Prepare')]
     [switch] $NodePrepare,
 
@@ -269,6 +281,27 @@ function PrepareHeadNode
                 # Create a default compute node template
                 New-HpcNodeTemplate -Name 'Default ComputeNode Template' -Description 'This is the default compute node template' -ErrorAction SilentlyContinue
                 TraceInfo "'Default ComputeNode Template' created"
+
+                # register scheduler task to bring node online
+                $task = Get-ScheduledTask -TaskName 'HpcNodeOnlineCheck' -ErrorAction SilentlyContinue
+                if($null -eq $task)
+                {
+                    TraceInfo 'Start to register HpcNodeOnlineCheck Task'
+                    $HpcNodeOnlineCheckFile = "$scriptPath\PrepareHN.ps1"
+                    $action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument "-ExecutionPolicy Unrestricted -Command `"& '$HpcNodeOnlineCheckFile' -NodeStateCheck`""
+                    $now = get-date
+                    $trigger = New-ScheduledTaskTrigger -RepetitionInterval (New-TimeSpan -Minutes 1) -At $now -RepetitionDuration (New-TimeSpan -Days 3650) -Once
+                    Register-ScheduledTask -TaskName 'HpcNodeOnlineCheck' -Action $action -Trigger $trigger -User $domainUserCred.UserName -Password $domainUserCred.GetNetworkCredential().Password -RunLevel Highest | Out-Null
+                    TraceInfo 'Finish to register task HpcNodeOnlineCheck'
+                    if(-not $?)
+                    {
+                        TraceInfo 'Failed to schedule HpcNodeOnlineCheck Task'
+                    }
+                }
+                else
+                {
+                    TraceInfo 'Task HpcNodeOnlineCheck is already existed'
+                }
         
                 TraceInfo 'Generating a self-signed certificate for the HPC web service ...'
                 $hpcBinPath = [System.IO.Path]::Combine($env:CCP_HOME, 'Bin')
@@ -297,28 +330,8 @@ function PrepareHeadNode
                 Export-Certificate -Cert $cert -FilePath $cerFile | Out-Null
                 $cerContent = [IO.File]::ReadAllBytes($cerFile)
                 TraceInfo "The certificate file with public key was exported: $thumbprint"
-                Remove-Item $cerFile -Force -ErrorAction SilentlyContinue
-        
-                # register scheduler task to bring node online
-                $task = Get-ScheduledTask -TaskName 'HpcNodeOnlineCheck' -ErrorAction SilentlyContinue
-                if($null -eq $task)
-                {
-                    TraceInfo 'Start to register HpcNodeOnlineCheck Task'
-                    $HpcNodeOnlineCheckFile = "$scriptPath\PrepareHN.ps1"
-                    $action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument "-ExecutionPolicy Unrestricted -Command `"& '$HpcNodeOnlineCheckFile' -NodeStateCheck`""
-                    $now = get-date
-                    $trigger = New-ScheduledTaskTrigger -RepetitionInterval (New-TimeSpan -Minutes 1) -At $now -RepetitionDuration (New-TimeSpan -Days 3650) -Once
-                    Register-ScheduledTask -TaskName 'HpcNodeOnlineCheck' -Action $action -Trigger $trigger -User $domainUserCred.UserName -Password $domainUserCred.GetNetworkCredential().Password -RunLevel Highest | Out-Null
-                    TraceInfo 'Finish to register task HpcNodeOnlineCheck'
-                    if(-not $?)
-                    {
-                        TraceInfo 'Failed to schedule HpcNodeOnlineCheck Task'
-                    }
-                }
-                else
-                {
-                    TraceInfo 'Task HpcNodeOnlineCheck is already existed'
-                }
+                Remove-Item $cerFile -Force -ErrorAction SilentlyContinue       
+                
             }
             else
             {
@@ -371,6 +384,19 @@ function NodeStateCheck
 Set-StrictMode -Version 3
 if ($PsCmdlet.ParameterSetName -eq 'Prepare')
 {
+    if([string]::IsNullOrEmpty($SubscriptionId) -eq $false)
+    {
+        New-Item -Path HKLM:\SOFTWARE\Microsoft\HPC -Name IaaSInfo -Force | Out-Null
+        Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\HPC\IaaSInfo -Name SubscriptionId -Value $SubscriptionId
+        $deployId = [System.Guid]::NewGuid().ToString()
+        Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\HPC\IaaSInfo -Name DeploymentId -Value $deployId
+        Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\HPC\IaaSInfo -Name VNet -Value $VNet
+        Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\HPC\IaaSInfo -Name Subnet -Value $Subnet
+        Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\HPC\IaaSInfo -Name AffinityGroup -Value ""
+        Set-ItemProperty -Path HKLM:\SOFTWARE\Microsoft\HPC\IaaSInfo -Name Location -Value $Location
+        TraceInfo "The information needed for in-box management scripts succcessfully configured."
+    }
+
     PrepareHeadNode -DomainFQDN $DomainFQDN -AdminUserName $AdminUserName -AdminPassword $AdminPassword
 }
 else
