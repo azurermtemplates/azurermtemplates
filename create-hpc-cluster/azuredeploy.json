@@ -318,24 +318,10 @@
         },
         {
             "apiVersion": "2014-12-01-preview",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[concat(variables('publicIPAddressName'), copyIndex())]",
-            "location": "[parameters('location')]",
-            "copy": {
-                "name": "CN",
-                "count": "[parameters('computeNodeNumber')]"
-            },
-            "properties": {
-                "publicIPAllocationMethod": "[variables('publicIPAddressType')]"
-            }
-        },
-        {
-            "apiVersion": "2014-12-01-preview",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[concat(variables('nicName'), copyIndex())]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'), copyIndex())]",
                 "[concat('Microsoft.Network/networkInterfaces/', variables('nicNameHN'))]"
             ],
             "copy": {
@@ -348,9 +334,6 @@
                         "name": "IPConfig",
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIPAddress": {
-                                "id": "[concat(resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName')), copyIndex())]"
-                            },
                             "subnet": {
                                 "id": "[variables('subnetRef')]"
                             }
