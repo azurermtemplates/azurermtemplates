@@ -396,7 +396,7 @@ resolvconf -u
 #TODO: Move this to an init.d script so we can handle instance size increases
 ES_HEAP=`free -m |grep Mem | awk '{if ($2/2 >31744)  print 31744;else print $2/2;}'`
 log "Configure elasticsearch heap size - $ES_HEAP"
-echo "ES_HEAP_SIZE=${ES_HEAP}/" /etc/default/elasticseach
+echo "ES_HEAP_SIZE=${ES_HEAP}/" >> /etc/default/elasticseach
 
 #Optionally Install Marvel
 if [ ${INSTALL_MARVEL} -eq "yes" ];
