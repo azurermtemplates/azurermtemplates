@@ -1,7 +1,0 @@
-{
-    "TemplateName": "ubuntu-vm-with-drone",
-    "Description": "This template provisions an instance of Ubuntu 14.04 LTS with the Docker Extension and Drone CI package.",
-    "ShortDescription": "Ubuntu VM template with Drone CI",
-    "GithubUsername": "anweiss",
-    "DateUpdated": "2015-04-06"
-}

@@ -1,0 +1,7 @@
+{
+  "itemDisplayName": "Deploy 'n' Virtual Machines from a user image across 3 storage accounts in the same region",
+  "description": "This template allows you to create VMs from User image across 3 Storage accounts in the same region. You can also chose to specify the number of Virtual Machines that you want to spin up per storage accounts where the user image is placed [Recommended number is 40]. There are some critical pre-requisties for this template, please refer to them below. This template also deploys a Virtual Network, 'N' number of Network Inerfaces/Virtual Machines.",
+  "summary": "Deploy 'n' Virtual Machines from a user image across 3 storage accounts in the same region",
+  "githubUsername": "mahthi",
+  "dateUpdated": "2015-04-04"
+}
