@@ -1,20 +1,20 @@
 #!/bin/bash
 
 export DEBIAN_FRONTEND=noninteractive
-apt-get -y update
+sudo apt-get -y update
 
 # install Python
-apt-get -y install python-setuptools
+sudo apt-get -y install python-setuptools
 
 # install DJango
-easy_install django
+sudo easy_install django
 
 # install Apache
-apt-get -y install apache2 libapache2-mod-wsgi
+sudo apt-get -y install apache2 libapache2-mod-wsgi
 
 # create a django app
 cd /var/www
-django-admin startproject helloworld
+sudo django-admin startproject helloworld
 
 # Create a new file named views.py in the /var/www/helloworld/helloworld directory. This will contain the view that renders the "hello world" page
 echo -e 'from django.http import HttpResponse
@@ -36,7 +36,7 @@ WSGIScriptAlias / /var/www/helloworld/helloworld/wsgi.py
 WSGIPythonPath /var/www/helloworld" | sudo tee /etc/apache2/sites-available/helloworld.conf
 
 #enable site
-a2ensite helloworld
+sudo a2ensite helloworld
 
 #restart apache
-service apache2 reload
+sudo service apache2 reload
