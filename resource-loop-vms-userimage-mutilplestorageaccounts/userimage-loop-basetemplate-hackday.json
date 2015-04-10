@@ -73,7 +73,7 @@
             "properties": {
                 "publicIPAllocationMethod": "Dynamic",
                 "dnsSettings": {
-                   "domainNameLabel": "[parameters('dnsNameForPublicIP')]"
+                   "domainNameLabel": "[concat(parameters('dnsNameForPublicIP'),copyindex())]"
                 }
             }
         },
