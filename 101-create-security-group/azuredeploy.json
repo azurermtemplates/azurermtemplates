@@ -37,6 +37,27 @@
     },
     "resources": [{
         "apiVersion": "2014-12-01-preview",
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "name": "[parameters('networkSecurityGroupName')]",
+        "location": "[parameters('location')]",
+        "properties": {
+            "securityRules": [{
+                "name": "first_rule",
+                "properties": {
+                    "description": "This is the First rule-We don't talk about it",
+                    "protocol": "Tcp",
+                    "sourcePortRange": "23-45",
+                    "destinationPortRange": "46-56",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "*",
+                    "access": "Allow",
+                    "priority": 123,
+                    "direction": "Inbound"
+                }
+            }]
+        }
+    }, {
+        "apiVersion": "2014-12-01-preview",
         "type": "Microsoft.Network/virtualNetworks",
         "name": "[parameters('virtualNetworkName')]",
         "location": "[parameters('location')]",
@@ -61,27 +82,6 @@
                 "name": "[parameters('subnet2Name')]",
                 "properties": {
                     "addressPrefix": "[parameters('subnet2Prefix')]"
-                }
-            }]
-        }
-    }, {
-        "apiVersion": "2014-12-01-preview",
-        "type": "Microsoft.Network/networkSecurityGroups",
-        "name": "[parameters('networkSecurityGroupName')]",
-        "location": "[parameters('location')]",
-        "properties": {
-            "securityRules": [{
-                "name": "first_rule",
-                "properties": {
-                    "description": "This is the First rule-We don't talk about it",
-                    "protocol": "Tcp",
-                    "sourcePortRange": "23-45",
-                    "destinationPortRange": "46-56",
-                    "sourceAddressPrefix": "*",
-                    "destinationAddressPrefix": "*",
-                    "access": "Allow",
-                    "priority": 123,
-                    "direction": "Inbound"
                 }
             }]
         }
