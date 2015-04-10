@@ -4,35 +4,62 @@
     "parameters": {
         "location": {
             "type": "String",
-            "defaultValue": "West US"
+            "defaultValue": "West US",
+            "metadata": { 
+                 "Description": "Location of resources" 
+            } 
         },
         "newStorageAccountName": {
-            "type": "string"
+            "type": "string",
+            "metadata": { 
+                 "Description": "Name of the of the storage account for VM OS Disk"
+            } 
         },
         "vmNamePrefix": {
             "type": "string",
-            "defaultValue": "coreos"
+            "defaultValue": "coreos",
+            "metadata": { 
+                 "Description": "Prefix for the names of the VMs"
+            } 
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "myVNET"
+            "defaultValue": "myVNET",
+            "metadata": { 
+                 "Description": "Name of the VNET hosting the VMs"
+            } 
         },
         "vmSourceImageName": {
             "type": "string",
-            "defaultValue": "2b171e93f07c4903bcad35bda10acf22__CoreOS-Stable-607.0.0"
+            "defaultValue": "2b171e93f07c4903bcad35bda10acf22__CoreOS-Stable-607.0.0",
+            "metadata": { 
+                 "Description": "Name of the CoreOS image"
+            } 
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "Standard_A1"
+            "defaultValue": "Standard_A1",
+            "metadata": { 
+                 "Description": "Instance size for the VMs"
+            } 
         },
         "adminUserName": {
-            "type": "string"
+            "type": "string",
+            "metadata": { 
+                 "Description": "Username to login to the VMs"
+            } 
         },
         "sshKeyData": {
-            "type": "string"
+            "type": "string",
+            "metadata": { 
+                 "Description": "Public key for SSH authentication"
+            } 
         },
         "customData": {
-            "type": "string"
+            "type": "string",
+            "metadata": { 
+                 "Description": "Base64-encoded cloud-config.yaml file to deploy and start Fleet"
+            } 
         }
     },
     "variables": {
