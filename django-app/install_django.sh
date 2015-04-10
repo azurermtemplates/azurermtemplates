@@ -10,9 +10,31 @@ sudo easy_install django
 # install Apache
 sudo apt-get -y install apache2 libapache2-mod-wsgi
 
-# write some PHP
-#echo \<center\>\<h1\>My Demo App\</h1\>\<br/\>\</center\> > /var/www/html/phpinfo.php
-#echo \<\?php phpinfo\(\)\; \?\> >> /var/www/html/phpinfo.php
+# create a django app
+cd /var/www
+sudo django-admin startproject helloworld
 
-# restart Apache
-#apachectl restart
+# Create a new file named views.py in the /var/www/helloworld/helloworld directory. This will contain the view that renders the "hello world" page
+echo -e 'from django.http import HttpResponse
+def home(request):
+    html = "<html><body>Hello World!</body><html>"
+    return HttpResponse(html)' | sudo tee /var/www/helloworld/helloworld/views.py
+
+# Update urls.py
+echo -e "from django.conf.urls import patterns, url
+          urlpatterns = patterns('',
+            url(r'^$', 'helloworld.views.home', name='home'),
+        )"   | sudo tee /var/www/helloworld/helloworld/urls.py
+
+# Setup Apache
+echo -e "<VirtualHost *:80>
+ServerName $1
+</VirtualHost>
+WSGIScriptAlias / /var/www/helloworld/helloworld/wsgi.py
+WSGIPythonPath /var/www/helloworld" | sudo tee /etc/apache2/sites-available/helloworld.conf
+
+#enable site
+sudo a2ensite helloworld
+
+#restart apache
+$ sudo service apache2 reload
