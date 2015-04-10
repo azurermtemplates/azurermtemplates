@@ -1,0 +1,153 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountNamePrefix": {
+            "type": "string",
+            "defaultValue": "myStg"
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "defaultValue": "myVNET"
+        },
+        "vmNamePrefix": {
+            "type": "string",
+            "defaultValue": "myVM"
+        },
+        "publicIPAddressNamePrefix": {
+            "type": "string",
+            "defaultValue": "myPublicIP"
+        },
+        "nicNamePrefix": {
+            "type": "string",
+            "defaultValue": "myNic"
+        },
+        "scaleNumberPerRegion": {
+            "type": "int",
+            "defaultValue": 10
+        },
+        "subscriptionId": {
+            "type": "string"
+        },
+        "addressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16"
+        },
+        "subnet1Name": {
+            "type": "string",
+            "defaultValue": "Subnet-1"
+        },
+        "subnet2Name": {
+            "type": "string",
+            "defaultValue": "Subnet-2"
+        },
+        "subnet3Name": {
+            "type": "string",
+            "defaultValue": "Subnet-3"
+        },
+        "subnet1Prefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/24"
+        },
+        "subnet2Prefix": {
+            "type": "string",
+            "defaultValue": "10.0.1.0/24"
+        },
+        "subnet3Prefix": {
+            "type": "string",
+            "defaultValue": "10.0.2.0/24"
+        },
+        "region": {
+            "type": "string",
+            "defaultValue": "West US"
+
+        },
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPassword": {
+            "type": "securestring"
+        }
+    },
+    "variables": {
+
+        "baseTemplateUri": "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/resource-loop-vm-template-linking-w-customdata/resourceloop-base-template.json",
+
+        "stgAcctName1": "[concat(parameters('storageAccountNamePrefix'),'1')]",
+
+
+      
+
+
+        "publicippref1": "[concat(parameters('publicIPAddressNamePrefix'),'1')]",
+
+
+        "nicref1": "[concat(parameters('nicNamePrefix'),'1')]"
+
+    },
+    "resources": [
+             {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('virtualNetworkName')]",
+            "location": "[parameters('region')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('subnet1Name')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnet1Prefix')]"
+                        }
+                    },
+                    {
+                        "name": "[parameters('subnet2Name')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnet2Prefix')]"
+                        }
+                    },
+                                        {
+                        "name": "[parameters('subnet3Name')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnet3Prefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "instance01",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('baseTemplateUri')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "storageAccountName": { "value": "[variables('stgAcctName1')]" },
+                    "adminUsername": { "value": "[parameters('adminUsername')]" },
+                    "adminPassword": { "value": "[parameters('adminPassword')]" },
+                    "numberOfInstances": { "value": "[parameters('scaleNumberPerRegion')]" },
+                    "subscriptionId": { "value": "[parameters('subscriptionId')]" },
+                    "region": { "value": "[parameters('region')]" },
+                    "publicIPNamePrefix": { "value": "[variables('publicippref1')]" },
+                    "nicNamePrefix": { "value": "[variables('nicref1')]" },
+                    "vmName": { "value": "[parameters('vmNamePrefix')]" },
+                    "virtualNetworkName": { "value": "[parameters('virtualNetworkName')]" },
+                    "subnetName": { "value": "[parameters('subnet1Name')]"  }
+                }
+            }
+        }
+      
+        
+    ]
+}
