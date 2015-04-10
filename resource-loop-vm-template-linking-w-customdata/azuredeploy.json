@@ -4,69 +4,92 @@
     "parameters": {
         "storageAccountNamePrefix": {
             "type": "string",
-            "defaultValue": "myStg"
+            "defaultValue": "myStg",
+            "metadata": {
+                "Description": "Vhd files will be stored here"
+            }
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "myVNET"
+            "defaultValue": "myVNET",
+            "metadata": {
+                "Description": "Name of the Virtual Network for all VMs"
+            }
         },
         "vmNamePrefix": {
             "type": "string",
-            "defaultValue": "myVM"
+            "defaultValue": "myVM",
+            "metadata": {
+                "Description": "VM name prefix"
+            }
         },
         "publicIPAddressNamePrefix": {
             "type": "string",
-            "defaultValue": "myPublicIP"
+            "defaultValue": "myPublicIP",
+            "metadata": {
+                "Description": "Public IP Address Name Prefix"
+            }
         },
         "nicNamePrefix": {
             "type": "string",
-            "defaultValue": "myNic"
+            "defaultValue": "myNic",
+            "metadata": {
+                "Description": "Network Interface Name Prefix"
+            }
         },
         "scaleNumberPerRegion": {
             "type": "int",
-            "defaultValue": 10
+            "defaultValue": 2,
+            "metadata": {
+                "Description": "Number of VMs to create"
+            }
         },
         "subscriptionId": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "Description": "Subscription ID"
+            }
         },
         "addressPrefix": {
             "type": "string",
-            "defaultValue": "10.0.0.0/16"
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+                "Description": "Virtual Network Address Space"
+            }
         },
         "subnet1Name": {
             "type": "string",
-            "defaultValue": "Subnet-1"
-        },
-        "subnet2Name": {
-            "type": "string",
-            "defaultValue": "Subnet-2"
-        },
-        "subnet3Name": {
-            "type": "string",
-            "defaultValue": "Subnet-3"
+            "defaultValue": "Subnet-1",
+            "metadata": {
+                "Description": "Subnet 1 Name"
+            }
         },
         "subnet1Prefix": {
             "type": "string",
-            "defaultValue": "10.0.0.0/24"
-        },
-        "subnet2Prefix": {
-            "type": "string",
-            "defaultValue": "10.0.1.0/24"
-        },
-        "subnet3Prefix": {
-            "type": "string",
-            "defaultValue": "10.0.2.0/24"
+            "defaultValue": "10.0.0.0/24",
+            "metadata": {
+                "Description": "Subnet 1 Address Space"
+            }
         },
         "region": {
             "type": "string",
-            "defaultValue": "West US"
+            "defaultValue": "West US",
+            "metadata": {
+                "Description": "Region where VMs will be deployed"
+            }
 
         },
         "adminUsername": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "Description": "Admin User Name for all VMs"
+            }
         },
         "adminPassword": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata": {
+                "Description": "Admin Password for all VMs"
+            }
         }
     },
     "variables": {
@@ -102,18 +125,6 @@
                         "name": "[parameters('subnet1Name')]",
                         "properties": {
                             "addressPrefix": "[parameters('subnet1Prefix')]"
-                        }
-                    },
-                    {
-                        "name": "[parameters('subnet2Name')]",
-                        "properties": {
-                            "addressPrefix": "[parameters('subnet2Prefix')]"
-                        }
-                    },
-                                        {
-                        "name": "[parameters('subnet3Name')]",
-                        "properties": {
-                            "addressPrefix": "[parameters('subnet3Prefix')]"
                         }
                     }
                 ]
