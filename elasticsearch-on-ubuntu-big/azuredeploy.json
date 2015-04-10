@@ -288,7 +288,7 @@
             "value": "[parameters('adminPassword')]"
           },
           "storageAccountName": {
-            "value": "[concat(parameters('storageAccountPrefix'),'datanodes-su', copyindex())]"
+            "value": "[concat(parameters('storageAccountPrefix'),'dnsu', copyindex())]"
           },
           "region": {
             "value": "[parameters('region')]"
