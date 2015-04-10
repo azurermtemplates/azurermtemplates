@@ -1,0 +1,7 @@
+{
+  "itemDisplayName": "Create a Windows VM with Custom Script extension",
+  "description": "This template creates a VM and runs a PowerShell script using the custom script extension. It also uses the listKeys function to get the Storage Account keys.",
+  "summary": "This template creates a VM and runs a PowerShell script using the custom script extension.",
+  "githubUsername": "singhkay",
+  "dateUpdated": "2015-03-30"
+}
