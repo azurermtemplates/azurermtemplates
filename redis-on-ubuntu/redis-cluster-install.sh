@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Script parameters and their defaults
+INSTANCE_COUNT=1
+ENABLE_PERSISTENCE=1
+VERSION="3.0.0"
+CLUSTER_NAME="redis-cluster"
+IP_PREFIX="10.0.0."
+
 ########################################################
 # This script will install Redis from sources
 ########################################################
@@ -14,7 +21,7 @@ help()
 log()
 {
 	# If you want to enable this logging add a un-comment the line below and add your account key 
-	#curl -X POST -H "content-type:text/plain" --data-binary "$(date) | ${HOSTNAME} | $1" https://logs-01.loggly.com/inputs/[account-key]/tag/redis-extension,${HOSTNAME}
+    	#curl -X POST -H "content-type:text/plain" --data-binary "$(date) | ${HOSTNAME} | $1" https://logs-01.loggly.com/inputs/[account-key]/tag/redis-extension,${HOSTNAME}
 	echo "$1"
 }
 
@@ -116,28 +123,34 @@ then
 fi
 
 # Parse script parameters
-while getopts :n:v:p:h optname; do
+while getopts :n:v:p:h:c:p optname; do
   log "Option $optname set with value ${OPTARG}"
   
   case $optname in
     n)  # Cluster name
-      CLUSTER_NAME=${OPTARG}
-      ;;
+		CLUSTER_NAME=${OPTARG}
+		;;
     v)  # Version to be installed
-      VERSION=${OPTARG}
-      ;;
+		VERSION=${OPTARG}
+		;;
     p)  # Persistence option
-      ENABLE_PERSISTENCE=true
-      ;;
+		ENABLE_PERSISTENCE=1
+		;;
+	c) # Number of instances
+		INSTANCE_COUNT=${OPTARG}
+		;;
+	p) # Private IP address prefix
+		IP_PREFIX==${OPTARG}
+		;;
     h)  # Helpful hints
-      help
-      exit 2
-      ;;
+		help
+		exit 2
+		;;
     \?) #unrecognized option - show help
-      echo -e \\n"Option -${BOLD}$OPTARG${NORM} not allowed."
-      help
-      exit 2
-      ;;
+		echo -e \\n"Option -${BOLD}$OPTARG${NORM} not allowed."
+		help
+		exit 2
+		;;
   esac
 done
 
