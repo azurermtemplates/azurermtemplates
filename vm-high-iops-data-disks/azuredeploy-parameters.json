@@ -31,20 +31,5 @@
     },
     "nicName" : {
       "value" : "myNic"
-    },
-    "DscExtensionName" : {
-        "value" : "DscExtension"
-    },
-    "DiagExtensionName" : {
-        "value" : "DiagExtension"
-    },
-    "vmDiagnosticsStorageAccountResourceGroup":{
-        "value" : "diagnosticsResourceGroup"
-    },
-    "vmDiagnosticsStorageAccountName":{
-        "value" : "diagnosticsStorageAccount"
-    },
-    "configurationFunction": {
-      "value": "StoragePools.ps1\StoragePool"
-    }
+    },  
 }

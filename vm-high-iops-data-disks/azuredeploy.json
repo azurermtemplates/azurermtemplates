@@ -44,31 +44,12 @@
             "type" : "string",
             "defaultValue":"myNIC"
         },
-        "DscExtensionName":{
-            "type" : "string",
-            "defaultValue":"DscExtension"
-        },
-        "DiagExtensionName":{
-            "type" : "string",
-            "defaultValue":"DiagExtension"
-        },
-        "vmDiagnosticsStorageAccountResourceGroup":{
-            "type" : "string"
-        },
-        "vmDiagnosticsStorageAccountName":{
-            "type" : "string"
-        },
+
         "modulesUrl": {
           "type": "string",
-          "defaultValue" : "http://github/",
+          "defaultValue" : "https://github.com/jvallery/azurermtemplates/blob/master/vm-high-iops-data-disks/StoragePools.ps1.zip",
           "metadata": {
               "Description": "URL for the DSC configuration module. NOTE: Can be a Github url(raw) to the zip file"
-          }
-        },
-        "configurationFunction": {
-          "type": "string",
-          "metadata": {
-              "Description": "DSC configuration function to call"
           }
         }
     },
@@ -81,6 +62,8 @@
         "vmStorageAccountContainerName": "vhds",
         "publicIPAddressType" : "Dynamic",
         "storageAccountType": "Standard_LRS",
+        "configurationFunction" : "StoragePool",
+        "DscExtensionName" : "DscExtension",
         "sourceImageName" : "[concat('/',subscription().subscriptionId,'/services/images/',parameters('vmSourceImageName'))]",
         "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "subnet1Ref" : "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]",
@@ -506,29 +489,6 @@
         },
         "protectedSettings": null
       }
-    },
-    {
-        "type": "Microsoft.Compute/virtualMachines/extensions",
-        "name": "[concat(parameters('vmName'),'/', parameters('DiagExtensionName'))]",
-        "apiVersion": "2014-12-01-preview",
-        "location": "[parameters('location')]",
-        "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
-        ],
-        "properties": {
-            "publisher": "Microsoft.Azure.Diagnostics",
-            "type": "IaaSDiagnostics",
-            "typeHandlerVersion": "1.2",
-            "settings": {
-                "xmlCfg":"PFdhZENmZz4NCiAgICAgICAgPERpYWdub3N0aWNNb25pdG9yQ29uZmlndXJhdGlvbiBvdmVyYWxsUXVvdGFJbk1CPSIyNTAwMCI+DQogICAgICAgIDxQZXJmb3JtYW5jZUNvdW50ZXJzIHNjaGVkdWxlZFRyYW5zZmVyUGVyaW9kPSJQVDFNIj4NCiAgICAgICAgICAgIDxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQcm9jZXNzb3IoX1RvdGFsKVwlIFByb2Nlc3NvciBUaW1lIiBzYW1wbGVSYXRlPSJQVDFNIiB1bml0PSJwZXJjZW50IiAvPg0KICAgICAgICAgICAgPFBlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24gY291bnRlclNwZWNpZmllcj0iXE1lbW9yeVxDb21taXR0ZWQgQnl0ZXMiIHNhbXBsZVJhdGU9IlBUMU0iIHVuaXQ9ImJ5dGVzIi8+DQogICAgICAgICAgICA8L1BlcmZvcm1hbmNlQ291bnRlcnM+DQogICAgICAgICAgICA8RXR3UHJvdmlkZXJzPg0KICAgICAgICAgICAgICAgIDxFdHdFdmVudFNvdXJjZVByb3ZpZGVyQ29uZmlndXJhdGlvbiBwcm92aWRlcj0iU2FtcGxlRXZlbnRTb3VyY2VXcml0ZXIiIHNjaGVkdWxlZFRyYW5zZmVyUGVyaW9kPSJQVDVNIj4NCiAgICAgICAgICAgICAgICAgICAgPEV2ZW50IGlkPSIxIiBldmVudERlc3RpbmF0aW9uPSJFbnVtc1RhYmxlIi8+DQogICAgICAgICAgICAgICAgICAgIDxFdmVudCBpZD0iMiIgZXZlbnREZXN0aW5hdGlvbj0iTWVzc2FnZVRhYmxlIi8+DQogICAgICAgICAgICAgICAgICAgIDxFdmVudCBpZD0iMyIgZXZlbnREZXN0aW5hdGlvbj0iU2V0T3RoZXJUYWJsZSIvPg0KICAgICAgICAgICAgICAgICAgICA8RXZlbnQgaWQ9IjQiIGV2ZW50RGVzdGluYXRpb249IkhpZ2hGcmVxVGFibGUiLz4NCiAgICAgICAgICAgICAgICAgICAgPERlZmF1bHRFdmVudHMgZXZlbnREZXN0aW5hdGlvbj0iRGVmYXVsdFRhYmxlIiAvPg0KICAgICAgICAgICAgICAgIDwvRXR3RXZlbnRTb3VyY2VQcm92aWRlckNvbmZpZ3VyYXRpb24+DQogICAgICAgICAgICA8L0V0d1Byb3ZpZGVycz4NCiAgICAgICAgPC9EaWFnbm9zdGljTW9uaXRvckNvbmZpZ3VyYXRpb24+DQogICAgPC9XYWRDZmc+",
-                "StorageAccount":"[parameters('vmDiagnosticsStorageAccountName')]"
-            },
-            "protectedSettings": {
-                "storageAccountName": "[parameters('vmDiagnosticsStorageAccountName')]",
-                "storageAccountKey": "[listKeys(variables('accountid'),'2014-12-01-preview').key1]",
-                "storageAccountEndPoint": "https://core.windows.net/"
-            }
-        }
     }
   ]
 }
