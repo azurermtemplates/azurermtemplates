@@ -3,17 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "principalId": {
-            "value": "ad6970a5-94c5-4911-9bb3-2c7f842c09ef"
+            "value": ""
         },
         "resourceGroup": {
             "value": "CloudDep"
         },
         "builtInRoleType": {
             "value": "Owner"
-        },
-        "subscriptionId": {
-            "value": "2498e3dd-307d-4f0d-bc19-bdc139ce0c30"
         }
-       
     }
 }

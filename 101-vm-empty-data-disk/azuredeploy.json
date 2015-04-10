@@ -20,9 +20,6 @@
             "type": "string",
             "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-Datacenter-201503.01-en.us-127GB.vhd"
         },
-        "subscriptionId":{
-            "type" : "string"
-        },
         "location": {
             "type": "String",
             "defaultValue" : "West US"
@@ -67,11 +64,11 @@
         "vmStorageAccountContainerName": "vhds",
         "publicIPAddressType" : "Dynamic",
         "storageAccountType": "Standard_LRS",
-        "sourceImageName" : "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('vmSourceImageName'))]",
+        "sourceImageName" : "[concat('/',subscription().subscriptionId,'/services/images/',parameters('vmSourceImageName'))]",
         "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "subnet1Ref" : "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]",
         "dataDisk1VhdName" : "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',parameters('vmName'),'dataDisk1.vhd')]",
-        "accountid": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('vmDiagnosticsStorageAccountResourceGroup'),'/providers/','Microsoft.Storage/storageAccounts/', parameters('vmDiagnosticsStorageAccountName'))]"
+        "accountid": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('vmDiagnosticsStorageAccountResourceGroup'),'/providers/','Microsoft.Storage/storageAccounts/', parameters('vmDiagnosticsStorageAccountName'))]"
     },
     "resources": [
     {

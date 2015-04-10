@@ -16,9 +16,6 @@
         },
         "adminPassword": {
             "value": "userPassword"
-        },
-        "subscriptionId": {
-            "value": "subscriptionID"
         }
    }
 }

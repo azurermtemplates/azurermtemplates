@@ -14,14 +14,11 @@
         "adminPassword": {
             "value": "userPassword"
         },
-		"mySqlPassword": {
+        "mySqlPassword": {
             "value": "mySqlPassword"
         },
         "vmDnsName": {
             "value": "uniqueDomain"
-        },
-        "subscriptionId": {
-            "value": "subscriptionID"
         }
-   }
+    }
 }

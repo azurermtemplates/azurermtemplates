@@ -5,9 +5,6 @@
         "storageAccountNamePrefix": {
             "type": "string"
         },
-        "subscriptionId" : {
-          "type" : "string"
-        },
         "adminUsername" : {
           "type" : "string"
         },
@@ -84,7 +81,7 @@
                 "adminUsername" :  { "value": "[parameters('adminUsername')]"},
                 "adminPassword" :  { "value": "[parameters('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
-                "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
+                "subscriptionId" : { "value": "[subscription().subscriptionId]"},
                 "region" : { "value": "West Europe"},
                 "publicIPNamePrefix" :{ "value": "[variables('publicippref1')]"},
                 "nicNamePrefix" :{ "value": "[variables('nicref1')]"},
@@ -108,7 +105,7 @@
                 "adminUsername" :  { "value": "[parameters('adminUsername')]"},
                 "adminPassword" :  { "value": "[parameters('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
-                "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
+                "subscriptionId" : { "value": "[subscription().subscriptionId]"},
                 "region" : { "value": "East Asia"},
                 "publicIPNamePrefix" :{ "value": "[variables('publicippref2')]"},
                 "nicNamePrefix" :{ "value": "[variables('nicref2')]"},
@@ -132,7 +129,7 @@
                 "adminUsername" :  { "value": "[parameters('adminUsername')]"},
                 "adminPassword" :  { "value": "[parameters('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
-                "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
+                "subscriptionId" : { "value": "[subscription().subscriptionId]"},
                 "region" : { "value": "West US"},
                 "publicIPNamePrefix" :{ "value": "[variables('publicippref3')]"},
                 "nicNamePrefix" :{ "value": "[variables('nicref3')]"},
@@ -156,7 +153,7 @@
                 "adminUsername" :  { "value": "[parameters('adminUsername')]"},
                 "adminPassword" :  { "value": "[parameters('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
-                "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
+                "subscriptionId" : { "value": "[subscription().subscriptionId]"},
                 "region" : { "value": "East US"},
                 "publicIPNamePrefix" :{ "value": "[variables('publicippref4')]"},
                 "nicNamePrefix" :{ "value": "[variables('nicref4')]"},
@@ -180,7 +177,7 @@
                 "adminUsername" :  { "value": "[parameters('adminUsername')]"},
                 "adminPassword" :  { "value": "[parameters('adminPassword')]"},
                 "numberOfInstances" : { "value": "[parameters('scaleNumberPerRegion')]"},
-                "subscriptionId" : { "value": "[parameters('subscriptionId')]"},
+                "subscriptionId" : { "value": "[subscription().subscriptionId]"},
                 "region" : { "value": "Southeast Asia"},
                 "publicIPNamePrefix" :{ "value": "[variables('publicippref5')]"},
                 "nicNamePrefix" :{ "value": "[variables('nicref5')]"},

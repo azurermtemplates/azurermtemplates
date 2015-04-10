@@ -19,9 +19,6 @@
             "type": "int",
             "defaultValue": 6
         },
-        "subscriptionId": {
-            "type": "string"
-        },
         "region": {
             "type": "string",
             "defaultValue": "West US"
@@ -76,7 +73,7 @@
         "vmSourceImageName": "5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-70-20150128",
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',parameters('subnet1Name'))]",
-        "sourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',variables('vmSourceImageName'))]",
+        "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]",
         "sshKeyPath" : "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]"
     },
     "resources": [
@@ -346,4 +343,3 @@
         }
     ]
 }
-

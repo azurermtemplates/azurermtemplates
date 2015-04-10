@@ -11,9 +11,6 @@
     "dnsNameForPublicIP": {
         "value": "uniqueDnsNameForPublicIP"
     },
-    "subscriptionId": {
-        "value": "898234d73-as24-466d-b9e0-d73235447c69"
-    },
     "vmSourceImageName" : {
         "value" : "5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-70-20150128"
     },

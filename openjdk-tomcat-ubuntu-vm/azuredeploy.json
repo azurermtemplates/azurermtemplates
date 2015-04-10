@@ -22,11 +22,11 @@
 		},
 	    "customScriptURL": {
 			"type": "String",
-            "defaultValue" : "https://raw.githubusercontent.com/snallami/templates/master/ubuntu/java-tomcat-install.sh"   
+            "defaultValue" : "https://raw.githubusercontent.com/snallami/templates/master/ubuntu/java-tomcat-install.sh"
 		},
 	    "commandToExecuteCustomScript": {
 			"type": "String",
-            "defaultValue" : "sh java-tomcat-install.sh"   
+            "defaultValue" : "sh java-tomcat-install.sh"
 		},
         "location": {
             "type": "String",
@@ -109,11 +109,8 @@
         "dnsName" : {
             "type" : "string"
         },
-        "subscriptionId":{
-            "type" : "string"
-        },
         "nicName":{
-            "type" : "string"  
+            "type" : "string"
         },
 		"vmExtensionName" : {
             "type" : "string",
@@ -121,7 +118,7 @@
         }
     },
     "variables": {
-        "sourceImageName" : "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('vmSourceImageName'))]",
+        "sourceImageName" : "[concat('/',subscription().subscriptionId,'/services/images/',parameters('vmSourceImageName'))]",
         "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "subnet1Ref" : "[concat(variables('vnetID'),'/subnets/',parameters('subnet1Name'))]",
 		"commandToExecuteCustomScriptWithParams" : "[concat(parameters('commandToExecuteCustomScript'),' ',parameters('javaPackageName'),' ',parameters('tomcatPackageName'))]"
@@ -230,7 +227,7 @@
                 {
                     "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('nicName'))]"
                 }
-                ]        
+                ]
             }
         }
     },
@@ -239,7 +236,7 @@
         "name": "[concat(parameters('vmName'),'/', parameters('vmExtensionName'))]",
         "apiVersion": "2014-12-01-preview",
         "location": "[parameters('location')]",
-        "dependsOn": [            
+        "dependsOn": [
             "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
         ],
         "properties": {
@@ -255,4 +252,4 @@
         }
     }
     ]
-} 
+}

@@ -32,9 +32,6 @@
         "virtualNetworkName": {
             "value": ""
         },
-        "subscriptionId": {
-            "value": ""
-        },
         "nicName": {
             "value": ""
         },
@@ -50,7 +47,7 @@
         "customScriptCommandToExecute": {
             "value": "powershell.exe -File getprocess.ps1 process.txt test"
         },
-        "customScriptStorageAccountResourceGroup": { 
+        "customScriptStorageAccountResourceGroup": {
             "value": ""
         }
     }

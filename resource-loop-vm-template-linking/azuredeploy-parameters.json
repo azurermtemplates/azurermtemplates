@@ -5,9 +5,6 @@
     "scaleNumberPerRegion" : {
         "value" : 2
     },
-    "subscriptionId" : {
-        "value" : "yourSubscriptionID"
-    },
     "adminUsername" : {
         "value" : ""
     },

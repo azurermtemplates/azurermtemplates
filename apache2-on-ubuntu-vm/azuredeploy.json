@@ -19,9 +19,6 @@
         },
         "adminPassword": {
             "type": "securestring"
-        },
-        "subscriptionId": {
-            "type": "string"
         }
     },
     "variables": {
@@ -37,7 +34,7 @@
         "vmName": "[parameters('vmDnsName')]",
         "vmSize": "Standard_A0",
         "virtualNetworkName": "MyVNET",
-        "sourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',variables('vmSourceImageName'))]",
+        "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]",
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
         "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]"
     },

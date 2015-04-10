@@ -29,9 +29,6 @@
         "virtualNetworkName": {
             "value": ""
         },
-        "subscriptionId": {
-            "value": ""
-        },
         "nicName": {
             "value": ""
         },

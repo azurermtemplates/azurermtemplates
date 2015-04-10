@@ -20,9 +20,6 @@
             "type": "string",
             "defaultValue": "5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-70-20150128"
         },
-        "subscriptionId":{
-            "type" : "string"
-        },
         "location": {
             "type": "String",
             "defaultValue" : "West US"
@@ -57,7 +54,7 @@
         "vmStorageAccountContainerName": "vhds",
         "publicIPAddressType" : "Dynamic",
         "storageAccountType": "Standard_LRS",
-        "sourceImageName" : "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('vmSourceImageName'))]",
+        "sourceImageName" : "[concat('/',subscription().subscriptionId,'/services/images/',parameters('vmSourceImageName'))]",
         "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "subnet1Ref" : "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]"
     },

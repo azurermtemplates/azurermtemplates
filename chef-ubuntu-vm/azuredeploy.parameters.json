@@ -11,9 +11,6 @@
     "vmDnsName": {
         "value": "uniquedomainname"
     },
-    "subscriptionId": {
-        "value": "your subscription"
-    },
     "client_rb": {
         "value": "clientrb"
     },

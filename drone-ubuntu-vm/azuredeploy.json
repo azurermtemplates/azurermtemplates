@@ -31,9 +31,6 @@
         },
         "githubSecret": {
             "type": "securestring"
-        },
-        "subscriptionId": {
-            "type": "string"
         }
     },
     "variables": {
@@ -48,7 +45,7 @@
         "vmName": "[parameters('vmDnsName')]",
         "vmSize": "Standard_A3",
         "virtualNetworkName": "droneCINET",
-        "sourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('vmSourceImageName'))]",
+        "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('vmSourceImageName'))]",
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
         "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]"
     },
