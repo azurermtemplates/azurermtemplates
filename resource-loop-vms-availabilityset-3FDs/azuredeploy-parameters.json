@@ -1,0 +1,47 @@
+﻿{
+    "storageAccountName" : {
+        "value":"uniqueStorageAccountName"
+    },
+    "adminUsername": {
+        "value": ""
+    },
+    "adminPassword": {
+        "value": ""
+    },
+    "numberOfInstances": {
+        "value": 5
+    },
+    "availabilitySetName":{
+        "value":"availabilitySetName"
+    },
+    "faultDomainCount" : {
+        "value": "3"
+    },
+    "updateDomainCount" :{
+        "value": "5"
+    },
+    "region": {
+        "value": "West US"
+    },
+    "virtualNetworkName": {
+        "value": "myVNET"
+    },
+    "vmSize": {
+        "value": "Standard_A0"
+    },
+    "subnet1Name": {
+        "value": "Subnet-1"
+    },
+    "subnet2Name": {
+        "value": "Subnet-2"
+    },
+    "addressPrefix": {
+        "value": "10.0.0.0/16"
+    },
+    "subnet1Prefix": {
+        "value": "10.0.0.0/24"
+    },
+    "subnet2Prefix": {
+        "value": "10.0.1.0/24"
+    }
+}

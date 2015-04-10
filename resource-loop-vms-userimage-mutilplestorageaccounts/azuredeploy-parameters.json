@@ -12,10 +12,10 @@
         "value" : "userImageOsType"
     },
     "vmNamePrefix" : {
-        "value" : "cloudeeyvm"
+        "value" : "myVM"
     },
     "nicNamePrefix" : {
-        "value" : "cloudeeynic"
+        "value" : "myNic"
     },
     "adminUsername": {
         "value": ""
@@ -26,14 +26,11 @@
     "scaleNumberPerStorageAccount": {
         "value": 2
     },
-    "subscriptionId": {
-        "value": "8459cd1c-aa24-346d-b7e0-d73955447c69"
-    },
     "region": {
         "value": "West US"
     },
     "virtualNetworkName": {
-        "value": "myVNETName"
+        "value": "myVNET"
     },
     "vmSize": {
         "value": "Standard_A2"

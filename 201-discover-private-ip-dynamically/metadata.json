@@ -1,0 +1,7 @@
+{
+  "itemDisplayName": "Deploy Docker Containers on VMs across 5 regions using Loops & Template Linking",
+  "description": "This template allows you to create 'N' number of Virtual Machines based on the 'numberOfInstances' parameter specified during the template deployment and deploys 2 docker containers [nginx & redis] on each VM. This template also deploys a Storage Account, Virtual Network, 'N' number of Public IP addresses/Network Inerfaces/Virtual Machines.  Note: The Recommended limit of number of disks per Storage Account is 40.",
+  "summary": "Deploy Docker Containers on VMs across 5 regions",
+  "githubUsername": "mahthi",
+  "dateUpdated": "2015-04-04"
+}

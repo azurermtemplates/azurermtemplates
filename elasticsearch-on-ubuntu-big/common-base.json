@@ -1,0 +1,93 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "region": {
+            "type": "string",
+            "defaultValue": "West US",
+            "metadata": {
+                "Description": "Location where resources will be provisioned"
+            }
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "metadata": {
+                "Description": "Virtual Network"
+            }
+        },
+        "addressPrefix": {
+            "type": "string",
+            "metadata": {
+                "Description": "Address space for the VNET"
+            }
+        },
+        "masterSubnetName": {
+            "type": "string",
+            "metadata": {
+                "Description": "Subnet name for the VNET that resources will be provisionined in to"
+            }
+        },
+        "masterSubnetPrefix": {
+            "type": "string",
+            "metadata": {
+                "Description": "Address space for the subnet"
+            }
+        },
+        "dataSubnetName": {
+            "type": "string",
+            "metadata": {
+                "Description": "Subnet name for the VNET that resources will be provisionined in to"
+            }
+        },
+        "dataSubnetPrefix": {
+            "type": "string",
+            "metadata": {
+                "Description": "Address space for the common nodes subnet"
+            }
+        },
+        "esDataHaSetName": {
+            "type": "string",
+            "metadata": {
+                "Description": "Name of the availability set for the data nodes"
+            }
+        }
+    },
+    "variables": {
+    },
+    "resources": [
+    {
+      "apiVersion": "2014-12-01-preview",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('virtualNetworkName')]",
+      "location": "[parameters('region')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('addressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[parameters('masterSubnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('masterSubnetPrefix')]"
+            }
+          },
+          {
+            "name": "[parameters('dataSubnetName')]",
+            "properties": {
+              "addressPrefix": "[parameters('dataSubnetPrefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "2014-12-01-preview",
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[parameters('esDataHaSetName')]",
+      "location": "[parameters('region')]",
+      "properties": {}
+    }
+  ]
+}

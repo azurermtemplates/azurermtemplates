@@ -1,0 +1,89 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/VNET.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "String",
+            "defaultValue": "West US"
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "defaultValue": "myVNET"
+        },
+        "addressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16"
+        },
+        "subnet1Name": {
+            "type": "string",
+            "defaultValue": "Subnet-1"
+        },
+        "subnet2Name": {
+            "type": "string",
+            "defaultValue": "Subnet-2"
+        },
+        "subnet1Prefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/24"
+        },
+        "subnet2Prefix": {
+            "type": "string",
+            "defaultValue": "10.0.1.0/24"
+        },
+        "networkSecurityGroupName": {
+            "type": "string",
+            "defaultValue": "myVNET"
+        },
+    },
+    "resources": [{
+        "apiVersion": "2014-12-01-preview",
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "name": "[parameters('networkSecurityGroupName')]",
+        "location": "[parameters('location')]",
+        "properties": {
+            "securityRules": [{
+                "name": "first_rule",
+                "properties": {
+                    "description": "This is the First rule-We don't talk about it",
+                    "protocol": "Tcp",
+                    "sourcePortRange": "23-45",
+                    "destinationPortRange": "46-56",
+                    "sourceAddressPrefix": "*",
+                    "destinationAddressPrefix": "*",
+                    "access": "Allow",
+                    "priority": 123,
+                    "direction": "Inbound"
+                }
+            }]
+        }
+    }, {
+        "apiVersion": "2014-12-01-preview",
+        "type": "Microsoft.Network/virtualNetworks",
+        "name": "[parameters('virtualNetworkName')]",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+            "[concat('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]"
+        ],
+        "properties": {
+            "addressSpace": {
+                "addressPrefixes": [
+                    "[parameters('addressPrefix')]"
+                ]
+            },
+            "subnets": [{
+                "name": "[parameters('subnet1Name')]",
+                "properties": {
+                    "addressPrefix": "[parameters('subnet1Prefix')]",
+                    "networkSecurityGroup" : {
+                      "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+                      }
+                }
+            }, {
+                "name": "[parameters('subnet2Name')]",
+                "properties": {
+                    "addressPrefix": "[parameters('subnet2Prefix')]"
+                }
+            }]
+        }
+    }]
+}

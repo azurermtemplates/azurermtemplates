@@ -1,0 +1,345 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPassword": {
+            "type": "securestring"
+        },
+        "storageAccountName": {
+            "type": "string"
+        },
+        "numberOfMasterInstances": {
+            "type": "int",
+            "defaultValue": 3
+        },
+        "numberOfSlaveInstances": {
+            "type": "int",
+            "defaultValue": 6
+        },
+        "region": {
+            "type": "string",
+            "defaultValue": "West US"
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "defaultValue": "myVNET"
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_A0"
+        },
+        "addressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16"
+        },
+        "subnet1Name": {
+            "type": "string",
+            "defaultValue": "Subnet-1"
+        },
+        "subnet2Name": {
+            "type": "string",
+            "defaultValue": "Subnet-2"
+        },
+        "subnet1Prefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/24"
+        },
+        "subnet2Prefix": {
+            "type": "string",
+            "defaultValue": "10.0.1.0/24"
+        },
+        "masterConfigScriptFilePath": {
+            "type": "string",
+            "defaultValue": "https://raw.githubusercontent.com/hausdorff/azurermtemplates/mesos_template/centos-mesosphere-cluster-high-availability/configure_master.sh"
+        },
+        "slaveConfigScriptFilePath": {
+            "type": "string",
+            "defaultValue": "https://raw.githubusercontent.com/hausdorff/azurermtemplates/mesos_template/centos-mesosphere-cluster-high-availability/configure_slave.sh"
+        },
+        "masterConfigCommand": {
+            "type": "string"
+        },
+        "slaveConfigCommand": {
+            "type": "string"
+        },
+        "sshKeyData" : {
+            "type" : "string"
+        }
+    },
+    "variables": {
+        "vmSourceImageName": "5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-70-20150128",
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+        "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',parameters('subnet1Name'))]",
+        "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]",
+        "sshKeyPath" : "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('storageAccountName')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('region')]",
+            "properties": {
+                "accountType": "Standard_LRS"
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('virtualNetworkName')]",
+            "location": "[parameters('region')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('subnet1Name')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnet1Prefix')]"
+                        }
+                    },
+                    {
+                        "name": "[parameters('subnet2Name')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnet2Prefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[concat('masterPublicIP', copyIndex())]",
+            "location": "[parameters('region')]",
+            "copy": {
+                "name": "masterPublicIPLoop",
+                "count": "[parameters('numberOfMasterInstances')]"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[concat('slavePublicIP', copyIndex())]",
+            "location": "[parameters('region')]",
+            "copy": {
+                "name": "slavePublicIPLoop",
+                "count": "[parameters('numberOfSlaveInstances')]"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[concat('masterNic', copyindex())]",
+            "location": "[parameters('region')]",
+            "copy": {
+                "name": "masterNicLoop",
+                "count": "[parameters('numberOfMasterInstances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', 'masterPublicIP', copyindex())]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat('masterPublicIP', copyindex()))]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnet1Ref')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[concat('slaveNic', copyindex())]",
+            "location": "[parameters('region')]",
+            "copy": {
+                "name": "slaveNicLoop",
+                "count": "[parameters('numberOfSlaveInstances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', 'slavePublicIP', copyindex())]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat('slavePublicIP', copyindex()))]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnet1Ref')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[concat('mastervm', copyindex())]",
+            "location": "[parameters('region')]",
+            "copy": {
+                "name": "virtualMachineLoop",
+                "count": "[parameters('numberOfMasterInstances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', 'masterNic', copyindex())]",
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computername": "[concat('mastervm', copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": "true",
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[variables('sshKeyPath')]",
+                                    "keyData": "[parameters('sshKeyData')]"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "sourceImage": {
+                        "id": "[variables('sourceImageName')]"
+                    },
+                    "destinationVhdsContainer": "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net/vhds/')]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('masterNic', copyindex()))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[concat('slavevm', copyindex())]",
+            "location": "[parameters('region')]",
+            "copy": {
+                "name": "virtualMachineLoop",
+                "count": "[parameters('numberOfSlaveInstances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', 'slaveNic', copyindex())]",
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computername": "[concat('slavevm', copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "linuxConfiguration" : {
+                        "disablePasswordAuthentication": "true",
+                        "ssh" : {
+                            "publicKeys" : [
+                              {
+                                  "path" : "[variables('sshKeyPath')]",
+                                  "keyData" : "[parameters('sshKeyData')]"
+                              }
+                            ]
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "sourceImage": {
+                        "id": "[variables('sourceImageName')]"
+                    },
+                    "destinationVhdsContainer": "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net/vhds/')]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('slaveNic', copyindex()))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat('mastervm', copyIndex(),'/', 'configure_master')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('region')]",
+            "copy": {
+                "name": "foo",
+                "count": "[parameters('numberOfMasterInstances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', 'mastervm', copyIndex())]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.OSTCExtensions",
+                "type": "CustomScriptForLinux",
+                "typeHandlerVersion": "1.2",
+                "settings": {
+                    "fileUris": [
+                        "[parameters('masterConfigScriptFilePath')]"
+                    ],
+                    "commandToExecute": "[concat(parameters('masterConfigCommand'), ' ', copyIndex(), ' ', reference(concat('masterNic', 0)).ipConfigurations[0].properties.privateIPAddress, ' ', reference(concat('masterNic', 1)).ipConfigurations[0].properties.privateIPAddress, ' ', reference(concat('masterNic', 2)).ipConfigurations[0].properties.privateIPAddress)]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat('slavevm', copyIndex(),'/', 'configure_slave')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('region')]",
+            "copy": {
+                "name": "foo",
+                "count": "[parameters('numberOfSlaveInstances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', 'slavevm', copyIndex())]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.OSTCExtensions",
+                "type": "CustomScriptForLinux",
+                "typeHandlerVersion": "1.2",
+                "settings": {
+                    "fileUris": [
+                        "[parameters('slaveConfigScriptFilePath')]"
+                    ],
+                    "commandToExecute": "[concat(parameters('slaveConfigCommand'), ' ', copyIndex(), ' ', reference(concat('masterNic', 0)).ipConfigurations[0].properties.privateIPAddress, ' ', reference(concat('masterNic', 1)).ipConfigurations[0].properties.privateIPAddress, ' ', reference(concat('masterNic', 2)).ipConfigurations[0].properties.privateIPAddress)]"
+                }
+            }
+        }
+    ]
+}

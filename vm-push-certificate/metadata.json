@@ -1,7 +1,7 @@
 {
-  "TemplateName": "Push a certificate onto a VM",
-  "Description": "Push a certificate onto a VM",
-  "ShortDescription": "Push a certificate onto a VM",
-  "GithubUsername": "singhkay",
-  "DateUpdated": "2015-04-03"
+  "itemDisplayName": "Push a certificate onto a VM",
+  "description": "Push a certificate onto a VM",
+  "summary": "Push a certificate onto a VM",
+  "githubUsername": "singhkay",
+  "dateUpdated": "2015-04-03"
 }

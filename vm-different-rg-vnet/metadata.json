@@ -1,7 +1,0 @@
-{
-  "TemplateName": "Create a VM in a VNET in different Resource Group",
-  "Description": "This template creates a VM in a VNET which is in a different Resource Group",
-  "ShortDescription": "This template creates a VM in a VNET which is in a different Resource Group",
-  "GithubUsername": "singhkay",
-  "DateUpdated": "2015-04-03"
-}

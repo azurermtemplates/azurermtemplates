@@ -1,0 +1,471 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "West US",
+            "metadata": {
+                "Description": "Location of the resource group and all contained resources"
+            }
+        },
+        "newStorageAccountName": {
+            "type": "string",
+            "metadata": {
+                "Description": "Unique name of the new storage account that will be created to store virtual machine VHDs"
+            }
+        },
+        "domainName": {
+            "type": "string",
+            "metadata": {
+                "Description": "Domain name of the publicly accessible Apache server"
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "azureuser",
+            "metadata": {
+                "Description": "Virtual machine administrator username"
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "Description": "Virtual machine administrator password"
+            }
+        },
+        "replicatorPassword": {
+            "type": "string"
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_A1",
+			"allowedValues": [
+                "Standard_A1",
+                "Standard_A2",
+                "Standard_A3",
+                "Standard_A4"
+            ],
+            "metadata": {
+                "Description": "Size of the virtual machine (must be able to support 2 data disks)"
+            }
+        },
+        "numberOfSlaveInstances": {
+            "type": "int",
+            "defaultValue": 1,
+            "allowedValues": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18
+            ],
+            "metadata": {
+                "Description": "Number of PostgreSQL slave instances to provision"
+            }
+        },
+        "dbMasterName": {
+            "type": "string",
+            "defaultValue": "dbmaster"
+        },
+        "dbSlaveNamePrefix": {
+            "type": "string",
+            "defaultValue": "dbslave"
+        },
+        "dbAvailabilitySetName": {
+            "type": "string",
+            "defaultValue": "dbavailabilityset",
+            "metadata": {
+                "Description": "Name of the availability set containing the PostgreSQL master and slave database servers"
+            }
+        },
+        "platformFaultDomainCount": {
+            "type": "string",
+            "defaultValue": "2"
+        },
+        "platformUpdateDomainCount": {
+            "type": "string",
+            "defaultValue": "5"
+        },
+        "dataDiskSizeGB": {
+            "type": "string",
+            "defaultValue": "1000"
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "defaultValue": "vnet",
+            "metadata": {
+                "Description": "Virtual network name"
+            }
+        },
+        "addressPrefix": {
+            "type": "string",
+            "defaultValue": "10.1.0.0/16"
+        },
+        "subnetDmzName": {
+            "type": "string",
+            "defaultValue": "Subnet-DMZ"
+        },
+        "subnetDmzPrefix": {
+            "type": "string",
+            "defaultValue": "10.1.0.0/24"
+        },
+        "subnetDbName": {
+            "type": "string",
+            "defaultValue": "Subnet-DB"
+        },
+        "subnetDbPrefix": {
+            "type": "string",
+            "defaultValue": "10.1.1.0/24"
+        }
+    },
+    "variables": {
+        "vmSourceImageName": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
+        "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]",
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+        "subnetDmzRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetDmzName'))]",
+        "subnetDbRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetDbName'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('newStorageAccountName')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "properties": {
+                "accountType": "Standard_LRS"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[parameters('dbAvailabilitySetName')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "properties": {
+                "platformFaultDomainCount": "[parameters('platformFaultDomainCount')]",
+                "platformUpdateDomainCount": "[parameters('platformUpdateDomainCount')]"
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('virtualNetworkName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('subnetDmzName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnetDmzPrefix')]"
+                        }
+                    },
+                    {
+                        "name": "[parameters('subnetDbName')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('subnetDbPrefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "publicip",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('domainName')]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "nicapache",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses','publicip')]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnetDmzRef')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "nicmaster",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnetDbRef')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[concat('nicslave', copyindex())]",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "slaveNicLoop",
+                "count": "[parameters('numberOfSlaveInstances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', 'nicmaster')]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnetDbRef')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('domainName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', 'nicapache')]",
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computername": "[parameters('domainName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "sourceImage": {
+                        "id": "[variables('sourceImageName')]"
+                    },
+                    "destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/')]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces','nicapache')]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('dbMasterName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', 'nicmaster')]",
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
+                "[concat('Microsoft.Compute/availabilitySets/', parameters('dbAvailabilitySetName'))]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('dbAvailabilitySetName'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computername": "[parameters('dbMasterName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "sourceImage": {
+                        "id": "[variables('sourceImageName')]"
+                    },
+                    "destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/')]",
+                    "dataDisks": [
+                        {
+                            "name": "datadisk1",
+                            "diskSizeGB": "[parameters('dataDiskSizeGB')]",
+                            "lun": 0,
+                            "vhd": {
+                                "Uri": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/',parameters('dbMasterName'),'-datadisk1.vhd')]"
+                            }
+                        },
+                        {
+                            "name": "datadisk2",
+                            "diskSizeGB": "[parameters('dataDiskSizeGB')]",
+                            "lun": 1,
+                            "vhd": {
+                                "Uri": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/',parameters('dbMasterName'),'-datadisk2.vhd')]"
+                            }
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces','nicmaster')]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[concat(parameters('dbSlaveNamePrefix'), copyindex())]",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "slaveVmLoop",
+                "count": "[parameters('numberOfSlaveInstances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', 'nicslave', copyindex())]",
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('dbMasterName'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
+                "[concat('Microsoft.Compute/availabilitySets/', parameters('dbAvailabilitySetName'))]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('dbAvailabilitySetName'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computername": "[concat(parameters('dbSlaveNamePrefix'), copyindex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "sourceImage": {
+                        "id": "[variables('sourceImageName')]"
+                    },
+                    "destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/')]",
+                    "dataDisks": [
+                        {
+                            "name": "datadisk1",
+                            "diskSizeGB": "[parameters('dataDiskSizeGB')]",
+                            "lun": 0,
+                            "vhd": {
+                                "Uri": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/',parameters('dbSlaveNamePrefix'), copyindex(),'-datadisk1.vhd')]"
+                            }
+                        },
+                        {
+                            "name": "datadisk2",
+                            "diskSizeGB": "[parameters('dataDiskSizeGB')]",
+                            "lun": 1,
+                            "vhd": {
+                                "Uri": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/',parameters('dbSlaveNamePrefix'), copyindex(),'-datadisk2.vhd')]"
+                            }
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('nicslave', copyindex()))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('dbMasterName'), '/install_postgresql')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('dbMasterName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.OSTCExtensions",
+                "type": "CustomScriptForLinux",
+                "typeHandlerVersion": "1.2",
+                "settings": {
+                    "fileUris": [
+                        "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/ubuntu-postgresql-multi-vm/install_postgresql.sh"
+                    ],
+                    "commandToExecute": "[concat('bash install_postgresql.sh ', reference('nicmaster').ipConfigurations[0].properties.privateIPAddress, ' ', parameters('subnetDbPrefix'), ' MASTER ', reference('nicmaster').ipConfigurations[0].properties.privateIPAddress, ' ', parameters('numberOfSlaveInstances'), ' ', parameters('replicatorPassword'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('dbSlaveNamePrefix'), copyindex(), '/install_postgresql')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "extensionLoop",
+                "count": "[parameters('numberOfSlaveInstances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('dbSlaveNamePrefix'), copyindex()))]",
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('dbMasterName'), '/extensions/install_postgresql')]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.OSTCExtensions",
+                "type": "CustomScriptForLinux",
+                "typeHandlerVersion": "1.2",
+                "settings": {
+                    "fileUris": [
+                        "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/ubuntu-postgresql-multi-vm/install_postgresql.sh"
+                    ],
+                    "commandToExecute": "[concat('bash install_postgresql.sh ', reference('nicmaster').ipConfigurations[0].properties.privateIPAddress, ' ', parameters('subnetDbPrefix'), ' SLAVE ', reference(concat('nicslave', copyindex())).ipConfigurations[0].properties.privateIPAddress, ' ', parameters('numberOfSlaveInstances'), ' ', parameters('replicatorPassword'))]"
+                }
+            }
+        }
+    ],
+    "outputs": {
+    }
+}

@@ -1,0 +1,7 @@
+{
+  "itemDisplayName": "Create multiple VMs in Availability Set in a single UD",
+  "description": "This template allows you to create 'N' number of Virtual Machines based on the 'numberOfInstances' parameter specified during the template deployment. This template also deploys a Storage Account, Virtual Network, 'N' number of Public IP addresses/Network Inerfaces/Virtual Machines. The template will deploy these VMs into an Availability Set and configure it to deploy into a single Update Domain. For more information on fault domains and managing your availability, please see this http://azure.microsoft.com/en-us/documentation/articles/virtual-machines-manage-availability/",
+  "summary": "Create multiple VMs in Availability Set in a single UD",
+  "githubUsername": "kenazk",
+  "dateUpdated": "2015-04-04"
+}

@@ -1,7 +1,0 @@
-{
-  "TemplateName": "Create 2 VMs in an Availability Set with 2 FDs",
-  "Description": "This template creates 2 VMs with in an Availability Set with 2 Fault Domains",
-  "ShortDescription": "This template creates 2 VMs with in an Availability Set with 2 Fault Domains",
-  "GithubUsername": "singhkay",
-  "DateUpdated": "2015-04-05"
-}

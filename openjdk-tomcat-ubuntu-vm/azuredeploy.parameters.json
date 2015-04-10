@@ -1,0 +1,48 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "javaPackageName": {
+            "value": "openjdk-7-jdk"
+        },
+        "tomcatPackageName": {
+            "value": "tomcat7"
+        },
+        "customScriptURL": {
+            "value": "https://raw.githubusercontent.com/snallami/templates/master/ubuntu/java-tomcat-install.sh"
+        },
+        "commandToExecuteCustomScript": {
+            "value": "sh java-tomcat-install.sh"
+        },
+        "location": {
+            "value": "West US"
+        },
+        "newStorageAccountName": {
+            "value": ""
+        },
+        "publicIPAddressName": {
+            "value": "javasample1ip"
+        },
+        "dnsName": {
+            "value": "javasample1dns"
+        },
+        "adminUserName": {
+            "value": "javasample1"
+        },
+        "adminPassword": {
+            "value": ""
+        },
+        "vmName": {
+            "value": "javasample1vm"
+        },
+        "vmSourceImageName": {
+            "value": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_10-amd64-server-20150202-en-us-30GB"
+        },
+        "virtualNetworkName": {
+            "value": "javasample1vnet"
+        },
+        "nicName": {
+            "value": "javasample1vnetnic"
+        }
+    }
+}

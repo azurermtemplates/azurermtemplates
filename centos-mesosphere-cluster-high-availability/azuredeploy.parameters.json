@@ -1,0 +1,39 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "region": {
+            "value": "West US"
+        },
+        "virtualNetworkName": {
+            "value": "myVNET"
+        },
+        "vmSize": {
+            "value": "Standard_A0"
+        },
+        "subnet1Name": {
+            "value": "Subnet-1"
+        },
+        "subnet2Name": {
+            "value": "Subnet-2"
+        },
+        "addressPrefix": {
+            "value": "10.0.0.0/16"
+        },
+        "subnet1Prefix": {
+            "value": "10.0.0.0/24"
+        },
+        "subnet2Prefix": {
+            "value": "10.0.1.0/24"
+        },
+        "masterConfigCommand": {
+            "value": "sh configure_master.sh"
+        },
+        "slaveConfigCommand": {
+            "value": "sh configure_slave.sh"
+        },
+        "numberOfSlaveInstances": {
+            "value": 1
+        }
+    }
+}

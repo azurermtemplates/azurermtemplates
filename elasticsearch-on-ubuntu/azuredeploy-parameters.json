@@ -1,21 +1,18 @@
 {
     "dnsNameforLBIP": {
-        "value":""
+        "value":"trentest23"
     },
     "storageAccountName" : {
-        "value":""
+        "value":"trentest23"
     },
     "adminUsername": {
         "value": "trent"
     },
     "adminPassword": {
-        "value": ""
+        "value": "Blue!2010"
     },
     "dataNodes": {
         "value": 2
-    },
-    "subscriptionId": {
-        "value": ""
     },
     "region": {
         "value": "West US"
