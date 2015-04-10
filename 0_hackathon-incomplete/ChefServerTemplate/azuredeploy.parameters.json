@@ -1,0 +1,14 @@
+{
+    "newStorageAccountName": {
+        "value": "your storagename"
+    },
+    "adminUserName": {
+        "value": "username"
+    },
+    "adminPassword": {
+        "value": "password"
+    },
+    "vmDnsName": {
+        "value": "uniquedomainname"
+    }
+}

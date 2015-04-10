@@ -1,0 +1,11 @@
+{
+    "dnsNameForPublicIP": {
+        "value": "uniquednsname"
+    },
+    "publicIPAddressName" : {
+      "value" : "myPublicIP"
+    },
+    "location": {
+        "value": "West US"
+    }
+}
