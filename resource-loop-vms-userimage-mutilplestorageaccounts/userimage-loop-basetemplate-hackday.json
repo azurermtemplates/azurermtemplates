@@ -49,6 +49,9 @@
         },
         "nicNamePrefix" : {
           "type" : "string"
+        },
+        "dnsNameForPublicIP" : {
+            "type" : "string"
         }
     },
     "variables": {
@@ -71,7 +74,10 @@
                 "count": "[parameters('numberOfInstances')]"
             },
             "properties": {
-                "publicIPAllocationMethod": "Dynamic"
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                   "domainNameLabel": "[parameters('dnsNameForPublicIP')]"
+                }
             }
         },
         {
