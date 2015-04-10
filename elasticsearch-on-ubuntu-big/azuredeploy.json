@@ -140,7 +140,7 @@
             "value": "[variables('addressPrefix')]"
           },
           "masterSubnetPrefix": {
-            "value": "1[variables('masterSubnetPrefix')]"
+            "value": "[variables('masterSubnetPrefix')]"
           },
           "masterSubnetName": {
             "value": "[variables('masterSubnetName')]"
