@@ -264,7 +264,7 @@
       }
     },
     {
-      "name": "data-nodes",
+      "name": "[concat('data-nodes',copyindex())]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2015-01-01",
       "dependsOn": [
