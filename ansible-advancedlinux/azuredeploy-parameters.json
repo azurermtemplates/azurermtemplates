@@ -1,0 +1,41 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"location": {
+			"value": "West US"
+		},
+		"storageAccountType": {
+			"value": "Standard_LRS"
+		},
+		"dnsNameLabel": {
+			"value": ""
+		},
+		"numberOfVMS": {
+			"value": 3
+		},
+		"vmSize": {
+			"value": "Standard_A1"
+		},
+		"vmNumberOfDataDisks": {
+			"value": 1
+		},
+		"adminUserName": {
+			"value": ""
+		},
+		"adminPassword": {
+			"value": ""
+		},
+		"sshKeyData" : { 
+             "value": "" 
+         }, 
+
+		"customScriptConfigStorageAccountName" : {
+            "value": ""
+        },
+        "customScriptConfigStorageAccountKey" : {
+            "value": ""
+        }
+
+	}
+}
