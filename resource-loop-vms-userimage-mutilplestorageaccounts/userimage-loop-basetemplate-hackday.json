@@ -49,6 +49,9 @@
         },
         "nicNamePrefix" : {
           "type" : "string"
+        },
+        "dnsNameForPublicIP" : {
+            "type" : "string"
         }
     },
     "variables": {
@@ -72,6 +75,9 @@
             },
             "properties": {
                 "publicIPAllocationMethod": "Dynamic"
+                "dnsSettings": {
+                    "domainNameLabel": "[concat(parameters('dnsNameForPublicIP'),copyindex()]"
+                }
             }
         },
         {
