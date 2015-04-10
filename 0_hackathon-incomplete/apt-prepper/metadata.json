@@ -1,0 +1,7 @@
+{
+  "itemDisplayName": "An APT repository in the cloud for a group of APT-based VMs",
+  "description": "This template deploys instances+1 APT-based (Ubuntu by default) VMs and configures a Web Site which will serve as an APT repository"
+  "summary": "This template deploys instances+1 APT-based (Ubuntu by default) VMs and configures a Web Site which will serve as an APT repository"
+  "githubUsername": "bureado",
+  "dateUpdated": "2015-04-10"
+}

@@ -1,0 +1,324 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+		"prefix": {
+			"type": "string",
+			"defaultValue": "pfx"
+		},
+        "storageAccount": {
+            "type": "string",
+			"defaultValue": "stg"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "West US"
+        },
+        "adminUsername": {
+            "type": "string",
+			"defaultValue": "azureuser"
+        },
+        "adminPassword": {
+            "type": "securestring"
+        },
+        "vmSourceImageName": {
+            "type": "string",
+            "defaultValue": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB"
+        },
+        "subscriptionId": {
+            "type": "string"
+        },
+		"callURIRepOp": {
+			"type": "securestring"
+		},
+		"callURI": {
+			"type": "string"
+		},
+		"instances": {
+			"type": "int",
+			"defaultValue": 2
+		},
+		"platformFaultDomainCount": {
+            "type": "string",
+            "defaultValue": "2"
+        },
+        "platformUpdateDomainCount": {
+            "type": "string",
+            "defaultValue": "5"
+        }
+    },
+    "variables": {
+        "nicName": "[concat(parameters('prefix'),'nic')]",
+        "addressPrefix": "10.0.0.0/16",
+        "subnetName": "Subnet-1",
+        "subnetPrefix": "10.0.0.0/24",
+        "storageAccountType": "Standard_LRS",
+        "publicIPAddressName": "[concat(parameters('prefix'),'pip')]",
+        "publicIPAddressType": "Dynamic",
+        "vmStorageAccountContainerName": "vhds",
+        "vmName": "[concat(parameters('prefix'),'vm')]",
+        "vmSize": "Standard_A3",
+        "virtualNetworkName": "[concat(parameters('prefix'),'vnet')]",
+        "sourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('vmSourceImageName'))]",
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
+        "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
+		"storageAccountName": "[concat(parameters('prefix'),parameters('storageAccount'))]",
+		"serverFarmName": "[concat(parameters('prefix'),'frm')]",
+		"siteName": "[concat(parameters('prefix'),'web')]",
+		"callURI": "[concat(parameters('callURI'),'?SiteName=',variables('siteName'))]",
+		"availabilitySetName": "[concat(parameters('prefix'),'avset')]",
+		"callURIRepOp": "[concat(parameters('callURIRepOp'),'&SiteName=',variables('siteName'))]"
+    },
+    "resources": [
+		{
+			"type": "Microsoft.Web/serverfarms",
+			"apiVersion": "2014-06-01",
+			"name": "[variables('serverFarmName')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"sku": "Free"
+			}			
+		},
+		{
+			"type": "Microsoft.Web/sites",
+			"apiVersion": "2014-06-01",
+			"dependsOn": ["[concat('Microsoft.Web/serverfarms/', variables('serverFarmName'))]"],
+			"name": "[variables('siteName')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"serverFarm": "[variables('serverFarmName')]"
+			}
+			
+		},
+		{
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[variables('availabilitySetName')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "properties": {
+                "platformFaultDomainCount": "[parameters('platformFaultDomainCount')]",
+                "platformUpdateDomainCount": "[parameters('platformUpdateDomainCount')]"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageAccountName')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "properties": {
+                "accountType": "[variables('storageAccountType')]"
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIPAddressName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[variables('vmName')]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[variables('virtualNetworkName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnetPrefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('nicName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+		{
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[concat('niccli', copyindex())]",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "clientNicLoop",
+                "count": "[parameters('instances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[variables('vmName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
+				"[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
+            ],
+            "properties": {
+				"availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[variables('vmSize')]"
+                },
+                "osProfile": {
+                    "computername": "[variables('vmName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "sourceImage": {
+                        "id": "[variables('sourceImageName')]"
+                    },
+                    "destinationVhdsContainer": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+                        }
+                    ]
+                }
+            }
+        },
+		{
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[concat(variables('vmName'),'cli', copyindex())]",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "cli-loop",
+                "count": "[parameters('instances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', 'niccli', copyindex())]",
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'), '/extensions/prepare_ops')]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+                "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computername": "[concat(variables('vmName'),'cli', copyindex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "sourceImage": {
+                        "id": "[variables('sourceImageName')]"
+                    },
+                    "destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/')]",
+
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('niccli', copyindex()))]"
+                        }
+                    ]
+                }
+            }
+        },
+		{
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(variables('vmName'),'/prepare_ops')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.OSTCExtensions",
+                "type": "CustomScriptForLinux",
+                "typeHandlerVersion": "1.2",
+                "settings": {
+                    "fileUris": [
+                        "[variables('callURIRepOp')]"
+                    ],
+                    "commandToExecute": "sh apt-prepare.sh"
+                }
+            }
+        },
+		{
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+			"name": "[concat(variables('vmName'), 'cli', copyindex(), '/enable_repo')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "extensionLoop",
+                "count": "[parameters('instances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'), 'cli', copyindex())]",
+                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.OSTCExtensions",
+                "type": "CustomScriptForLinux",
+                "typeHandlerVersion": "1.2",
+                "settings": {
+                    "fileUris": [
+                        "[variables('callURI')]"
+                    ],
+                    "commandToExecute": "sh apt-enable.sh"
+                }
+            }
+        }
+    ]
+}
