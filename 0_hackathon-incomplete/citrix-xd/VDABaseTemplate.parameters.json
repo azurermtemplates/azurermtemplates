@@ -1,0 +1,45 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "value": "janzen"
+        },
+        "adminPassword": {
+            "value": "Citrix$!"
+        },
+        "numberOfInstances": {
+            "value": 2
+        },
+		"storageAccountNameFromTemplate": {
+		    "value": "jhbarmtest4sto1"
+		},
+        "subscriptionId": {
+            "value": "9fd14417-478c-4245-bd82-784c20397f3f"
+        },
+        "region": {
+            "value": "West US"
+        },
+		"existingVnetResourceGroup": {
+		    "value": "jhbarmtest3"
+		},
+		"existingVnetName": {
+		    "value": "vnet1"
+		},
+        "existingSubnetName": {
+            "value": "Subnet-1"
+        },
+        "nicNamePrefix": {
+            "value": "nic-vda-"
+        },
+        "vmNamePrefix": {
+            "value": "armtest4-vda-"
+        },
+		"availabilitySetName": {
+		    "value": "aset1"
+		},
+		"dnsNamePrefix": {
+		    "value": "jhbarmtest4-"
+		},
+    }
+}

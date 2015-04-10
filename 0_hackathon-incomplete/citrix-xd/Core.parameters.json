@@ -1,0 +1,42 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "newStorageAccountName": {
+            "value": "jhbarmtest12sto1"
+        },
+        "adminUsername": {
+            "value": "janzen"
+        },
+        "adminPassword": {
+            "value": "Citrix$!"
+        },
+        "virtualNetworkName": {
+            "value": "vnet1"
+        },
+        "subscriptionId": {
+            "value": "9fd14417-478c-4245-bd82-784c20397f3f"
+        },
+        "nicNamePrefix": {
+            "value": "nic"
+        },
+        "dcVmName": {
+            "value": "dc"
+        },
+        "sqlVmName": {
+            "value": "sql"
+        },
+        "ddcVmName": {
+            "value": "ddc"
+        },
+        "dcDnsName": {
+            "value": "jhbarmtest12-dc"
+        },
+        "sqlDnsName": {
+            "value": "jhbarmtest12-sql"
+        },
+        "ddcDnsName": {
+            "value": "jhbarmtest12-ddc"
+        }
+    }
+}
