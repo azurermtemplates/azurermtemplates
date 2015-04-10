@@ -49,9 +49,6 @@
         "vmSize": {
             "type": "string",
             "defaultValue": "Standard_A2"
-        },
-        "dnsNameForPublicIP" : {
-            "type" : "string"
         }
     },
     "variables": {
@@ -62,15 +59,13 @@
         "subnet2Prefix" : "10.0.1.0/24",
 
         "baseTemplateUri": "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/resource-loop-vms-userimage-mutilplestorageaccounts/userimage-loop-basetemplate.json",
-        "storageAccountCount": 4,
+        "storageAccountCount": 3,
         "nicref0": "[concat(parameters('nicNamePrefix'),'0')]",
         "nicref1": "[concat(parameters('nicNamePrefix'),'10')]",
         "nicref2": "[concat(parameters('nicNamePrefix'),'20')]",
-        "nicref3": "[concat(parameters('nicNamePrefix'),'30')]",
         "vmref0": "[concat(parameters('vmNamePrefix'),'0')]",
         "vmref1": "[concat(parameters('vmNamePrefix'),'10')]",
-        "vmref2": "[concat(parameters('vmNamePrefix'),'20')]",
-        "vmref3": "[concat(parameters('vmNamePrefix'),'30')]"
+        "vmref2": "[concat(parameters('vmNamePrefix'),'20')]"
     },
     "resources": [
         {
@@ -156,9 +151,6 @@
                     },
                     "vmSize": {
                         "value": "[parameters('vmSize')]"
-                    },
-                    {
-                        "value" : "[parameters('dnsNameForPublicIP')]"
                     }
                 }
             }
