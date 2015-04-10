@@ -11,17 +11,13 @@
 #  This script automates building a Couchbase cluster. Specifically it:
 #     installs ansible on all the nodes
 #     configures ssh keys
-#     configures 
-#     clone git repo https://github.com/couchbaselabs/ansible-couchbase-server.git
-#     configures couchbase installation
-#     create couchbase cluster 
 # Parameters :
 #  1 - i: IP Pattern
 #  2 - n: Number of nodes
 #  3 - r: Configure RAID 
 #  4 - f: filesystem : ext4 or xfs
 # Note : 
-# This script has only been tested on CentOS 6.5 and Ubuntu 12.04 LTS with Couchbase version XX
+# This script has only been tested on CentOS 6.5 and Ubuntu 12.04 LTS 
 ######################################################### 
 
 #---BEGIN VARIABLES---
@@ -194,11 +190,18 @@ function configure_ssh()
     # set permissions
     chmod 600 ~/.ssh/authorized_keys 
 
-    # configure SELinux
-    restorecon -Rv ~/.ssh         
+    if [[ "${DIST}" == "Ubuntu" ]];
+    then
+        #restart sshd service - Ubuntu
+        service ssh restart
+
+    else [[ "${DIST}" == "CentOS" ]] ; then
+        # configure SELinux
+        restorecon -Rv ~/.ssh 
     
-    #restart sshd service - CentOS
-    service sshd restart
+        #restart sshd service - CentOS
+        service sshd restart
+    fi
 
 }
 
@@ -243,6 +246,8 @@ InitializeVMs()
 {
     check_OS
     
+    configure_ssh
+
     if [[ "${DIST}" == "Ubuntu" ]];
     then
         log "INFO:Installing Ansible for Ubuntu"
@@ -253,8 +258,7 @@ InitializeVMs()
     else
          log "ERROR:Unsupported OS ${DIST}"
     fi
-
-    configure_ssh
+    
     configure_ansible
 
     # TODO :

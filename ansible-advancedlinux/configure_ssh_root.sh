@@ -75,7 +75,7 @@ function check_OS()
      
 }
 
-function configure_ssh_CentOS()
+function configure_ssh()
 {
 
     # copy root ssh key
@@ -87,17 +87,19 @@ function configure_ssh_CentOS()
     chmod 700 ~/.ssh
     chmod 600 ~/.ssh/authorized_keys 
 
-    # configure SELinux
-    restorecon -Rv ~/.ssh 
+    if [[ "${DIST}" == "Ubuntu" ]];
+    then
+        #restart sshd service - Ubuntu
+        service ssh restart
+
+    else [[ "${DIST}" == "CentOS" ]] ; then
+        # configure SELinux
+        restorecon -Rv ~/.ssh 
     
-    # Not needed
-    # modify ssh config file
-    #file=sshd_config    
-    #cp -p /etc/ssh/$file $file.backup        
-    # sed -i '/^#PermitRootLogin/s/^.*$/PermitRootLogin yes/' /etc/ssh/sshd_config    
+        #restart sshd service - CentOS
+        service sshd restart
+    fi
     
-    #restart sshd service - CentOS
-    service sshd restart
 
 } 
 
@@ -110,14 +112,13 @@ function ConfigureSSH()
     if [[ "${DIST}" == "Ubuntu" ]];
     then
         log "INFO:Configuring root loging for Ubuntu"
-        install_ansible_ubuntu
     elif [[ "${DIST}" == "CentOS" ]] ; then
         log "INFO:Configuring root loging for CentOS"
-        configure_ssh_CentOS
     else
          log "ERROR:Unsupported OS ${DIST}"
     fi
 
+    configure_ssh
 }
 
 ConfigureSSH
