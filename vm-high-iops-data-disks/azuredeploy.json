@@ -21,12 +21,16 @@
             "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201503.01-en.us-127GB.vhd"
         },
         "location": {
-            "type": "String",
+            "type": "string",
             "defaultValue" : "West US"
         },
         "vmSize": {
             "type": "string",
             "defaultValue": "Standard_D14"
+        },
+        "sizeOfEachDataDiskInGB" : {
+          "type" : "string",
+          "defaultValue" : "1023"
         },
         "publicIPAddressName": {
             "type": "string",
@@ -98,7 +102,7 @@
         "dataDisk29VhdName" : "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',parameters('vmName'),'dataDisk29.vhd')]",
         "dataDisk30VhdName" : "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',parameters('vmName'),'dataDisk30.vhd')]",
         "dataDisk31VhdName" : "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',parameters('vmName'),'dataDisk31.vhd')]",
-        "dataDisk32VhdName" : "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',parameters('vmName'),'dataDisk32.vhd')]"        
+        "dataDisk32VhdName" : "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',parameters('vmName'),'dataDisk32.vhd')]"
     },
     "resources": [
     {
@@ -468,7 +472,7 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(parameters('vmName'),'/', parameters('DscExtensionName'))]",
+      "name": "[concat(parameters('vmName'),'/', variables('DscExtensionName'))]",
       "apiVersion": "2014-12-01-preview",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -481,7 +485,7 @@
         "settings": {
           "ModulesUrl": "[parameters('modulesUrl')]",
           "SasToken": "",
-          "ConfigurationFunction": "[parameters('configurationFunction')]",
+          "ConfigurationFunction": "[variables('configurationFunction')]",
           "Properties": {
             "MachineName": "[parameters('vmName')]"
           }
