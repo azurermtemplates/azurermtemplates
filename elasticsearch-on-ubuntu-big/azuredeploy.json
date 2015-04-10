@@ -140,7 +140,7 @@
             "value": "[variables('addressPrefix')]"
           },
           "masterSubnetPrefix": {
-            "value": "1[variables('masterSubnetPrefix')]"
+            "value": "[variables('masterSubnetPrefix')]"
           },
           "masterSubnetName": {
             "value": "[variables('masterSubnetName')]"
@@ -277,7 +277,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('masterTemplateUrl')]",
+          "uri": "[variables('dataTemplateUrl')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -288,7 +288,7 @@
             "value": "[parameters('adminPassword')]"
           },
           "storageAccountName": {
-            "value": "[concat(parameters('storageAccountPrefix'),'datanodes-su', copyindex())]"
+            "value": "[concat(parameters('storageAccountPrefix'),'dnsu', copyindex())]"
           },
           "region": {
             "value": "[parameters('region')]"
