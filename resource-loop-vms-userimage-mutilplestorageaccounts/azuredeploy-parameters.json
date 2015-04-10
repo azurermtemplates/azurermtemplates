@@ -26,9 +26,6 @@
     "scaleNumberPerStorageAccount": {
         "value": 2
     },
-    "subscriptionId": {
-        "value": "yourSubscriptionID"
-    },
     "region": {
         "value": "West US"
     },

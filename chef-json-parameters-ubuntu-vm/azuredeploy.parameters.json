@@ -11,9 +11,6 @@
     "vmDnsName": {
         "value": "unique dns name"
     },
-    "subscriptionId": {
-        "value": "your subscription id"
-    },
     "chef_node_name": {
         "value": "your node name"
     },

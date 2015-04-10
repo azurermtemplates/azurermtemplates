@@ -84,9 +84,6 @@
         "dnsName": {
             "type": "string"
         },
-        "subscriptionId": {
-            "type": "string"
-        },
         "nicName": {
             "type": "string"
         },
@@ -107,10 +104,10 @@
         }
     },
     "variables": {
-        "sourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('vmSourceImageName'))]",
+        "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('vmSourceImageName'))]",
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',parameters('subnet1Name'))]",
-        "accountid": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('customScriptStorageAccountResourceGroup'),'/providers/','Microsoft.Storage/storageAccounts/', parameters('customScriptStorageAccountName'))]"
+        "accountid": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',parameters('customScriptStorageAccountResourceGroup'),'/providers/','Microsoft.Storage/storageAccounts/', parameters('customScriptStorageAccountName'))]"
     },
     "resources": [
         {
@@ -243,4 +240,4 @@
             }
         }
     ]
-} 
+}

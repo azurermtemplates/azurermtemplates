@@ -21,9 +21,6 @@
                 "linux"
             ]
         },
-        "subscriptionId": {
-            "type": "string"
-        },
         "adminUsername": {
             "type": "string"
         },
@@ -138,7 +135,7 @@
                         "value": "[parameters('scaleNumberPerStorageAccount')]"
                     },
                     "subscriptionId": {
-                        "value": "[parameters('subscriptionId')]"
+                        "value": "[subscription().subscriptionId]"
                     },
                     "region": {
                         "value": "[parameters('region')]"

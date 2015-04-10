@@ -139,12 +139,6 @@
         "Description": "DNS Name for Public IP"
       }
     },
-    "subscriptionId": {
-      "type": "string",
-      "metadata": {
-        "Description": "Subcription Id"
-      }
-    },
     "nicName": {
       "type": "string",
       "metadata": {
@@ -177,7 +171,7 @@
     }
   },
   "variables": {
-    "sourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('vmSourceImageName'))]",
+    "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('vmSourceImageName'))]",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
     "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',parameters('subnet1Name'))]"
   },

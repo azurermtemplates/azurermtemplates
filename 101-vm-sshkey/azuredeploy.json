@@ -24,9 +24,6 @@
             "type": "string",
             "defaultValue": "b4590d9e3ed742e4a1d46e5424aa335e__SUSE-Linux-Enterprise-Server-11-SP3-v206"
         },
-        "subscriptionId":{
-            "type" : "string"
-        },
         "location": {
             "type": "String",
             "defaultValue" : "West US"
@@ -62,7 +59,7 @@
         "publicIPAddressType" : "Dynamic",
         "storageAccountType": "Standard_LRS",
         "sshKeyPath" : "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
-        "sourceImageName" : "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('vmSourceImageName'))]",
+        "sourceImageName" : "[concat('/',subscription().subscriptionId,'/services/images/',parameters('vmSourceImageName'))]",
         "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "subnet1Ref" : "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]"
     },

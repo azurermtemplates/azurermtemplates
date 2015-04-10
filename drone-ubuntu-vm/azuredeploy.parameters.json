@@ -22,9 +22,6 @@
         },
         "githubSecret": {
             "value": ""
-        },
-        "subscriptionId": {
-            "value": ""
         }
     }
 }

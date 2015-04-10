@@ -19,9 +19,6 @@
         },
         "mySqlPassword": {
             "value": "password"
-        },
-        "subscriptionId": {
-            "value": "aaaaaaaa-xxxx-yyyy-xxxx-bbbbbbbbbbbb"
         }
    }
 }
