@@ -1,0 +1,7 @@
+{
+  "itemDisplayName": "Deploying Virtual Machines across 5 regions using Template Linking & Loops",
+  "description": "This template allows you to create 'N' number of Virtual Machines based on the 'numberOfInstances' parameter specified during the template deployment. This template also deploys a Storage Account, Virtual Network, 'N' number of Public IP addresses/Network Inerfaces/Virtual Machines.",
+  "summary": "Deploying Virtual Machines across 5 regions using Template Linking & Loops",
+  "githubUsername": "mahthi",
+  "dateUpdated": "2015-04-04"
+}
