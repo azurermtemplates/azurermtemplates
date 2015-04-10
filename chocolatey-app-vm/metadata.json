@@ -1,0 +1,7 @@
+{
+  "itemDisplayName": "Deploy a VM with Chocolatey installed",
+  "description": "This template allows you to create a VM with an application from Chocolatey installed. Currently the custom script to launch the choco install is being pulled from https://iaasscripts.blob.core.windows.net/scripts/InstallApplication.ps1. Once the Custom Script Extension is updated to pull from any URL it will be updated to pull directly from GitHub.",
+  "summary": "Deploy a VM with Chocolatey installed",
+  "githubUsername": "drewm3",
+  "dateUpdated": "2015-04-03"
+}

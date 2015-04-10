@@ -1,0 +1,7 @@
+{
+  "itemDisplayName": "Create a Virtual Machine from an Image with VM Diagnostics Extension",
+  "description": "This template allows you to create a Windows Virtual Machine from a specified image during the template deployment and install the VM Diagnostics Extension. This template also deploys a Storage Account, Virtual Network, Public IP addresses and a Network Interface.",
+  "summary": "Create a Virtual Machine from an Image with VM Diagnostics Extension",
+  "githubUsername": "kenazk",
+  "dateUpdated": "2015-04-04"
+}
