@@ -1,12 +1,14 @@
 #!/bin/bash
-apt-get -y update
+
+export DEBIAN_FRONTEND=noninteractive
+sudo apt-get -y update
 
 # install Python
-apt-get -y install python-setuptools
+sudo apt-get -y install python-setuptools
 # install DJango
-easy_install django
+sudo easy_install django
 # install Apache
-apt-get install apache2 libapache2-mod-wsgi
+sudo apt-get -y install apache2 libapache2-mod-wsgi
 
 # write some PHP
 #echo \<center\>\<h1\>My Demo App\</h1\>\<br/\>\</center\> > /var/www/html/phpinfo.php
