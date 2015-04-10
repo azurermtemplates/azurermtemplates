@@ -4,39 +4,72 @@
     "parameters" : {
         "StorageAccountName": {
             "type": "string",
+            "metadata": { 
+                "Description": "The name of an existing storage account from any resource group"
+            } 
         },
         "dnsNameForPublicIP" : {
-            "type" : "string"
+            "type" : "string",
+            "metadata": { 
+                "Description": "A unique DNS name"
+            }
         },
         "adminUserName": {
-            "type": "string"
+            "type": "string",
+            "metadata": { 
+                "Description": "VM admin username"
+            }
         },
         "adminPassword": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata": { 
+                "Description": "VM admin password"
+            }
         },
         "vmSourceImageName": {
             "type": "string",
-            "defaultValue": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB"
+            "defaultValue": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
+            "metadata": { 
+                "Description": "Name of the image to be used to create the V"
+            }
         },
         "location": {
             "type": "String",
-            "defaultValue" : "West US"
+            "defaultValue" : "West US",
+            "metadata": { 
+                "Description": "Location of the resources being created"
+            }
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "Standard_A0"
+            "defaultValue": "Standard_A0",
+            "metadata": { 
+                "Description": "The size of the VM being created"
+            }
         },
         "publicIPAddressName": {
-            "type": "string"
+            "type": "string",
+            "metadata": { 
+                "Description": "The name of the public IP"
+            }
         },
         "vmName": {
-            "type": "string"
+            "type": "string",
+            "metadata": { 
+                "Description": "The name of the VM"
+            }
         },
         "virtualNetworkName":{
-            "type" : "string"
+            "type" : "string",
+            "metadata": { 
+                "Description": "The name of the virtual network being created"
+            }
         },
         "nicName":{
-            "type" : "string"
+            "type" : "string",
+            "metadata": { 
+                "Description": "The Network Interface Name"
+            }
         }
     },
     "variables": {
