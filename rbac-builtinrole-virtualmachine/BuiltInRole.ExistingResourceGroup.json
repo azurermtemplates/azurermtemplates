@@ -1,0 +1,48 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "subscriptionId": {
+            "type": "string"
+        },
+        "principalId": {
+            "type": "string"
+        },
+        "resourceGroup": {
+            "type": "string"
+        },
+        "virtualMachineName": {
+            "type": "string"
+        },
+        "builtInRoleType": {
+            "type": "string",
+            "allowedValues": [
+                "Owner",
+                "Contributor",
+                "Reader",
+                "Virtual Machine Contributor"
+            ]
+        },
+         "guid": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "Owner": "[concat('/subscriptions/',parameters('subscriptionId'), '/providers/Microsoft.Authorization/roleDefinitions/', '8e3af657-a8ff-443c-a75c-2fe8c4bcb635')]",
+        "Contributor": "[concat('/subscriptions/',parameters('subscriptionId'), '/providers/Microsoft.Authorization/roleDefinitions/', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+        "Reader": "[concat('/subscriptions/',parameters('subscriptionId'), '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",        
+        "Virtual Machine Contributor": "[concat('/subscriptions/',parameters('subscriptionId'), '/providers/Microsoft.Authorization/roleDefinitions/', 'd73bb868-a0df-4d4d-bd69-98a00b01fccb')]",        
+        "resourceName": "[concat(parameters('virtualMachineName'), '/Microsoft.Authorization/', parameters('guid'))]"       
+    },
+    "resources": [
+        {
+          "apiVersion": "2014-10-01-preview",
+          "name": "[variables('resourceName')]",
+          "type": "Microsoft.Compute/virtualMachines/providers/roleAssignments",
+            "properties": {
+                "roleDefinitionId": "[variables(parameters('builtInRoleType'))]",
+                "principalId": "[parameters('principalId')]"                
+            }
+        }
+    ]
+    }
