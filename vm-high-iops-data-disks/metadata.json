@@ -1,0 +1,7 @@
+{
+  "itemDisplayName": "Create a VM from a Windows Image with 32 data disks configured with storage pools",
+  "description": "This template creates a D14 with 32 data disks attached.  Using DSC they are automatically striped per best practices to get maximum IOPS.",
+  "summary": "Create a VM from 32 Data Disks configured for high IOPS",
+  "githubUsername": "jvallery",
+  "dateUpdated": "2015-04-10"
+}
