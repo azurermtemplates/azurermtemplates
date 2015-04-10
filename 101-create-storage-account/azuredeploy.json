@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "newStorageAccountName": {
-      "type": "String"
+      "type": "string"
     },
     "storageAccountType": {
       "type": "string",
@@ -11,11 +11,11 @@
       "allowedValues": [
         "Standard_LRS",
         "Standard_GRS",
-        "Standard_ZRS"        
-      ],
+        "Standard_ZRS"
+      ]
     },
     "location": {
-      "type": "String",
+      "type": "string",
       "defaultValue" : "West US",
       "allowedValues": [
         "West US",
