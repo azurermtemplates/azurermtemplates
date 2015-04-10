@@ -252,7 +252,7 @@
                     "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
                 },
                 "hardwareProfile": {
-                    "vmSize": "[parameters('vmSize')]"
+                    "vmSize": "[variables('vmSize')]"
                 },
                 "osProfile": {
                     "computername": "[concat(variables('vmName'),'cli', copyindex())]",
@@ -263,8 +263,7 @@
                     "sourceImage": {
                         "id": "[variables('sourceImageName')]"
                     },
-                    "destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/')]",
-
+                    "destinationVhdsContainer": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/vhds/')]",
                 },
                 "networkProfile": {
                     "networkInterfaces": [
