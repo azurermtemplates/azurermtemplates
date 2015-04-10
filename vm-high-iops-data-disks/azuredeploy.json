@@ -51,7 +51,7 @@
 
         "modulesUrl": {
           "type": "string",
-          "defaultValue" : "https://github.com/jvallery/azurermtemplates/blob/master/vm-high-iops-data-disks/StoragePools.ps1.zip",
+          "defaultValue" : "https://github.com/jvallery/azurermtemplates/blob/master/vm-high-iops-data-disks/StoragePool.ps1.zip",
           "metadata": {
               "Description": "URL for the DSC configuration module. NOTE: Can be a Github url(raw) to the zip file"
           }
@@ -66,7 +66,7 @@
         "vmStorageAccountContainerName": "vhds",
         "publicIPAddressType" : "Dynamic",
         "storageAccountType": "Standard_LRS",
-        "configurationFunction" : "StoragePool",
+        "configurationFunction" : "StoragePool.ps1\StoragePool ",
         "DscExtensionName" : "DscExtension",
         "sourceImageName" : "[concat('/',subscription().subscriptionId,'/services/images/',parameters('vmSourceImageName'))]",
         "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
@@ -352,7 +352,7 @@
                         "diskSizeGB" : "[parameters('sizeOfEachDataDiskInGB')]",
                         "lun" : 18,
                         "vhd":{
-                          "Uri" : "[variables('dataDisk17VhdName')]"
+                          "Uri" : "[variables('dataDisk19VhdName')]"
                         }
                     },
                     {
@@ -460,6 +460,8 @@
                         }
                     }
                 ],
+                "destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
+              },
             "networkProfile": {
                 "networkInterfaces" : [
                 {
@@ -467,7 +469,6 @@
                 }
                 ]
             }
-        }
       }
     },
     {
