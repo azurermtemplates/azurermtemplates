@@ -1,0 +1,6 @@
+{ 
+  "itemDisplayName": "Spin up a 3-node CoreOS cluster with Fleet", 
+  "description": "Template spins up a CoreOS cluster with Fleet deployed deployed and started on each cluster node.", 
+  "githubUsername": "nmackenzie", 
+  "dateUpdated": "2015-04-10" 
+} 

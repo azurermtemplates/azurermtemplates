@@ -1,0 +1,32 @@
+﻿{
+    "location": {
+        "value": "West US"
+    },
+    "newStorageAccountName" : {
+        "value":""
+    },
+    "vmNamePrefix" : {
+      "value" : ""
+    },
+    "virtualNetworkName": {
+        "value": ""
+    },
+    "vmSourceImageName" : {
+        "value" : ""
+    },
+    "vmSize": {
+        "value": "Standard_A1"
+    },
+    "adminUsername": {
+        "value": ""
+    },
+    "sshKeyData" : {
+        "value" : ""
+    },
+    "customData" : {
+        "value" : ""
+    },
+    "subscriptionId": {
+        "value": ""
+    }
+}
