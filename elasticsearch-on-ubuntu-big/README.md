@@ -4,7 +4,7 @@
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
-This template deploys an Elasticsearch cluster on Ubuntu Virtual Machines.  The template provisions 3 dedicated master and client nodes in separate availability sets and storage accounts. Data node scale unit count and nodes int a scale unit can be configured as parameters.  A load balancer is configured with a rule to route traffic on port 9200 to the client nodes, and also includes a single SSH nat management rule for a single node.  Multiple data disks are attached and data is striped across them as an approach to improve disk throughput.
+This template deploys an Elasticsearch cluster on Ubuntu Virtual Machines and uses template linking to create data node scale untis.  The template provisions 3 dedicated master and client nodes in separate availability sets and storage accounts. Data node scale unit count and nodes in a scale unit can be configured as parameters.  A load balancer is configured with a rule to route traffic on port 9200 to the client nodes, and also includes a single SSH nat management rule for a single node.  Multiple data disks are attached and data is striped across them as an approach to improve disk throughput.
 
 This template also deploys a Storage Account, Virtual Network, Availability Sets, Public IP addresses, Load Balancer, and a Network Interface.
 
