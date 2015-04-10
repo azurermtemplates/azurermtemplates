@@ -1,0 +1,7 @@
+{
+  "itemDisplayName": "A PHP Web Site with a companion Linux/Apache server",
+  "description": "This template deploys an APT-based Linux VM (Ubuntu by default) and a Web Site and connects them via git for test/production",
+  "summary": "This template deploys an APT-based Linux VM (Ubuntu by default) and a Web Site and connects them via git for test/production",
+  "githubUsername": "bureado",
+  "dateUpdated": "2015-04-10"
+}
