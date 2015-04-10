@@ -34,5 +34,11 @@
     },
     "redisClusterName": {
         "value": "redis-arm-cluster"
+    },
+    "redisNodeIPAddressPrefix": {
+        "value": "10.0.0.1"
+    },
+    "jumpbox": { 
+        "value": "enabled"
     }
 }

@@ -45,6 +45,13 @@
         "vmSize": {
             "type": "string",
             "defaultValue": "Standard_A0",
+            "allowedValues": [
+                "Standard_A0",
+                "Standard_A1",
+                "Standard_A2",
+                "Standard_A3",
+                "Standard_A4"
+            ],
             "metadata": {
                 "Description": "The virtual machine size of the Redis nodes"
             }
@@ -79,7 +86,7 @@
         },
         "redisVersion": {
             "type": "string",
-			"defaultValue": "stable",
+            "defaultValue": "stable",
             "metadata": {
                 "Description": "The version of the Redis package to be deployed on the cluster (or use 'stable' to pull in the latest and greatest)"
             }
@@ -88,6 +95,24 @@
             "type": "string",
             "metadata": {
                 "Description": "The arbitrary name of the Redis cluster (maps to cluster's configuration file name)"
+            }
+        },
+        "redisNodeIPAddressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.1",
+            "metadata": {
+                "Description": "The IP address prefix that will be used for constructing a static private IP address for each node in the cluster"
+            }
+        },
+        "jumpbox": {
+            "type": "string",
+            "defaultValue": "enabled",
+            "allowedValues": [
+                "enabled",
+                "disabled"
+            ],
+            "metadata": {
+                "Description": "The flag allowing to enable or disable provisioning of the jumpbox VM that can be used to access the Redis nodes"
             }
         }
     },
@@ -98,58 +123,80 @@
         "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName'))]",
         "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]",
         "computerNamePrefix": "redisnode_",
-        "scriptUrl": "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/redis-on-ubuntu/"
+        "scriptUrl": "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/redis-on-ubuntu/",
+        "templateUrl": "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/redis-on-ubuntu/",
+        "sharedTemplateName": "shared-resources",
+        "jumpboxTemplateName": "jumpbox-resources-"
     },
     "resources": [
         {
-            "type": "Microsoft.Storage/storageAccounts",
-            "name": "[parameters('storageAccountName')]",
-            "apiVersion": "2014-12-01-preview",
-            "location": "[parameters('region')]",
+            "name": "shared-resources",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
             "properties": {
-                "accountType": "Standard_LRS"
-            }
-        },
-        {
-            "apiVersion": "2014-12-01-preview",
-            "type": "Microsoft.Compute/availabilitySets",
-            "name": "redisCluserAS",
-            "location": "[parameters('region')]",
-            "properties": {
-            }
-        },
-        {
-            "apiVersion": "2014-12-01-preview",
-            "type": "Microsoft.Network/virtualNetworks",
-            "name": "[parameters('virtualNetworkName')]",
-            "location": "[parameters('region')]",
-            "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "[parameters('addressPrefix')]"
-                    ]
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('templateUrl'), variables('sharedTemplateName'), '.json')]",
+                    "contentVersion": "1.0.0.0"
                 },
-                "subnets": [
-                    {
-                        "name": "[parameters('subnetName')]",
-                        "properties": {
-                            "addressPrefix": "[parameters('subnetPrefix')]"
-                        }
+                "parameters": {
+                    "region": {
+                        "value": "[parameters('region')]"
+                    },
+                    "storageAccountName": {
+                        "value": "[parameters('storageAccountName')]"
+                    },
+                    "virtualNetworkName": {
+                        "value": "[parameters('virtualNetworkName')]"
+                    },
+                    "addressPrefix": {
+                        "value": "[parameters('addressPrefix')]"
+                    },
+                    "subnetName": {
+                        "value": "[parameters('subnetName')]"
+                    },
+                    "subnetPrefix": {
+                        "value": "[parameters('subnetPrefix')]"
                     }
-                ]
+                }
             }
         },
         {
-            "apiVersion": "2014-12-01-preview",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[concat('publicIP', copyIndex())]",
-            "location": "[parameters('region')]",
-            "copy": {
-                "name": "publicIPLoop",
-                "count": "[parameters('numberOfInstances')]"
-            },
+            "name": "jumpbox-resources",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'shared-resources')]"
+            ],
             "properties": {
-                "publicIPAllocationMethod": "Dynamic"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('templateUrl'), variables('jumpboxTemplateName'), parameters('jumpbox'), '.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "region": {
+                        "value": "[parameters('region')]"
+                    },
+                    "virtualNetworkName": {
+                        "value": "[parameters('virtualNetworkName')]"
+                    },
+                    "subnetName": {
+                        "value": "[parameters('subnetName')]"
+                    },
+                    "storageAccountName": {
+                        "value": "[parameters('storageAccountName')]"
+                    },
+                    "adminUsername": {
+                        "value": "[parameters('adminUsername')]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('adminPassword')]"
+                    },
+                    "computerNamePrefix": {
+                        "value": "[variables('computerNamePrefix')]"
+                    }
+                }
             }
         },
         {
@@ -162,18 +209,15 @@
                 "count": "[parameters('numberOfInstances')]"
             },
             "dependsOn": [
-                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
-                "[concat('Microsoft.Network/publicIPAddresses/', 'publicIP', copyindex())]"
+                "[concat('Microsoft.Resources/deployments/', 'shared-resources')]"
             ],
             "properties": {
                 "ipConfigurations": [
                     {
                         "name": "ipconfig1",
                         "properties": {
-                            "privateIPAllocationMethod": "Dynamic",
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat('publicIP', copyindex()))]"
-                            },
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "[concat(parameters('redisNodeIPAddressPrefix'), copyindex())]",
                             "subnet": {
                                 "id": "[variables('subnetRef')]"
                             }
@@ -192,9 +236,8 @@
                 "count": "[parameters('numberOfInstances')]"
             },
             "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', 'nic', copyindex())]",
-                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]",
-                "[concat('Microsoft.Compute/availabilitySets/', 'redisCluserAS')]"
+                "[concat('Microsoft.Resources/deployments/', 'shared-resources')]",
+                "[concat('Microsoft.Network/networkInterfaces/', 'nic', copyindex())]"
             ],
             "properties": {
                 "availabilitySet": {
@@ -234,15 +277,6 @@
                         {
                             "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('nic', copyindex()))]"
                         }
-                    ],
-                    "inputEndpoints": [
-                        {
-                            "enableDirectServerReturn": "False",
-                            "endpointName": "SSH",
-                            "privatePort": 22,
-                            "publicPort": 22,
-                            "protocol": "tcp"
-                        }
                     ]
                 }
             }
@@ -268,7 +302,7 @@
                     "fileUris": [
                         "[concat(variables('scriptUrl'), 'redis-cluster-install.sh')]"
                     ],
-                    "commandToExecute": "[concat('bash redis-cluster-install.sh -n ', parameters('redisClusterName'), ' -v ', parameters('redisVersion'))]"
+                    "commandToExecute": "[concat('bash redis-cluster-install.sh -n ', parameters('redisClusterName'), ' -v ', parameters('redisVersion'), ' -c ', parameters('numberOfInstances'), ' -p ', parameters('redisNodeIPAddressPrefix'))]"
                 }
             }
         }
