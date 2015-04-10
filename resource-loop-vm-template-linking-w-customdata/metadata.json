@@ -1,0 +1,7 @@
+{
+  "TemplateName": "Generate VMs with custom data",
+  "Description": "This template generates N number of VMs in a single Virtual network. The input parameters for the template are uploaded via CustomData to each VM. ",
+  "ShortDescription": "Generate VM Instances and pass all input parameters via custom data",
+  "GithubUsername": "MJZawacki",
+  "DateUpdated": "2015-04-10"
+}
