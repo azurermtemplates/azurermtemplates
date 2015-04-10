@@ -33,9 +33,6 @@
         },
         "customData": {
             "type": "string"
-        },
-        "subscriptionId": {
-            "type": "string"
         }
     },
     "variables": {
@@ -48,7 +45,7 @@
         "publicIPAddressType": "Dynamic",
         "storageAccountType": "Standard_LRS",
         "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
-        "sourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('vmSourceImageName'))]",
+        "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('vmSourceImageName'))]",
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]"
     },

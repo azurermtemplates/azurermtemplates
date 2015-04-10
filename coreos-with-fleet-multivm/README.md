@@ -48,6 +48,7 @@ This file must be base64 encoded and set as the customData value in azuredeploy-
 Below are the parameters that the template expects
 
 | Name   | Description    |
+|:--- |:---|
 | location | location where the resources will be deployed |
 | newStorageAccountName | new storage account for the VMs OS disk |
 | vmNamePrefix | prefix for the names of each VM |
