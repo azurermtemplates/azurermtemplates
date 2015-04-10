@@ -277,7 +277,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('masterTemplateUrl')]",
+          "uri": "[variables('dataTemplateUrl')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
