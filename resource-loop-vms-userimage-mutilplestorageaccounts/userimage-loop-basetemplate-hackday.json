@@ -34,9 +34,6 @@
             "type": "int",
             "defaultValue": 2
         },
-        "subscriptionId": {
-            "type": "string"
-        },
         "region": {
             "type": "string"
         },
