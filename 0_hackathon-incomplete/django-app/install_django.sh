@@ -1,5 +1,4 @@
 #!/bin/bash
-
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get -y update
 
@@ -16,20 +15,20 @@ sudo apt-get -y install apache2 libapache2-mod-wsgi
 cd /var/www
 sudo django-admin startproject helloworld
 
-# Create a new file named views.py in the /var/www/helloworld/helloworld directory. This will contain the view that renders the "hello world" page
-echo -e 'from django.http import HttpResponse
+# Create a new file named views.py in the /var/www/helloworld/helloworld directory. This will contain the view
+# that renders the "hello world" page
+echo 'from django.http import HttpResponse
 def home(request):
     html = "<html><body>Hello World!</body><html>"
     return HttpResponse(html)' | sudo tee /var/www/helloworld/helloworld/views.py
-
 # Update urls.py
-echo -e "from django.conf.urls import patterns, url
-          urlpatterns = patterns('',
-            url(r'^$', 'helloworld.views.home', name='home'),
-        )"   | sudo tee /var/www/helloworld/helloworld/urls.py
+echo "from django.conf.urls import patterns, url
+urlpatterns = patterns('',
+    url(r'^$', 'helloworld.views.home', name='home'),
+)" | sudo tee /var/www/helloworld/helloworld/urls.py
 
 # Setup Apache
-echo -e "<VirtualHost *:80>
+echo "<VirtualHost *:80>
 ServerName $1
 </VirtualHost>
 WSGIScriptAlias / /var/www/helloworld/helloworld/wsgi.py
