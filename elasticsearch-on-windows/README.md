@@ -6,7 +6,7 @@
 
 This template creates a loadbalanced ElasticSearch cluster running on Windows 2012. 
 
-This template deploys a Storage Account, Virtual Network, Public IP addresses, Load Balancer, Virtual Machines and a Network Interface. The loadbalancer is also set up and exposes RDP ports (on the first two nodes) as well as port 9200.
+This template deploys a Storage Account, Virtual Network, Public IP addresses, Load Balancer, Virtual Machines, Availability Set and a Network Interface. The loadbalancer is also set up and exposes RDP ports (on the first two nodes) as well as port 9200.
 
 Since it exposes the ElasticSearch cluster over the load balancer on port 9200 you may want to look at adding some layer of security in. After deployment you can visualize the cluster by browsing to: http://&lt;public_ip&gt;:9200/_plugin/head/.
 
@@ -16,7 +16,7 @@ It will use provision the resources and then on each VM it will run a powershell
 2. Download and install ElasticSearch
 3. Install the head plugin to make it easier to visualise the cluster
 4. Modify the ElasticSearch config to set up the cluster so all the nodes can talk to each other. 
-5. Modify the VM firewall to allow the right ports.
+5. Modify each node VM firewall to allow the right ports.
 
 Below are the parameters that the template expects
 
