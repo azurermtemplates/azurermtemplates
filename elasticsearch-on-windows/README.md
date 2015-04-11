@@ -27,7 +27,7 @@ Below are the parameters that the template expects
 | nodeAdminPassword  | Password for the Virtual Machine  |
 | dnsName  | Unique DNS Name for the Public IP (dnsName.westus.cloudapp.azure.com) |
 | location | location where the resources will be deployed |
-| virtualNetworkName | Name of Virtual Network |
+| vnetName | Name of Virtual Network |
 | nodeSize | Size of the Virtual Machine Instance |
 | vnetPrefix | Virtual Network Address Prefix <br> <ul><li>10.0.0.0/16 **(default)**</li></ul> |
 | vnetSubnet1Name | Name of Subnet 1 <br> <ul><li>Subnet-1 **(default)**</li></ul> |

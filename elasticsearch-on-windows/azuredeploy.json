@@ -1,9 +1,12 @@
-﻿{
+{
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "vnetName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "Description": "Name of Virtual Network"
+            }
         },
 
         "location": {
@@ -13,26 +16,41 @@
                 "West US",
                 "East US",
                 "Central US"
-            ]
+            ],
+            "metadata": {
+                "Description": "Location where the resources will be deployed to"
+            }
         },
 
         "vnetPrefix": {
             "type": "string",
-            "defaultValue": "10.0.0.0/16"
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+                "Description": "Virtual Network Address Prefix"
+            }
         },
 
         "vnetSubnet1Name": {
             "type": "string",
-            "defaultValue": "Subnet-1"
+            "defaultValue": "Subnet-1",
+            "metadata": {
+                "Description": "Name of Subnet 1"
+            }
         },
 
         "vnetSubnet1Prefix": {
             "type": "string",
-            "defaultValue": "10.0.0.0/24"
+            "defaultValue": "10.0.0.0/24",
+            "metadata": {
+                "Description": "Address prefix for Subnet 1"
+            }
         },
 
         "storageName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "Description": "Unique DNS Name for the Storage Account where the Virtual Machine's disks will be placed"
+            }
         },
 
         "storageType": {
@@ -42,12 +60,18 @@
                 "Standard_LRS",
                 "Standard_GRS",
                 "Standard_ZRS"
-            ]
+            ],
+            "metadata": {
+                "Description": "Storage redundancy type"
+            }
         },
 
         "nodeStorageAccountContainerName": {
             "type": "string",
-            "defaultValue": "vhds"
+            "defaultValue": "vhds",
+            "metadata": {
+                "Description": "Name for the container to place the vhds in"
+            }
         },
 
         "nodeSize": {
@@ -59,27 +83,46 @@
                 "Standard_A2",
                 "Standard_A3",
                 "Standard_A4"
-            ]
+            ],
+            "metadata": {
+                "Description": "Size of the Virtual Machine Instance"
+            }
         },
 
         "nodeSourceImageName": {
             "type": "string",
-            "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201502.01-en.us-127GB.vhd"
+            "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201502.01-en.us-127GB.vhd",
+            "metadata": {
+                "Description": "Image name to use for node vm "
+            }
         },
+
         "nodeAdminUserName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "Description": "Username for the Virtual Machines"
+            }
         },
 
         "nodeAdminPassword": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata": {
+                "Description": "Password for the Virtual Machine"
+            }
         },
       
         "subscriptionId": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "Description": "Your Azure Subscription Id"
+            }
         },
 
         "publicIpAddressName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "Description": "Name of public ip address"
+            }
         },
 
         "publicIpAddressType": {
@@ -87,21 +130,24 @@
             "defaultValue": "Dynamic",
             "allowedValues": [
                 "Dynamic"
-            ]
+            ],
+            "metadata": {
+                "Description": "Type of public ip address"
+            }
         },
 
         "dnsName": {
             "type": "string",
             "metadata": {
-                "Description": "DNS name for the Public IP"
+                "Description": "Unique DNS name for the Public IP"
             }
         },
 
         "nodes": {
             "type": "int",
-            "defaultValue": 2,
+            "defaultValue": 3,
             "metadata": {
-                "Description": "Number of ElasticSearch Nodes"
+                "Description": "Total of how many nodes you want"
             }
         },
         "nodeIpAddresses": {
@@ -110,17 +156,26 @@
                 "10.0.0.16",
                 "10.0.0.17",
                 "10.0.0.18"
-            ]
+            ],
+            "metadata": {
+                "Description": "Array of internal ip addresses for each node"
+            }
 
         },
         "nodeIPAddressesString": {
             "type": "string",
-            "defaultValue": "10.0.0.16,10.0.0.17,10.0.0.18"
+            "defaultValue": "10.0.0.16,10.0.0.17,10.0.0.18",
+            "metadata": {
+                "Description": "A comma separated list of the values in nodeIpAddresses for passing to powershell script"
+            }
 
         },
         "clustername": {
             "type": "string",
-            "defaultValue": "elasticsearch" 
+            "defaultValue": "elasticsearch",
+            "metadata": {
+                "Description": "Name for the elasticsearch cluster"
+            }
 
         }
     },
