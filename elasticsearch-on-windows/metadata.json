@@ -1,0 +1,7 @@
+﻿{
+  "TemplateName": "Create an ElasticSearch cluster on Windows",
+  "Description": "This template creates an ElasticSearch cluster running on Windows - you can specifiy how many nodes you want and the ip addresses of each node.",
+  "ShortDescription": "This template create an ElasticSearch cluster on Windows",
+  "GithubUsername": "johndehavilland",
+  "DateUpdated": "2015-04-10"
+}
