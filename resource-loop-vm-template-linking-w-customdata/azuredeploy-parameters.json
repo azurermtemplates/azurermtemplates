@@ -1,0 +1,11 @@
+﻿{
+    "storageAccountNamePrefix" : {
+        "value":"myAGstg"
+    },
+    "scaleNumberPerRegion" : {
+        "value" : 2
+    },
+    "subscriptionId" : {
+        "value" : ""
+    }
+}
