@@ -18,7 +18,7 @@
         "subscriptionId": {
             "type": "string"
         },
-        "region": {
+        "location": {
             "type": "string",
             "defaultValue": "West US"
         },
@@ -33,7 +33,7 @@
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "Standard_A0",
+            "defaultValue": "Standard_A1",
             "allowedValues": [
                 "Standard_A0",
                 "Standard_A1",
@@ -66,6 +66,24 @@
 		"dnsNamePrefix": {
 		    "type": "string"
 		},
+        "passwordRef": {
+            "type": "string"
+        },
+        "password": {
+            "type": "string"
+        },
+        "dscModulesUrl": {
+            "type": "string"
+        },
+        "dscConfigurationFunction": {
+            "type": "string"
+        },
+        "dscDomainName": {
+            "type": "string"
+        },
+        "dscUsername": {
+            "type": "string"
+        },
     },
     "variables": {
 	    "vnetRef": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('existingVnetResourceGroup'),'/providers/Microsoft.Network/virtualNetworks/',parameters('existingVnetName'))]",
@@ -77,7 +95,7 @@
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[parameters('storageAccountNameFromTemplate')]",
             "apiVersion": "2014-12-01-preview",
-            "location": "[parameters('region')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "accountType": "Standard_LRS"
             }
@@ -86,14 +104,14 @@
             "type": "Microsoft.Compute/availabilitySets",
             "name": "[parameters('availabilitySetName')]",
             "apiVersion": "2014-12-01-preview",
-            "location": "[parameters('region')]",
+            "location": "[parameters('location')]",
             "properties": {}
         },
         {
             "apiVersion": "2014-12-01-preview",
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "[concat(parameters('dnsNamePrefix'), copyindex())]",
-            "location": "[parameters('region')]",
+            "location": "[parameters('location')]",
             "copy": {
                 "name": "publicIPLoop",
                 "count": "[parameters('numberOfInstances')]"
@@ -109,7 +127,7 @@
             "apiVersion": "2014-12-01-preview",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[concat(parameters('nicNamePrefix'), copyindex())]",
-            "location": "[parameters('region')]",
+            "location": "[parameters('location')]",
             "copy": {
                 "name": "nicLoop",
                 "count": "[parameters('numberOfInstances')]"
@@ -138,7 +156,7 @@
             "apiVersion": "2014-12-01-preview",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[concat(parameters('vmNamePrefix'), copyindex())]",
-            "location": "[parameters('region')]",
+            "location": "[parameters('location')]",
             "copy": {
                 "name": "virtualMachineLoop",
                 "count": "[parameters('numberOfInstances')]"
@@ -173,6 +191,45 @@
                         }
                     ]
                 }
+            }
+        },
+		 {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('vmNamePrefix'), copyIndex(),'/','dscExtension')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+			"copy": {
+                "name": "extensionLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('vmNamePrefix'), copyindex())]"
+            ],
+            "properties": { 
+                "publisher": "Microsoft.Powershell", 
+                "type": "DSC", 
+                "typeHandlerVersion": "1.7", 
+				"protectedSettings" : {
+					"Items" : {
+						"18332aa3-b1e3-4a59-83b6-d9447372835f" : "[parameters('password')]",
+					}
+				},
+                "settings": { 
+                    "ModulesUrl": "[parameters('dscModulesUrl')]", 
+                    "SasToken": "", 
+                    "ConfigurationFunction": "[parameters('dscConfigurationFunction')]", 
+                    "Properties": [
+                        { "Name" : "MachineName", "Value" : "[concat(parameters('vmNamePrefix'), copyindex())]", "TypeName" : "System.String" },
+                        { "Name" : "Domain", "Value" : "[parameters('dscDomainName')]", "TypeName" : "System.String" },
+                        {
+                            "Name" : "DomainCredential",
+                            "Value" : {
+                                "Username" : "[concat(parameters('dscDomainName'),'\\',parameters('dscUsername'))]",
+                                "Password" : "[concat('PrivateSettingsRef:','18332aa3-b1e3-4a59-83b6-d9447372835f')]"},
+							"TypeName" : "System.Management.Automation.PSCredential"
+                        }
+                    ]
+				}
             }
         }
     ]
