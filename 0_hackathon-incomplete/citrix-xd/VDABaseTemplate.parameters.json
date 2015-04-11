@@ -3,43 +3,61 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "adminUsername": {
-            "value": "janzen"
+            "value": ""
         },
         "adminPassword": {
-            "value": "Citrix$!"
+            "value": ""
         },
         "numberOfInstances": {
-            "value": 2
+            "value": 1
         },
 		"storageAccountNameFromTemplate": {
-		    "value": "jhbarmtest4sto1"
+		    "value": ""
 		},
-        "subscriptionId": {
-            "value": "9fd14417-478c-4245-bd82-784c20397f3f"
-        },
-        "region": {
-            "value": "West US"
+		"subscriptionId" : {
+			"value": "" 
+		},
+        "location": {
+            "value": ""
         },
 		"existingVnetResourceGroup": {
-		    "value": "jhbarmtest3"
+		    "value": ""
 		},
 		"existingVnetName": {
-		    "value": "vnet1"
+		    "value": ""
 		},
         "existingSubnetName": {
-            "value": "Subnet-1"
+            "value": ""
         },
         "nicNamePrefix": {
-            "value": "nic-vda-"
+            "value": ""
         },
         "vmNamePrefix": {
-            "value": "armtest4-vda-"
+            "value": ""
         },
 		"availabilitySetName": {
-		    "value": "aset1"
+		    "value": ""
 		},
 		"dnsNamePrefix": {
-		    "value": "jhbarmtest4-"
+		    "value": ""
 		},
+        "passwordRef": {
+            "value": ""
+        },
+        "password": {
+            "value": ""
+        },
+        "dscModulesUrl": {
+            "value": ""
+        },
+        "dscConfigurationFunction": {
+            "value": ""
+        },
+        "dscDomainName": {
+            "value": ""
+        },
+        "dscUsername": {
+            "value": ""
+        },
     }
 }

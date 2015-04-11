@@ -68,7 +68,9 @@
                 "Standard_A1",
                 "Standard_A2",
                 "Standard_A3",
-                "Standard_A4"
+                "Standard_A4",
+                "Standard_A5",
+                "Standard_A6",
             ]
         },
         "dcVmName": {
@@ -94,7 +96,9 @@
                 "Standard_A1",
                 "Standard_A2",
                 "Standard_A3",
-                "Standard_A4"
+                "Standard_A4",
+                "Standard_A5",
+                "Standard_A6",
             ]
         },
         "sqlVmName": {
@@ -120,7 +124,9 @@
                 "Standard_A1",
                 "Standard_A2",
                 "Standard_A3",
-                "Standard_A4"
+                "Standard_A4",
+                "Standard_A5",
+                "Standard_A6",
             ]
         },
         "ddcVmName": {
@@ -135,6 +141,25 @@
 			"defaultValue": "publicIP-ddc"
         },
         "ddcDnsName": {
+            "type": "string"
+        },
+        
+        "xdIsoSourcePath": {
+            "type": "string"
+        },
+        "sourcePathCredKey": {
+            "type": "string"
+        },
+        "xdDscModulesUrl": {
+            "type": "string"
+        },
+        "sourcePathCredUsername": {
+            "type": "string"
+        },
+        "xdImagePath": {
+            "type": "string"
+        },
+        "xdDscConfigurationFunction": {
             "type": "string"
         },
     },
@@ -408,26 +433,26 @@
                 "type": "DSC", 
                 "typeHandlerVersion": "1.7", 
                 "settings": { 
-                    "ModulesUrl": "https://pakkam1.blob.core.windows.net/windows-powershell-dsc/ApplyXDRoleISO.ps1.zip", 
+                    "ModulesUrl": "[parameters('xdDscModulesUrl')]", 
                     "SasToken": "", 
-                    "ConfigurationFunction": "ApplyXDRoleISO.ps1\\xdServerRole", 
+                    "ConfigurationFunction": "[parameters('xdDscConfigurationFunction')]", 
                     "Properties": [
                         {
                             "Name": "SourcePath",
-                            "Value": "\\\\configtool.file.core.windows.net\\provisioning\\iso\\95",
+                            "Value": "[parameters('xdIsoSourcePath')]",
                             "TypeName" : "System.String",
                         },
                         {
                             "Name" : "ImagePath",
-                            "Value" : "C:\\Image\\XenApp_and_XenDesktop7_7.jenkins-AzureProvisioningPlugin-311.iso",
+                            "Value" : "[parameters('xdImagePath')]",
                             "TypeName" : "System.String",
                         },
                         {
                             "Name" : "Credential",
                             "TypeName" : "System.Management.Automation.PSCredential",
                             "Value" : {
-                                "Username" : "configtool",
-                                "Password" : "PrivateSettingsRef:b1429262-d30b-4af7-9473-4e2815f26f3d"
+                                "Username" : "[parameters('sourcePathCredUsername')]",
+                                "Password" : "[concat('PrivateSettingsRef:','f4ec0b04-714c-44ac-b6c8-fd1aa99c5497')]"
                             }
                         },
                         {
@@ -444,7 +469,7 @@
                 },
                 "protectedSettings" : {
                     "Items" : {
-                        "b1429262-d30b-4af7-9473-4e2815f26f3d" : "cjKTYkxyIfDHrvfp5GNKCDCSswj9yokGywyt5b1gCChIxv7CLBCsRI4UimtuyLjBYFXXAyiQDbJAJObRq90yMg=="
+                        "f4ec0b04-714c-44ac-b6c8-fd1aa99c5497" : "[parameters('sourcePathCredKey')]"
                     }
                 }
             }
