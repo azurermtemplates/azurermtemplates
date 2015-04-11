@@ -5,6 +5,9 @@ param
 )
 
 try {
+
+	#with reference from: http://belczyk.com/2014/07/elasticsearch-one-click-installation-script-for-windows/
+
 	#download java from a location you choose.
 	$jdkSource = "https://jdharm.blob.core.windows.net/powershell/jdk-8u40-windows-x64.exe"
 	$jdkDestination = "D:\jdk-8u40-windows-x64.exe"
@@ -43,7 +46,7 @@ try {
 
 	if (-not (test-path $elasticSearchBinPath))
 	{
-		write-host "ElasticSearch bin path doesn't exist: $elasticSearchBinPath"  -foregroundcolor red
+		write-host "ElasticSearch bin path doesn't exist: $elasticSearchBinPath" -foregroundcolor red
 		return;	
 	}
 
@@ -52,14 +55,13 @@ try {
 		write-host "Java JDK path doesn't exist: $jdkPath"  -foregroundcolor red
 		return;
 	}
-
-	
+		
 	# Setting JAVA_HOME	
 	write-host "setting JAVA_HOME system variable" -foregroundcolor green
 
-	if ([environment]::GetEnvironmentVariable("JAVA_HOME","machine") -eq $null)
+	if ([environment]::GetEnvironmentVariable("JAVA_HOME", "machine") -eq $null)
 	{
-		[environment]::setenvironmentvariable("JAVA_HOME",$jdkpath,"machine")
+		[environment]::setenvironmentvariable("JAVA_HOME", $jdkpath, "machine")
 		$env:JAVA_HOME = $jdkpath
 	}
 
@@ -74,16 +76,16 @@ try {
 	}
 
 	(Get-Content $configPath) | ForEach-Object { $_ -replace "#?\s?cluster.name: .+" , "cluster.name: $clusterName" } | Set-Content $configPath
-	Write-Host "Cluster name is: $clusterName"   -foregroundcolor gray	
+	Write-Host "Cluster name is: $clusterName" -foregroundcolor gray	
 
 	# Set discovery
 	Write-Host "Changing discovery settings" -foregroundcolor green 
 		
 	(Get-Content $configPath) | ForEach-Object { $_ -replace "#?\s?discovery.zen.ping.multicast.enabled: false+" , "discovery.zen.ping.multicast.enabled: false" } | Set-Content $configPath
-	Write-Host "Enabled unicast"   -foregroundcolor gray
+	Write-Host "Enabled unicast" -foregroundcolor gray
 
 	(Get-Content $configPath) | ForEach-Object { $_ -replace '#?\s?discovery.zen.ping.unicast.hosts: .+' , "discovery.zen.ping.unicast.hosts: [$IPaddresses]" } | Set-Content $configPath
-	Write-Host "added ip addresses of nodes"   -foregroundcolor gray			 
+	Write-Host "added ip addresses of nodes" -foregroundcolor gray			 
 
 	#Install ElasticSearch as a service
 	Write-Host "Install ElasticSearch as a service" -foregroundcolor green 
@@ -115,11 +117,9 @@ try {
 
 	Start-Service 'elasticsearch-service-x64'
 
-	Write-Host "ElasticSearch service status: " (service "elasticsearch-service-x64").Status   -foregroundcolor gray
-		
 	Write-Host "Set service startup type to automatic" -foregroundcolor green 
 
-	set-service 'elasticsearch-service-x64' -startuptype automatic
+	Set-Service 'elasticsearch-service-x64' -StartupType automatic
 
 	# Enable ports through firewall 
 	New-NetFirewallRule -DisplayName "Allow Port 9200 in" -Direction Inbound -LocalPort 9200 -Protocol TCP -Action Allow
@@ -127,24 +127,8 @@ try {
 	New-NetFirewallRule -DisplayName "Allow Port 9300 in" -Direction Inbound -LocalPort 9300 -Protocol TCP -Action Allow
 	New-NetFirewallRule -DisplayName "Allow Port 9300 out" -Direction Outbound -LocalPort 9300 -Protocol TCP -Action Allow
 
-	if(-not $esAreadyInstalled ){
-		Write-Host "Now sleep 20s for ElasticSearch to start" -foregroundcolor yellow
-		Start-Sleep -s 20
-	}
-	 
-	# Confirm that it is installed and running. 
-	Write-Host "Checking install... " -foregroundcolor green 
-		
-	$esRequest = [System.Net.WebRequest]::Create("http://localhost:9200")
-	$esRequest.Method = "GET"
-	$esResponse = $esRequest.GetResponse()
-	$reader = new-object System.IO.StreamReader($esResponse.GetResponseStream())
-	Write-Host "ElasticSearch service response status: " $esResponse.StatusCode   -foregroundcolor gray
-	Write-Host "ElasticSearch service response full text: " $reader.ReadToEnd()   -foregroundcolor gray	
-	
 	Write-Host "ElasticSearch endpoint: http://localhost:9200" -foregroundcolor green 
-	write-host
-	write-host
+
 	Write-Host "Completed with success" -foregroundcolor green 
 
 }
