@@ -1,0 +1,1126 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "serviceName": {
+            "type": "string"
+        },
+        "resourceLocation": {
+            "type": "string"
+        },
+        "certificateThumbprint": {
+            "type": "string"
+        },
+        "certificateData": {
+            "type": "string"
+        },
+        "certificatePassword": {
+            "type": "string"
+        },
+        "dcfswSourceImageName": {
+            "type": "string"
+        },
+        "sqlSourceImageName": {
+            "type": "string"
+        },
+        "dcVMSize": {
+            "type": "string"
+        },
+        "sqlVMSize": {
+            "type": "string"
+        },
+        "administratorAccount": {
+            "type": "string"
+        },
+        "administratorPassword": {
+            "type": "string"
+        },
+        "administratorPasswordEncrypted": {
+            "type": "string"
+        },
+        "sqlServiceAccount": {
+            "type": "string"
+        },
+        "sqlServicePasswordEncrypted": {
+            "type": "string"
+        },
+        "domainName": {
+            "type": "string"
+        },
+        "domainNetBiosName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "SQLDomainName": "[concat(parameters('serviceName'), '-SQL')]",
+        "DCDomainName": "[concat(parameters('serviceName'), '-DC')]",
+        "FSWDomainName": "[concat(parameters('serviceName'), '-FSW')]",
+        "SQLCertificateName": "[concat(variables('SQLDomainName'), '/sha1-', parameters('certificateThumbprint'))]",
+        "DCCertificateName": "[concat(variables('DCDomainName'), '/sha1-', parameters('certificateThumbprint'))]",
+        "FSWCertificateName": "[concat(variables('FSWDomainName'), '/sha1-', parameters('certificateThumbprint'))]",
+        "storageName":"[parameters('serviceName')]",
+        "storageType":"Standard-GRS",
+        "vnetName":"[parameters('serviceName')]",
+        "vnetAddressSpace":"10.10.0.0/26",
+        "DC1Disk1Name":"[concat(parameters('serviceName'),'-dc-',parameters('serviceName'),'-DC1-os-0403201501')]",
+        "DC1Disk2Name":"[concat(parameters('serviceName'),'-dc-',parameters('serviceName'),'-DC1-os-0403201502')]",
+        "DC2Disk1Name":"[concat(parameters('serviceName'),'-dc-',parameters('serviceName'),'-DC2-os-0403201503')]",
+        "DC2Disk2Name":"[concat(parameters('serviceName'),'-dc-',parameters('serviceName'),'-DC2-os-0403201504')]",
+        "SQL1Disk1Name":"[concat(parameters('serviceName'),'-sql-',parameters('serviceName'),'-SQL1-os-0403201505')]",
+        "SQL1Disk2Name":"[concat(parameters('serviceName'),'-sql-',parameters('serviceName'),'-SQL1-os-0403201506')]",
+        "SQL1Disk3Name":"[concat(parameters('serviceName'),'-sql-',parameters('serviceName'),'-SQL1-os-0403201507')]",
+        "SQL2Disk1Name":"[concat(parameters('serviceName'),'-sql-',parameters('serviceName'),'-SQL2-os-0403201508')]",
+        "SQL2Disk2Name":"[concat(parameters('serviceName'),'-sql-',parameters('serviceName'),'-SQL2-os-0403201509')]",
+        "SQL2Disk3Name":"[concat(parameters('serviceName'),'-sql-',parameters('serviceName'),'-SQL2-os-0403201510')]",
+        "FSWDisk1Name":"[concat(parameters('serviceName'),'-fsw-',parameters('serviceName'),'-FSW-os-0403201511')]",
+        "FSWDisk2Name":"[concat(parameters('serviceName'),'-fsw-',parameters('serviceName'),'-FSW-os-0403201512')]",
+        "SQL1Name":"[concat(parameters('serviceName'),'-sql1')]",
+        "SQL2Name":"[concat(parameters('serviceName'),'-sql2')]",
+        "DC1Name":"[concat(parameters('serviceName'),'-dc1')]",
+        "DC2Name":"[concat(parameters('serviceName'),'-dc2')]",
+        "FSWName":"[concat(parameters('serviceName'),'-fsw')]",
+        "CreateADPrimaryDomainControllerCommand" : "[concat('powershell.exe -ExecutionPolicy Unrestricted -Command .\\CreateADPrimaryDomainController.ps1 -DomainName \"',parameters('domainName'),'\" -DomainNetBiosName \"',parameters('domainNetBiosName'),'\" -UserName \"',parameters('administratorAccount'),'\" -Password \"',parameters('administratorPasswordEncrypted'), '\" -EncryptionCertificateThumbprint \"',parameters('certificateThumbprint'),'\"')]",
+        "CreateADBackupDomainControllerCommand" : "[concat('powershell.exe -ExecutionPolicy Unrestricted -Command .\\CreateADBackupDomainController.ps1 -DomainName \"',parameters('domainName'),'\" -UserName \"',parameters('administratorAccount'),'\" -Password \"',parameters('administratorPasswordEncrypted'), '\" -EncryptionCertificateThumbprint \"',parameters('certificateThumbprint'),'\"')]",
+        "CreateFileShareWitnessCommand":"[concat('powershell.exe -ExecutionPolicy Unrestricted -Command .\\CreateFileShareWitness.ps1 -DomainName \"',parameters('domainName'),'\" -DomainAdministratorUserName \"',parameters('administratorAccount'),'\" -DomainAdministratorPassword \"',parameters('administratorPasswordEncrypted'), '\" -EncryptionCertificateThumbprint \"',parameters('certificateThumbprint'),'\" -SharePath \"FSW_',parameters('serviceName'),'-fc\"')]",
+        "PrepareAlwaysOnSqlServerCommand":"[concat('powershell.exe -ExecutionPolicy Unrestricted -Command .\\PrepareAlwaysOnSqlServer.ps1 -DomainName \"',parameters('domainName'),'\" -DomainAdministratorUserName \"',parameters('administratorAccount'),'\" -DomainAdministratorPassword \"',parameters('administratorPasswordEncrypted'), '\" -EncryptionCertificateThumbprint \"',parameters('certificateThumbprint'),'\"')]", 
+        "PrepareFailoverClusterNodeCommand":"[concat('powershell.exe -ExecutionPolicy Unrestricted -Command .\\PrepareFailoverClusterNode.ps1 -DomainName \"',parameters('domainName'),'\" -DomainAdministratorUserName \"',parameters('administratorAccount'),'\" -DomainAdministratorPassword \"',parameters('administratorPasswordEncrypted'), '\" -EncryptionCertificateThumbprint \"',parameters('certificateThumbprint'),'\"')]",
+        "CreateFailoverClusterCommand":"[concat('powershell.exe -ExecutionPolicy Unrestricted -Command .\\CreateFailoverCluster.ps1 -DomainName \"', parameters('domainName'),'\" -DomainAdministratorUserName \"',parameters('administratorAccount'),'\" -DomainAdministratorPassword \"',parameters('administratorPasswordEncrypted'), '\" -EncryptionCertificateThumbprint \"',parameters('certificateThumbprint'),'\" -ClusterName \"',parameters('serviceName'),'-fc\" -SharePath \"\\\\',variables('FSWName'),'\\FSW_',parameters('serviceName'),'-fc\" -Nodes \"',variables('SQL1Name'),'\",\"',variables('SQL2Name'),'\"')]",
+        "PrepareAvailabilityGroupNodeCommand":"[concat('powershell.exe -ExecutionPolicy Unrestricted -Command .\\PrepareAvailabilityGroupNode.v2.ps1 -DomainName \"',parameters('domainName'),'\" -DomainNetBiosName \"',parameters('domainNetBiosName'),'\" -DomainAdministratorUserName \"',parameters('administratorAccount'),'\" -DomainAdministratorPassword \"',parameters('administratorPasswordEncrypted'), '\" -EncryptionCertificateThumbprint \"',parameters('certificateThumbprint'),'\" -AdministratorUserName \"',parameters('administratorAccount'),'\" -AdministratorPassword \"',parameters('administratorPasswordEncrypted'),'\" -SqlServerServiceAccountUserName \"',parameters('sqlServiceAccount'),'\" -SqlServerServiceAccountPassword \"',parameters('sqlServicePasswordEncrypted'),'\" -SqlAlwaysOnEndpointName \"',parameters('serviceName'),'-hadr\"')]",
+        "CreateAvailabilityGroupCommand":"[concat('powershell.exe -ExecutionPolicy Unrestricted -Command .\\CreateAvailabilityGroup.ps1 -DomainName \"',parameters('domainName'),'\" -DomainNetBiosName \"',parameters('domainNetBiosName'),'\" -DomainAdministratorUserName \"',parameters('administratorAccount'),'\" -DomainAdministratorPassword \"',parameters('administratorPasswordEncrypted'), '\" -EncryptionCertificateThumbprint \"',parameters('certificateThumbprint'),'\" -SqlAlwaysOnAvailabilityGroupName \"',parameters('serviceName'),'-ag\" -SqlAlwaysOnAvailabilityGroupListenerName \"',parameters('serviceName'),'-ag-listener\" -SqlAlwaysOnAvailabilityGroupListenerPort \"1433\" -ClusterName \"',parameters('serviceName'),'-fc\" -DomainNameFqdn \"',parameters('serviceName'),'-SQL.cloudapp.net\" -PrimaryReplica \"',variables('SQL1Name'),'\" -SecondaryReplica \"',variables('SQL1Name'),'\" -DatabaseNames \"',parameters('serviceName'),'-ag-AlwaysOnTestDatabase\"')]"       
+    },
+    "resources": [
+        {
+            "type": "Microsoft.ClassicCompute/domainNames",
+            "apiVersion": "2014-06-01",
+            "name": "[variables('SQLDomainName')]",
+            "location": "[parameters('resourceLocation')]"
+        },
+        {
+            "type": "Microsoft.ClassicCompute/domainNames",
+            "apiVersion": "2014-06-01",
+            "name": "[variables('DCDomainName')]",
+            "location": "[parameters('resourceLocation')]"
+        },
+         {
+            "type": "Microsoft.ClassicCompute/domainNames",
+            "apiVersion": "2014-06-01",
+            "name": "[variables('FSWDomainName')]",
+            "location": "[parameters('resourceLocation')]"
+        },
+        {
+            "type": "Microsoft.ClassicCompute/domainNames/serviceCertificates",
+            "properties": {
+                "certificateFormat": "pfx",
+                "data": "[parameters('certificateData')]",
+                "password": "[parameters('certificatePassword')]"
+            },
+            "apiVersion": "2014-06-01",
+            "name": "[variables('SQLCertificateName')]",
+            "location": "[parameters('resourceLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ClassicCompute/domainNames', variables('SQLDomainName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/domainNames/serviceCertificates",
+            "properties": {
+                "certificateFormat": "pfx",
+                "data": "[parameters('certificateData')]",
+                "password": "[parameters('certificatePassword')]"
+            },
+            "apiVersion": "2014-06-01",
+            "name": "[variables('DCCertificateName')]",
+            "location": "[parameters('resourceLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ClassicCompute/domainNames', variables('DCDomainName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/domainNames/serviceCertificates",
+            "properties": {
+                "certificateFormat": "pfx",
+                "data": "[parameters('certificateData')]",
+                "password": "[parameters('certificatePassword')]"
+            },
+            "apiVersion": "2014-06-01",
+            "name": "[variables('FSWCertificateName')]",
+            "location": "[parameters('resourceLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ClassicCompute/domainNames', variables('FSWDomainName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicStorage/storageAccounts",
+            "apiVersion": "2014-06-01",
+            "name": "[variables('storageName')]",
+            "properties": {
+                "accountType": "[variables('storageType')]"
+            },
+            "location": "[parameters('resourceLocation')]"
+        },
+        {
+            "type": "Microsoft.ClassicNetwork/virtualNetworks",
+            "apiVersion": "2014-06-01",
+            "name": "[variables('vnetName')]",
+            "location": "[parameters('resourceLocation')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes":["[variables('vnetAddressSpace')]"]
+                },
+                "subnets": [
+                    {
+                        "name": "subnet_SQL",
+                        "addressPrefix": "10.10.0.0/28"
+                    },
+                    {
+                        "name": "subnet_DC",
+                        "addressPrefix": "10.10.0.16/28"
+                    }
+                ],
+                "dhcpOptions": {
+                    "dnsServers": [
+                        "10.10.0.20",
+                        "10.10.0.21"
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.ClassicCompute/virtualMachines",
+            "properties": {
+                "storageProfile": {
+                    "operatingSystemDisk": {
+                        "caching": "ReadWrite",
+                        "sourceImageName": "[parameters('dcfswSourceImageName')]",
+                        "diskName": "[variables('DC1Disk1Name')]",
+                        "vhdUri": "[concat(reference(concat('Microsoft.ClassicStorage/storageAccounts/',parameters('serviceName'))).endpoints[0], 'vhds', parameters('serviceName'),'-dc/',variables('DC1Disk1Name'),'.vhd')]"
+                    },
+                    "dataDisks": [
+                        {
+                            "vhdUri": "[concat(reference(concat('Microsoft.ClassicStorage/storageAccounts/',parameters('serviceName'))).endpoints[0], 'vhds',parameters('serviceName'),'-dc/',variables('DC1Disk2Name'),'.vhd')]",
+                            "lun": 0,
+                            "diskSize": 120,
+                            "caching": "None"
+                        }
+                    ]
+                },
+                "hardwareProfile": {
+                    "platformGuestAgent": "true",
+                    "size": "[parameters('dcVMSize')]",
+                    "availabilitySet": "AS-DC"
+                },
+                "operatingSystemProfile": {
+                    "computerName": "[variables('DC1Name')]",
+                    "windowsOperatingSystemProfile": {
+                        "winRMListeners": [
+                            {
+                                "protocol": "Https"
+                            }
+                        ],
+                        "serviceCertificates": [
+                            {
+                                "storeLocation": "LocalMachine",
+                                "storeName": "My",
+                                "certificateThumbprint": "[parameters('certificateThumbprint')]"
+                            }
+                        ],
+                        "unattendedSetupConfigurations": [
+                            {
+                                "configurationName": "oobeSystem",
+                                "components": [
+                                    {
+                                        "componentName": "Microsoft-Windows-Shell-Setup",
+                                        "settings": [
+                                            {
+                                                "settingName": "FirstLogonCommands",
+                                                "content": {
+                                                    "FirstLogonCommands": {
+                                                        "@xmlns:wcm": "http://schemas.microsoft.com/WMIConfig/2002/State",
+                                                        "SynchronousCommand": {
+                                                            "@wcm:action": "add",
+                                                            "CommandLine": "powershell.exe -Command Import-Module ServerManager; Install-WindowsFeature DNS; Get-NetAdapter Ethernet* | Set-DnsClientServerAddress -ServerAddresses 127.0.0.1",
+                                                            "Order": "1"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "settingName": "AutoLogon",
+                                                "content": {
+                                                    "AutoLogon": {
+                                                        "Enabled": "True",
+                                                        "LogonCount": "1",
+                                                        "Username": "[parameters('administratorAccount')]",
+                                                        "Password": {
+                                                            "Value": "[parameters('administratorPassword')]"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "adminUserName": "[parameters('administratorAccount')]",
+                    "adminPassword": "[parameters('administratorPassword')]"
+                },
+                "networkProfile": {
+                    "inputEndpoints": [
+                        {
+                            "enableDirectServerReturn": "False",
+                            "endpointName": "WinRM",
+                            "privatePort": 5986,
+                            "protocol": "tcp"
+                        },
+                        {
+                            "enableDirectServerReturn": "False",
+                            "endpointName": "Remote Desktop",
+                            "privatePort": 3389,
+                            "protocol": "tcp"
+                        }
+                    ],
+                    "virtualNetwork": {
+                        "id": "[resourceId('Microsoft.ClassicNetwork/virtualNetworks',variables('vnetName'))]",
+                        "subnetNames": [
+                            "subnet_DC"
+                        ],
+                        "staticIpAddress": "10.10.0.20"
+                    }
+                },
+                "extensions": [
+                    {
+                        "extension": "BGInfo",
+                        "publisher": "Microsoft.Compute",
+                        "version": "1.*"
+                    },
+                    {
+                        "extension": "CustomScriptExtension",
+                        "publisher": "Microsoft.Compute",
+                        "version": "1.*",
+                        "parameters": {
+                            "public": {
+                                "fileUris": [
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/InstallDSCModules.ps1",
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/xComputerManagement.zip",
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/xActiveDirectory.zip"
+                                ],
+                                "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -Command .\\InstallDSCModules.ps1 -Modules \"xComputerManagement\",\"xActiveDirectory\" -Force"
+                            }
+                        }
+                    }
+                ],
+                "domainName": {
+                    "id": "[concat(resourceGroup().id, '/providers/Microsoft.ClassicCompute/domainNames/',variables('DCDomainName'))]"
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "name": "[variables('DC1Name')]",
+            "location": "[parameters('resourceLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ClassicCompute/domainNames', variables('DCDomainName'))]",
+                "[resourceId('Microsoft.ClassicNetwork/virtualNetworks', variables('vnetName'))]",
+                "[resourceId('Microsoft.ClassicStorage/storageAccounts', variables('storageName'))]",
+                "[concat('Microsoft.ClassicCompute/domainNames/', variables('DCDomainName'), '/serviceCertificates/sha1-', parameters('certificateThumbprint'))]"
+            ]
+        },
+        {   "type": "Microsoft.ClassicCompute/virtualMachines",
+            "properties": {
+                "storageProfile": {
+                    "operatingSystemDisk": {
+                        "caching": "ReadWrite",
+                        "sourceImageName": "[parameters('dcfswSourceImageName')]",
+                        "diskName": "[variables('DC2Disk1Name')]",
+                        "vhdUri": "[concat(reference(concat('Microsoft.ClassicStorage/storageAccounts/',parameters('serviceName'))).endpoints[0], 'vhds', parameters('serviceName'),'-dc/',variables('DC2Disk1Name'),'.vhd')]"
+                    },
+                    "dataDisks": [
+                        {
+                            "vhdUri": "[concat(reference(concat('Microsoft.ClassicStorage/storageAccounts/',parameters('serviceName'))).endpoints[0], 'vhds',parameters('serviceName'),'-dc/',variables('DC2Disk2Name'),'.vhd')]",
+                            "lun": 0,
+                            "diskSize": 120,
+                            "caching": "None"
+                        }
+                    ]
+                },
+                "hardwareProfile": {
+                    "platformGuestAgent": "true",
+                    "size": "[parameters('dcVMSize')]",
+                    "availabilitySet": "AS-DC"
+                },
+                "operatingSystemProfile": {
+                    "computerName": "[variables('DC2Name')]",
+                    "windowsOperatingSystemProfile": {
+                        "winRMListeners": [
+                            {
+                                "protocol": "Https"
+                            }
+                        ],
+                        "serviceCertificates": [
+                            {
+                                "storeLocation": "LocalMachine",
+                                "storeName": "My",
+                                "certificateThumbprint": "[parameters('certificateThumbprint')]"
+                            }
+                        ],
+                        "unattendedSetupConfigurations": [
+                            {
+                                "configurationName": "oobeSystem",
+                                "components": [
+                                    {
+                                        "componentName": "Microsoft-Windows-Shell-Setup",
+                                        "settings": [
+                                            {
+                                                "settingName": "FirstLogonCommands",
+                                                "content": {
+                                                    "FirstLogonCommands": {
+                                                        "@xmlns:wcm": "http://schemas.microsoft.com/WMIConfig/2002/State",
+                                                        "SynchronousCommand": {
+                                                            "@wcm:action": "add",
+                                                            "Order": "1",
+                                                            "CommandLine": "powershell.exe \"Get-NetAdapter Ethernet* | Set-DnsClientServerAddress -ServerAddresses 10.10.0.20\""
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "settingName": "AutoLogon",
+                                                "content": {
+                                                    "AutoLogon": {
+                                                        "Enabled": "True",
+                                                        "LogonCount": "1",
+                                                        "Username": "[parameters('administratorAccount')]",
+                                                        "Password": {
+                                                            "Value": "[parameters('administratorPassword')]"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "adminUserName": "[parameters('administratorAccount')]",
+                    "adminPassword": "[parameters('administratorPassword')]"
+                },
+                "networkProfile": {
+                    "inputEndpoints": [
+                        {
+                            "enableDirectServerReturn": "False",
+                            "endpointName": "WinRM",
+                            "privatePort": 5986,
+                            "protocol": "tcp"
+                        },
+                        {
+                            "enableDirectServerReturn": "False",
+                            "endpointName": "Remote Desktop",
+                            "privatePort": 3389,
+                            "protocol": "tcp"
+                        }
+                    ],
+                    "virtualNetwork": {
+                        "id": "[resourceId('Microsoft.ClassicNetwork/virtualNetworks',variables('vnetName'))]",
+                        "subnetNames": [
+                            "subnet_DC"
+                        ],
+                        "staticIpAddress": "10.10.0.21"
+                    }
+                },
+                "extensions": [
+                    {
+                        "extension": "BGInfo",
+                        "publisher": "Microsoft.Compute",
+                        "version": "1.*"
+                    },
+                    {
+                        "extension": "CustomScriptExtension",
+                        "publisher": "Microsoft.Compute",
+                        "version": "1.*",
+                        "parameters": {
+                            "public": {
+                                "fileUris": [
+                                    "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/InstallDSCModules.ps1",
+                                    "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/xComputerManagement.zip",
+                                    "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/xActiveDirectory.zip"
+                                ],
+                                "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -Command .\\InstallDSCModules.ps1 -Modules \"xComputerManagement\",\"xActiveDirectory\" -Force"
+                            }
+                        }
+                    }
+                ],
+                "domainName": {
+                    "id": "[concat(resourceGroup().id, '/providers/Microsoft.ClassicCompute/domainNames/',variables('DCDomainName'))]"
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "name": "[variables('DC2Name')]",
+            "location": "[parameters('resourceLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ClassicCompute/domainNames', variables('DCDomainName'))]",
+                "[resourceId('Microsoft.ClassicNetwork/virtualNetworks', variables('vnetName'))]",
+                "[resourceId('Microsoft.ClassicStorage/storageAccounts', variables('storageName'))]",
+                "[concat('Microsoft.ClassicCompute/domainNames/', variables('DCDomainName'), '/serviceCertificates/sha1-', parameters('certificateThumbprint'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/virtualMachines/extensions",
+            "properties": {
+                "extension": "CustomScriptExtension",
+                "publisher": "Microsoft.Compute",
+                "version": "1.*",
+                "parameters": {
+                    "public": {
+                        "fileUris": [
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/Common.ps1",
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/CreateADPrimaryDomainController.ps1"
+                        ],
+                        "commandToExecute": "[variables('CreateADPrimaryDomainControllerCommand')]"
+                    }
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "name": "[concat(variables('DC1Name'),'/CreateADPrimaryDomainControllerCustomScript')]",
+            "location": "[parameters('resourceLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ClassicCompute/virtualMachines', variables('DC1Name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/virtualMachines/extensions",
+            "properties": {
+                "extension": "CustomScriptExtension",
+                "publisher": "Microsoft.Compute",
+                "version": "1.*",
+                "parameters": {
+                    "public": {
+                        "fileUris":[  
+                           "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/Common.ps1",
+                           "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/CreateADBackupDomainController.ps1"
+                        ],
+                        "commandToExecute": "[variables('CreateADBackupDomainControllerCommand')]"
+                    }
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "name": "[concat(variables('DC2Name'),'/CreateADBackupDomainControllerCustomScript')]",
+            "location": "[parameters('resourceLocation')]",
+            "dependsOn": [
+                "[concat('Microsoft.ClassicCompute/virtualMachines/', variables('DC1Name'), '/extensions/CreateADPrimaryDomainControllerCustomScript')]",
+                "[resourceId('Microsoft.ClassicCompute/virtualMachines', variables('DC2Name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/virtualMachines",
+            "properties": {
+                "storageProfile": {
+                    "operatingSystemDisk": {
+                        "caching": "ReadWrite",
+                        "sourceImageName": "[parameters('dcfswSourceImageName')]",
+                        "diskName": "[variables('FSWDisk1Name')]",
+                        "vhdUri": "[concat(reference(concat('Microsoft.ClassicStorage/storageAccounts/',parameters('serviceName'))).endpoints[0], 'vhds', parameters('serviceName'),'-fsw/',variables('FSWDisk1Name'),'.vhd')]"
+                    },
+                    "dataDisks": [
+                        {
+                            "vhdUri": "[concat(reference(concat('Microsoft.ClassicStorage/storageAccounts/',parameters('serviceName'))).endpoints[0], 'vhds',parameters('serviceName'),'-fsw/',variables('FSWDisk2Name'),'.vhd')]",
+                            "lun": 0,
+                            "diskSize": 40,
+                            "caching": "None"
+                        }
+                    ]
+                },
+                "hardwareProfile": {
+                    "platformGuestAgent": "true",
+                    "size": "Basic_A0"
+                },
+                "operatingSystemProfile": {
+                    "computerName": "[variables('FSWName')]",
+                    "windowsOperatingSystemProfile": {
+                        "winRMListeners": [
+                            {
+                                "protocol": "Https"
+                            }
+                        ],
+                        "serviceCertificates": [
+                            {
+                                "storeLocation": "LocalMachine",
+                                "storeName": "My",
+                                "certificateThumbprint": "[parameters('certificateThumbprint')]"
+                            }
+                        ]
+                    },
+                    "adminUserName": "[parameters('administratorAccount')]",
+                    "adminPassword": "[parameters('administratorPassword')]"
+                },
+                "networkProfile": {
+                    "inputEndpoints": [
+                        {
+                            "enableDirectServerReturn": "False",
+                            "endpointName": "WinRM",
+                            "privatePort": 5986,
+                            "protocol": "tcp"
+                        },
+                        {
+                            "enableDirectServerReturn": "False",
+                            "endpointName": "Remote Desktop",
+                            "privatePort": 3389,
+                            "protocol": "tcp"
+                        }
+                    ],
+                    "virtualNetwork": {
+                        "id": "[resourceId('Microsoft.ClassicNetwork/virtualNetworks',variables('vnetName'))]",
+                        "subnetNames": [
+                            "subnet_SQL"
+                        ]
+                    }
+                },
+                "extensions": [
+                    {
+                        "extension": "BGInfo",
+                        "publisher": "Microsoft.Compute",
+                        "version": "1.*"
+                    },
+                    {
+                        "extension": "CustomScriptExtension",
+                        "publisher": "Microsoft.Compute",
+                        "version": "1.*",
+                        "parameters": {
+                            "public": {
+                                "fileUris": [  
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/InstallDSCModules.ps1",
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/xComputerManagement.zip",
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/xSmbShare.zip"
+                                ],
+                                "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -Command .\\InstallDSCModules.ps1 -Modules \"xComputerManagement\",\"xSmbShare\" -Force"
+                            }
+                        }
+                    }
+                ],
+                "domainName": {
+                    "id": "[concat(resourceGroup().id, '/providers/Microsoft.ClassicCompute/domainNames/',variables('FSWDomainName'))]"
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "name": "[variables('FSWName')]",
+            "location": "[parameters('resourceLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ClassicCompute/domainNames', variables('FSWDomainName'))]",
+                "[resourceId('Microsoft.ClassicNetwork/virtualNetworks', variables('vnetName'))]",
+                "[resourceId('Microsoft.ClassicStorage/storageAccounts', variables('storageName'))]",
+                "[concat('Microsoft.ClassicCompute/domainNames/', variables('FSWDomainName'), '/serviceCertificates/sha1-', parameters('certificateThumbprint'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/virtualMachines",
+            "properties": {
+                "storageProfile": {
+                    "operatingSystemDisk": {
+                        "caching": "ReadWrite",
+                        "sourceImageName": "[parameters('sqlSourceImageName')]",
+                        "diskName": "[variables('SQL1Disk1Name')]",
+                        "vhdUri": "[concat(reference(concat('Microsoft.ClassicStorage/storageAccounts/',parameters('serviceName'))).endpoints[0], 'vhds', parameters('serviceName'),'-sql/',variables('SQL1Disk1Name'),'.vhd')]"
+                    },
+                    "dataDisks": [
+                        {
+                            "vhdUri": "[concat(reference(concat('Microsoft.ClassicStorage/storageAccounts/',parameters('serviceName'))).endpoints[0], 'vhds',parameters('serviceName'),'-sql/',variables('SQL1Disk2Name'),'.vhd')]",
+                            "lun": 0,
+                            "diskSize": 1023,
+                            "caching": "None"
+                        },
+                        {
+                            "vhdUri": "[concat(reference(concat('Microsoft.ClassicStorage/storageAccounts/',parameters('serviceName'))).endpoints[0], 'vhds',parameters('serviceName'),'-sql/',variables('SQL1Disk3Name'),'.vhd')]",
+                            "lun": 1,
+                            "diskSize": 1023,
+                            "caching": "None"
+                        }
+                    ]
+                },
+                "hardwareProfile": {
+                    "platformGuestAgent": "true",
+                    "size": "[parameters('sqlVMSize')]",
+                    "availabilitySet": "AS-SQL"
+                },
+                "operatingSystemProfile": {
+                    "computerName": "[variables('SQL1Name')]",
+                    "windowsOperatingSystemProfile": {
+                        "winRMListeners": [
+                            {
+                                "protocol": "Https"
+                            }
+                        ],
+                        "serviceCertificates": [
+                            {
+                                "storeLocation": "LocalMachine",
+                                "storeName": "My",
+                                "certificateThumbprint": "[parameters('certificateThumbprint')]"
+                            }
+                        ]
+                    },
+                    "adminUserName": "[parameters('administratorAccount')]",
+                    "adminPassword": "[parameters('administratorPassword')]"
+                },
+                "networkProfile": {
+                    "inputEndpoints": [
+                        {
+                            "enableDirectServerReturn": "False",
+                            "endpointName": "WinRM",
+                            "privatePort": 5986,
+                            "protocol": "tcp"
+                        },
+                        {
+                            "enableDirectServerReturn": "False",
+                            "endpointName": "Remote Desktop",
+                            "privatePort": 3389,
+                            "protocol": "tcp"
+                        },
+                        {
+                            "endpointName": "SQLAlwaysOnAGListener",
+                            "protocol": "tcp",
+                            "publicPort": 1433,
+                            "privatePort": 1433,
+                            "loadBalancedEndpointSetName": "SQLAlwaysOnAGListener",
+                            "probe": {
+                                "protocol": "tcp",
+                                "port": 59999
+                            },
+                            "enableDirectServerReturn": "true"
+                        }
+                    ],
+                    "virtualNetwork": {
+                        "id": "[resourceId('Microsoft.ClassicNetwork/virtualNetworks',variables('vnetName'))]",
+                        "subnetNames": [
+                            "subnet_SQL"
+                        ]
+                    }
+                },
+                "extensions": [
+                    {
+                        "extension": "BGInfo",
+                        "publisher": "Microsoft.Compute",
+                        "version": "1.*"
+                    },
+                    {
+                        "extension": "CustomScriptExtension",
+                        "publisher": "Microsoft.Compute",
+                        "version": "1.*",
+                        "parameters": {
+                            "public": {
+                                "fileUris":[  
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/InstallDSCModules.ps1",
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/xComputerManagement.zip",
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/xFailOverCluster.zip",
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/xNetworking.zip",
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/xSqlPs.zip",
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/xActiveDirectory.zip"
+                                ],
+                                "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -Command .\\InstallDSCModules.ps1 -Modules \"xComputerManagement\",\"xFailOverCluster\",\"xNetworking\",\"xSqlPs\",\"xActiveDirectory\" -Force"
+                            }
+                        }
+                    }
+                ],
+                "domainName": {
+                    "id": "[concat(resourceGroup().id, '/providers/Microsoft.ClassicCompute/domainNames/',variables('SQLDomainName'))]"
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "name": "[variables('SQL1Name')]",
+            "location": "[parameters('resourceLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ClassicCompute/domainNames', variables('SQLDomainName'))]",
+                "[resourceId('Microsoft.ClassicNetwork/virtualNetworks', variables('vnetName'))]",
+                "[resourceId('Microsoft.ClassicStorage/storageAccounts', variables('storageName'))]",
+                "[concat('Microsoft.ClassicCompute/domainNames/', variables('SQLDomainName'), '/serviceCertificates/sha1-', parameters('certificateThumbprint'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/virtualMachines",
+            "properties": {
+                "storageProfile": {
+                    "operatingSystemDisk": {
+                        "caching": "ReadWrite",
+                        "sourceImageName": "[parameters('sqlSourceImageName')]",
+                        "diskName": "[variables('SQL2Disk1Name')]",
+                        "vhdUri": "[concat(reference(concat('Microsoft.ClassicStorage/storageAccounts/',parameters('serviceName'))).endpoints[0], 'vhds', parameters('serviceName'),'-sql/',variables('SQL2Disk1Name'),'.vhd')]"
+                    },
+                    "dataDisks": [
+                        {
+                            "vhdUri": "[concat(reference(concat('Microsoft.ClassicStorage/storageAccounts/',parameters('serviceName'))).endpoints[0], 'vhds',parameters('serviceName'),'-sql/',variables('SQL2Disk2Name'),'.vhd')]",
+                            "lun": 0,
+                            "diskSize": 1023,
+                            "caching": "None"
+                        },
+                        {
+                            "vhdUri": "[concat(reference(concat('Microsoft.ClassicStorage/storageAccounts/',parameters('serviceName'))).endpoints[0], 'vhds',parameters('serviceName'),'-sql/',variables('SQL2Disk3Name'),'.vhd')]",
+                            "lun": 1,
+                            "diskSize": 1023,
+                            "caching": "None"
+                        }
+                    ]
+                },
+                "hardwareProfile": {
+                    "platformGuestAgent": "true",
+                    "size": "[parameters('sqlVMSize')]",
+                    "availabilitySet": "AS-SQL"
+                },
+                "operatingSystemProfile": {
+                    "computerName": "[variables('SQL2Name')]",
+                    "windowsOperatingSystemProfile": {
+                        "winRMListeners": [
+                            {
+                                "protocol": "Https"
+                            }
+                        ],
+                        "serviceCertificates": [
+                            {
+                                "storeLocation": "LocalMachine",
+                                "storeName": "My",
+                                "certificateThumbprint": "[parameters('certificateThumbprint')]"
+                            }
+                        ]
+                    },
+                    "adminUserName": "[parameters('administratorAccount')]",
+                    "adminPassword": "[parameters('administratorPassword')]"
+                },
+                "networkProfile": {
+                    "inputEndpoints": [
+                        {
+                            "enableDirectServerReturn": "False",
+                            "endpointName": "WinRM",
+                            "privatePort": 5986,
+                            "protocol": "tcp"
+                        },
+                        {
+                            "enableDirectServerReturn": "False",
+                            "endpointName": "Remote Desktop",
+                            "privatePort": 3389,
+                            "protocol": "tcp"
+                        },
+                        {
+                            "endpointName": "SQLAlwaysOnAGListener",
+                            "protocol": "tcp",
+                            "publicPort": 1433,
+                            "privatePort": 1433,
+                            "loadBalancedEndpointSetName": "SQLAlwaysOnAGListener",
+                            "probe": {
+                                "protocol": "tcp",
+                                "port": 59999
+                            },
+                            "enableDirectServerReturn": "true"
+                        }
+                    ],
+                    "virtualNetwork": {
+                        "id": "[resourceId('Microsoft.ClassicNetwork/virtualNetworks',variables('vnetName'))]",
+                        "subnetNames": [
+                            "subnet_SQL"
+                        ]
+                    }
+                },
+                "extensions": [
+                    {
+                        "extension": "BGInfo",
+                        "publisher": "Microsoft.Compute",
+                        "version": "1.*"
+                    },
+                    {
+                        "extension": "CustomScriptExtension",
+                        "publisher": "Microsoft.Compute",
+                        "version": "1.*",
+                        "parameters": {
+                            "public": {
+                                "fileUris":[  
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/InstallDSCModules.ps1",
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/xComputerManagement.zip",
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/xFailOverCluster.zip",
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/xNetworking.zip",
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/xSqlPs.zip",
+                                   "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/xActiveDirectory.zip"
+                                ],
+                                "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -Command .\\InstallDSCModules.ps1 -Modules \"xComputerManagement\",\"xFailOverCluster\",\"xNetworking\",\"xSqlPs\",\"xActiveDirectory\" -Force"
+                            }
+                        }
+                    }
+                ],
+                "domainName": {
+                    "id": "[concat(resourceGroup().id, '/providers/Microsoft.ClassicCompute/domainNames/',variables('SQLDomainName'))]"
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "name": "[variables('SQL2Name')]",
+            "location": "[parameters('resourceLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ClassicCompute/domainNames', variables('SQLDomainName'))]",
+                "[resourceId('Microsoft.ClassicNetwork/virtualNetworks', variables('vnetName'))]",
+                "[resourceId('Microsoft.ClassicStorage/storageAccounts', variables('storageName'))]",
+                "[concat('Microsoft.ClassicCompute/domainNames/', variables('SQLDomainName'), '/serviceCertificates/sha1-', parameters('certificateThumbprint'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/virtualMachines/extensions",
+            "properties": {
+                "extension": "SqlIaaSAgent",
+                "publisher": "Microsoft.SqlServer.Management",
+                "version": "1.*",
+                "parameters": {
+                    "public": {
+                        "AutoPatchingSettings": {
+                            "Enable": false
+                        },
+                        "AutoBackupSettings": {
+                            "Enable": false
+                        },
+                        "AutoTelemetrySettings": {
+                            "Region": "[parameters('resourceLocation')]"
+                        }
+                    }
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "name": "[concat(variables('SQL1Name'),'/AutoHAIaasExtension')]",
+            "location": "[parameters('resourceLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ClassicCompute/virtualMachines', variables('SQL1Name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/virtualMachines/extensions",
+            "properties": {
+                "extension": "SqlIaaSAgent",
+                "publisher": "Microsoft.SqlServer.Management",
+                "version": "1.*",
+                "parameters": {
+                    "public": {
+                        "AutoPatchingSettings": {                          
+                            "Enable": false
+                        },
+                        "AutoBackupSettings": {
+                            "Enable": false
+                        },
+                        "AutoTelemetrySettings": {
+                            "Region": "[parameters('resourceLocation')]"
+                        }
+                    }
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "name": "[concat(variables('SQL2Name'),'/AutoHAIaasExtension')]",
+            "location": "[parameters('resourceLocation')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ClassicCompute/virtualMachines', variables('SQL2Name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/virtualMachines/extensions",
+            "properties": {
+                "extension": "CustomScriptExtension",
+                "publisher": "Microsoft.Compute",
+                "version": "1.*",
+                "parameters": {
+                    "public": {
+                        "fileUris": [
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/Common.ps1",
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/CreateFileShareWitness.ps1"
+                        ],
+                        "commandToExecute": "[variables('CreateFileShareWitnessCommand')]"
+                    }
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "location": "[parameters('resourceLocation')]",
+            "name": "[concat(variables('FSWName'),'/CreateFileShareWitnessCustomScript')]",
+            "dependsOn": [
+                "[concat('Microsoft.ClassicCompute/virtualMachines/',variables('DC1Name'),'/extensions/CreateADPrimaryDomainControllerCustomScript')]",
+                "[resourceId('Microsoft.ClassicCompute/virtualMachines', variables('FSWName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/virtualMachines/extensions",
+            "properties": {
+                "extension": "CustomScriptExtension",
+                "publisher": "Microsoft.Compute",
+                "version": "1.*",
+                "parameters": {
+                    "public": {
+                        "fileUris": [
+                           "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/Common.ps1",
+                           "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/PrepareAlwaysOnSqlServer.ps1"
+                        ],
+                        "commandToExecute": "[variables('PrepareAlwaysOnSqlServerCommand')]"
+                    }
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "location": "[parameters('resourceLocation')]",
+            "name": "[concat(variables('SQL1Name'),'/PrepareSqlServerCustomScript')]",
+            "dependsOn": [
+                "[concat('Microsoft.ClassicCompute/virtualMachines/',variables('SQL1Name'),'/extensions/AutoHAIaasExtension')]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/virtualMachines/extensions",
+            "properties": {
+                "extension": "CustomScriptExtension",
+                "publisher": "Microsoft.Compute",
+                "version": "1.*",
+                "parameters": {
+                    "public": {
+                        "fileUris": [
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/Common.ps1",
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/PrepareAlwaysOnSqlServer.ps1"
+                        ],
+                        "commandToExecute": "[variables('PrepareAlwaysOnSqlServerCommand')]"
+                    }
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "location": "[parameters('resourceLocation')]",
+            "name": "[concat(variables('SQL2Name'),'/PrepareSqlServerCustomScript')]",
+            "dependsOn": [
+                "[concat('Microsoft.ClassicCompute/virtualMachines/',variables('SQL2Name'),'/extensions/AutoHAIaasExtension')]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/virtualMachines/extensions",
+            "properties": {
+                "extension": "CustomScriptExtension",
+                "publisher": "Microsoft.Compute",
+                "version": "1.*",
+                "parameters": {
+                    "public": {
+                        "fileUris": [
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/Common.ps1",
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/PrepareFailoverClusterNode.ps1"
+                        ],
+                        "commandToExecute": "[variables('PrepareFailoverClusterNodeCommand')]"
+                    }
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "location": "[parameters('resourceLocation')]",
+            "name": "[concat(variables('SQL1Name'),'/PrepareFailoverClusterNodeCustomScript')]",
+            "dependsOn": [
+                "[concat('Microsoft.ClassicCompute/virtualMachines/',variables('DC1Name'),'/extensions/CreateADPrimaryDomainControllerCustomScript')]",
+                "[concat('Microsoft.ClassicCompute/virtualMachines/',variables('SQL1Name'),'/extensions/PrepareSqlServerCustomScript')]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/virtualMachines/extensions",
+            "properties": {
+                "extension": "CustomScriptExtension",
+                "publisher": "Microsoft.Compute",
+                "version": "1.*",
+                "parameters": {
+                    "public": {
+                        "fileUris": [
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/Common.ps1",
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/PrepareFailoverClusterNode.ps1"
+                        ],
+                        "commandToExecute": "[variables('PrepareFailoverClusterNodeCommand')]"
+                    }
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "location": "[parameters('resourceLocation')]",
+            "name": "[concat(variables('SQL2Name'),'/PrepareFailoverClusterNodeCustomScript')]",
+            "dependsOn": [
+                "[concat('Microsoft.ClassicCompute/virtualMachines/',variables('DC1Name'),'/extensions/CreateADPrimaryDomainControllerCustomScript')]",
+                "[concat('Microsoft.ClassicCompute/virtualMachines/',variables('SQL2Name'),'/extensions/PrepareSqlServerCustomScript')]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/virtualMachines/extensions",
+            "properties": {
+                "extension": "CustomScriptExtension",
+                "publisher": "Microsoft.Compute",
+                "version": "1.*",
+                "parameters": {
+                    "public": {
+                        "fileUris": [
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/Common.ps1",
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/CreateFailoverCluster.ps1"
+                        ],
+                        "commandToExecute": "[variables('CreateFailoverClusterCommand')]"
+                    }
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "location": "[parameters('resourceLocation')]",
+            "name": "[concat(variables('SQL1Name'),'/CreateFailoverClusterCustomScript')]",
+            "dependsOn": [
+                "[concat('Microsoft.ClassicCompute/virtualMachines/',variables('FSWName'),'/extensions/CreateFileShareWitnessCustomScript')]",
+                "[concat('Microsoft.ClassicCompute/virtualMachines/',variables('SQL1Name'),'/extensions/PrepareFailoverClusterNodeCustomScript')]",
+                "[concat('Microsoft.ClassicCompute/virtualMachines/',variables('SQL2Name'),'/extensions/PrepareFailoverClusterNodeCustomScript')]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/virtualMachines/extensions",
+            "properties": {
+                "extension": "CustomScriptExtension",
+                "publisher": "Microsoft.Compute",
+                "version": "1.*",
+                "parameters": {
+                    "public": {
+                        "fileUris": [
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/Common.ps1",
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/PrepareAvailabilityGroupNode.v2.ps1"
+                        ],
+                        "commandToExecute": "[variables('PrepareAvailabilityGroupNodeCommand')]"
+                    }
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "location": "[parameters('resourceLocation')]",
+            "name": "[concat(variables('SQL1Name'),'/PrepareAvailabilityGroupNodeCustomScript')]",
+            "dependsOn": [
+                "[concat('Microsoft.ClassicCompute/virtualMachines/',variables('SQL1Name'),'/extensions/CreateFailoverClusterCustomScript')]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/virtualMachines/extensions",
+            "properties": {
+                "extension": "CustomScriptExtension",
+                "publisher": "Microsoft.Compute",
+                "version": "1.*",
+                "parameters": {
+                    "public": {
+                        "fileUris": [
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/Common.ps1",
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/PrepareAvailabilityGroupNode.v2.ps1"
+                        ],
+                        "commandToExecute": "[variables('PrepareAvailabilityGroupNodeCommand')]"
+                    }
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "location": "[parameters('resourceLocation')]",
+            "name": "[concat(variables('SQL2Name'),'/PrepareAvailabilityGroupNodeCustomScript')]",
+            "dependsOn": [
+                "[concat('Microsoft.ClassicCompute/virtualMachines/',variables('SQL1Name'),'/extensions/CreateFailoverClusterCustomScript')]"
+            ]
+        },
+        {
+            "type": "Microsoft.ClassicCompute/virtualMachines/extensions",
+            "properties": {
+                "extension": "CustomScriptExtension",
+                "publisher": "Microsoft.Compute",
+                "version": "1.*",
+                "parameters": {
+                    "public": {
+                        "fileUris": [
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/CreateAvailabilityGroupCommon.ps1",
+                            "https://azuregalleryassetsch.blob.core.windows.net/microsoft-sharepoint-sql-0-3-0-preview/CreateAvailabilityGroup.ps1"
+                        ],
+                        "commandToExecute": "[variables('CreateAvailabilityGroupCommand')]"
+                    }
+                }
+            },
+            "apiVersion": "2014-06-01",
+            "location": "[parameters('resourceLocation')]",
+            "name": "[concat(variables('SQL1Name'),'/CreateAvailabilityGroupCustomScript')]",
+            "dependsOn": [
+                "[concat('Microsoft.ClassicCompute/virtualMachines/',variables('SQL1Name'),'/extensions/PrepareAvailabilityGroupNodeCustomScript')]",
+                "[concat('Microsoft.ClassicCompute/virtualMachines/',variables('SQL2Name'),'/extensions/PrepareAvailabilityGroupNodeCustomScript')]"
+            ]
+        }
+    ]
+}
