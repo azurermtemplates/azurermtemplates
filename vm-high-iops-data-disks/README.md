@@ -13,8 +13,7 @@ Below are the parameters that the template expects
 
 | Name   | Description    |
 |:--- |:---|
-
-| newStorageAccountName    | Name of the storage account to create    |
+| newStorageAccountName  | Name of the storage account to create |
 | adminUsername | Admin username for the VM |
 | adminPassword | Admin password for the VM |
 | vmSourceImageName | Name of image to use for the VM <br> <ul><li>a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201503.01-en.us-127GB.vhd **(default)**</li></ul>|
