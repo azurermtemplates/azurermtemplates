@@ -1,12 +1,12 @@
 {
     "newStorageAccountName" : {
-        "value":"jvrgdsc32"
+        "value":""
     },
     "adminUsername": {
-        "value": "jason"
+        "value": ""
     },
     "adminPassword": {
-        "value": "B1ekooa!iaea"
+        "value": ""
     },
     "vmSourceImageName" : {
         "value" : "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-Datacenter-201503.01-en.us-127GB.vhd"
@@ -21,19 +21,19 @@
       "value" : "1023"
     },
     "publicIPAddressName" : {
-      "value" : "myPublicIP3"
+      "value" : "myPublicIP"
     },
     "dnsName" : {
-      "value" : "jvrgdsc32"
+      "value" : ""
     },
     "vmName" : {
-      "value" : "myVM3"
+      "value" : "myVM"
     },
     "virtualNetworkName": {
-        "value": "myVNET3"
+        "value": "myVNET"
     },
     "nicName" : {
-      "value" : "myNic3"
+      "value" : "myNic"
     },
     "modulesUrl" : {
       "value" : "https://github.com/jvallery/azurermtemplates/blob/master/vm-high-iops-data-disks/StoragePool.ps1.zip?raw=true"
