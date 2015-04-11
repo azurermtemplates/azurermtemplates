@@ -319,19 +319,24 @@ install_es
 #------------------------
 scan_partition_format
 
-#Prepare configuratino information
-#Configure permissions on data disks for elasticsearch user:group
+# Prepare configuratino information
+# Configure permissions on data disks for elasticsearch user:group
 #--------------------------
 DATAPATH_CONFIG=""
-for D in `find /datadisks/ -mindepth 1 -maxdepth 1 -type d`
-do
-    #Configure disk permssions and folder for storage
-    setup_data_disk ${D}
-    # Add to list for elasticsearch configuration
-    DATAPATH_CONFIG+="$D/elasticsearch/data,"
-done
-#Remove the extra trailing comma
-DATAPATH_CONFIG="${DATAPATH_CONFIG%?}"
+if [ -d "${DATA_BASE}" ]; then
+    for D in `find /datadisks/ -mindepth 1 -maxdepth 1 -type d`
+    do
+        #Configure disk permssions and folder for storage
+        setup_data_disk ${D}
+        # Add to list for elasticsearch configuration
+        DATAPATH_CONFIG+="$D/elasticsearch/data,"
+    done
+    #Remove the extra trailing comma
+    DATAPATH_CONFIG="${DATAPATH_CONFIG%?}"
+else
+    #If we do not find folders/disks in our data disk mount directory then use the defaults
+    log "Configured data directory does not exist for ${HOSTNAME} using defaults"
+fi
 
 #Get a list of my local IP addresses so we can trim this machines IP out of the discovery list
 MY_IPS=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`

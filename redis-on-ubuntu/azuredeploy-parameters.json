@@ -8,17 +8,11 @@
     "adminPassword": {
         "value": ""
     },
-    "numberOfInstances": {
-        "value": 2
-    },
     "region": {
         "value": "West US"
     },
     "virtualNetworkName": {
         "value": "redisClustVnet"
-    },
-    "vmSize": {
-        "value": "Standard_A0"
     },
     "subnetName": {
         "value": "Subnet1"
@@ -38,7 +32,10 @@
     "redisNodeIPAddressPrefix": {
         "value": "10.0.0.1"
     },
-    "jumpbox": { 
+    "jumpbox": {
         "value": "enabled"
+    },
+    "tshirtSize":  {
+        "value": "S"
     }
 }
