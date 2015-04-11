@@ -1,0 +1,66 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "newStorageAccountName": {
+            "value": "cawadsciis07"
+        },
+        "location" : {
+            "value" : "West US"
+        },
+        "dnsName": {
+            "value": "cawaiisdns07"
+        },
+        "publicIPAddressName": {
+            "value": "cawaiisIP07"
+        },
+        "publicIPAddressType": {
+            "value": "Dynamic"
+        },
+        "vmName": {
+            "value": "cawaiisvm07"
+        },
+        "vmSize": {
+            "value": "Standard_A2"
+        },
+        "adminUserName": {
+            "value": "vmuser"
+        },
+        "adminPassword": {
+            "value": "test.123"
+        },
+        "virtualNetworkName": {
+            "value": "cawaiisvnet07"
+        },
+        "subscriptionId": {
+            "value": "9de7ded6-0ad3-43e6-87b8-17d93e3ff695"
+        },
+        "nicName": {
+            "value": "cawaiisNic07"
+        },
+        "vmExtensionName": {
+            "value": "dscExtension"
+        },
+        "modulesUrl": {
+            "value": "https://cawadscstrg.blob.core.windows.net/windows-powershell-dsc/ConfigureWebServer.ps1.zip"
+        },
+        "sasToken": {
+            "value": "?sv=2014-02-14&sr=c&sig=DAJnDCohNUnP44koqizaHwQN27CZBANSfq%2FYef99wa8%3D&se=2015-04-10T22%3A14%3A00Z&sp=r"
+        },
+        "configurationFunction": {
+            "value": "ConfigureWebServer.ps1\\Main"
+        },
+        "serverName": {
+            "value": "cawadbserver07"
+        },
+        "serverLocation": {
+            "value": "westus"
+        },
+        "administratorLogin": {
+            "value": "dbadmin"
+        },
+        "databaseName": {
+            "value": "testdb"
+        }
+    }
+}
