@@ -14,10 +14,8 @@ The example expects the following parameters:
 | storageAccountName  | Unique DNS Name for the Storage Account where the Virtual Machine's disks will be placed |
 | adminUsername  | Admin user name for the Virtual Machines  |
 | adminPassword  | Admin password for the Virtual Machine  |
-| numberOfInstances | The number of VM instances to be configured for the Redis cluster |
 | region | Region name where the corresponding Azure artifacts will be created |
 | virtualNetworkName | Name of Virtual Network |
-| vmSize | Size of the Virtual Machine |
 | dataDiskSize | Size of each disk attached to Redis nodes (in GB) |
 | subnetName | Name of the Virtual Network subnet |
 | addressPrefix | The IP address mask used by the Virtual Network |
@@ -26,6 +24,7 @@ The example expects the following parameters:
 | redisClusterName | Name of the Redis cluster |
 | redisNodeIPAddressPrefix | The IP address prefix that will be used for constructing a static private IP address for each node in the cluster |
 | jumpbox | The flag allowing to enable or disable provisioning of the jumpbox VM that can be used to access the Redis nodes |
+| tshirtSize | The t-shirt size of the Redis node (small, medium, large) |
 
 Topology
 --------
