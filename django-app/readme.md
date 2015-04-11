@@ -1,4 +1,4 @@
-# Deploy a LAMP app on Ubuntu.
+# Deploy a Django app on Ubuntu.
 
 
 | Deploy to Azure  | Author                          | Template Name   | Description     |
