@@ -1,0 +1,389 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetName": {
+            "type": "string"
+        },
+
+        "location": {
+            "type": "string",
+            "defaultValue": "East US",
+            "allowedValues": [
+                "West US",
+                "East US",
+                "Central US"
+            ]
+        },
+
+        "vnetPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16"
+        },
+
+        "vnetSubnet1Name": {
+            "type": "string",
+            "defaultValue": "Subnet-1"
+        },
+
+        "vnetSubnet1Prefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/24"
+        },
+
+        "storageName": {
+            "type": "string"
+        },
+
+        "storageType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_GRS",
+                "Standard_ZRS"
+            ]
+        },
+
+        "nodeStorageAccountContainerName": {
+            "type": "string",
+            "defaultValue": "vhds"
+        },
+
+        "nodeSize": {
+            "type": "string",
+            "defaultValue": "Standard_A0",
+            "allowedValues": [
+                "Standard_A0",
+                "Standard_A1",
+                "Standard_A2",
+                "Standard_A3",
+                "Standard_A4"
+            ]
+        },
+
+        "nodeSourceImageName": {
+            "type": "string",
+            "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201502.01-en.us-127GB.vhd"
+        },
+        "nodeAdminUserName": {
+            "type": "string"
+        },
+
+        "nodeAdminPassword": {
+            "type": "securestring"
+        },
+      
+        "subscriptionId": {
+            "type": "string"
+        },
+
+        "publicIpAddressName": {
+            "type": "string"
+        },
+
+        "publicIpAddressType": {
+            "type": "string",
+            "defaultValue": "Dynamic",
+            "allowedValues": [
+                "Dynamic"
+            ]
+        },
+
+        "dnsName": {
+            "type": "string",
+            "metadata": {
+                "Description": "DNS name for the Public IP"
+            }
+        },
+
+        "nodes": {
+            "type": "int",
+            "defaultValue": 2,
+            "metadata": {
+                "Description": "Number of ElasticSearch Nodes"
+            }
+        },
+        "nodeIpAddresses": {
+            "type": "array",
+            "defaultValue": [
+                "10.0.0.16",
+                "10.0.0.17",
+                "10.0.0.18"
+            ]
+
+        },
+        "nodeIPAddressesString": {
+            "type": "string",
+            "defaultValue": "10.0.0.16,10.0.0.17,10.0.0.18"
+
+        },
+        "clustername": {
+            "type": "string",
+            "defaultValue": "elasticsearch" 
+
+        }
+    },
+
+    "resources": [
+        {
+            "name": "[parameters('storageName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "location": "[parameters('location')]",
+            "apiVersion": "2014-12-01-preview",
+            "dependsOn": [ ],
+            "tags": {
+                "displayName": "storage"
+            },
+            "properties": {
+                "accountType": "[parameters('storageType')]"
+            }
+        },
+        {
+            "name": "[parameters('vnetName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "location": "[parameters('location')]",
+            "apiVersion": "2014-12-01-preview",
+            "dependsOn": [ ],
+            "tags": {
+                "displayName": "vnet"
+            },
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[parameters('vnetPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[parameters('vnetSubnet1Name')]",
+                        "properties": {
+                            "addressPrefix": "[parameters('vnetSubnet1Prefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+
+        {
+            "name": "[concat('nic', copyindex())]",
+            "copy": {
+                "name": "nicLoop",
+                "count": "[parameters('nodes')]"
+            },
+            "type": "Microsoft.Network/networkInterfaces",
+            "location": "[parameters('location')]",
+            "apiVersion": "2014-12-01-preview",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('vnetName'))]"
+            ],
+            "tags": {
+                "displayName": "[concat('nic', copyindex())]"
+            },
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "[parameters('nodeIpAddresses')[copyindex()]]",
+                            "subnet": {
+                                "id": "[variables('nodeSubnet1Ref')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[concat('node', copyindex())]",
+            "copy": {
+                "name": "virtualMachineLoop",
+                "count": "[parameters('nodes')]"
+            },
+            "type": "Microsoft.Compute/virtualMachines",
+            "location": "[parameters('location')]",
+            "apiVersion": "2014-12-01-preview",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', 'nic', copyindex())]",
+                "[concat('Microsoft.Compute/availabilitySets/', 'esAvailabilitySet')]"
+            ],
+            "properties": {
+                 "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', 'esAvailabilitySet')]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('nodeSize')]"
+                },
+                "osProfile": {
+                    "computername": "[concat('esnode', copyIndex())]",
+                    "adminUsername": "[parameters('nodeAdminUsername')]",
+                    "adminPassword": "[parameters('nodeAdminPassword')]",
+                    "windowsProfile": {
+                        "provisionVMAgent": "true"
+                    }
+                },
+                "storageProfile": {
+                    "sourceImage": {
+                        "id": "[variables('nodeSourceImageName')]"
+                    },
+                    "destinationVhdsContainer": "[concat('http://', parameters('storageName'),'.blob.core.windows.net/', parameters('nodeStorageAccountContainerName'),'/')]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('nic', copyindex()))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat('node', copyindex(),'/', 'customScriptExtension')]",
+            "copy": {
+                "name": "extensionLoop",
+                "count": "[parameters('nodes')]"
+            },
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', 'node', copyindex())]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.3",
+                "settings": {
+                    "fileUris": [ "http://jdharm.blob.core.windows.net/powershell/install-elasticsearch.ps1" ],
+                    "commandToExecute": "[concat('powershell.exe -File install-elasticsearch.ps1 ',  parameters('nodeIPAddressesString'), ' ', parameters('clustername'))]"
+                }
+            }
+        },
+        {
+            "name": "[parameters('publicIpAddressName')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "location": "[parameters('location')]",
+            "apiVersion": "2014-12-01-preview",
+            "dependsOn": [ ],
+            "tags": {
+                "displayName": "publicIpAddress"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "[parameters('publicIpAddressType')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('dnsName')]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "name": "loadBalancer",
+            "type": "Microsoft.Network/loadBalancers",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', 'nic0')]",
+                "[concat('Microsoft.Network/publicIPAddresses/', parameters('publicIpAddressName'))]"
+            ],
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "LBFE",
+                        "properties": {
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIpAddressName'))]"
+                            }
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "LBBE",
+                        "properties": {
+                            "backendIPConfigurations": [
+                                {
+                                    "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', 'nic0'),'/ipConfigurations/ipconfig1')]"
+                                },
+                                {
+                                    "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', 'nic1'),'/ipConfigurations/ipconfig1')]"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "inboundNatRules": [
+                    {
+                        "name": "rdp",
+                        "properties": {
+                            "frontendIPConfigurations": [
+                                {
+                                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'loadBalancer'),'/frontendIPConfigurations/LBFE')]"
+                                }
+                            ],
+                            "backendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', 'nic0'),'/ipConfigurations/ipconfig1')]"
+                            },
+                            "protocol": "tcp",
+                            "frontendPort": 3389,
+                            "backendPort": 3389,
+                            "enableFloatingIP": false
+                        }
+                    },
+                    {
+                        "name": "rdp2",
+                        "properties": {
+                            "frontendIPConfigurations": [
+                                {
+                                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'loadBalancer'),'/frontendIPConfigurations/LBFE')]"
+                                }
+                            ],
+                            "backendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', 'nic1'),'/ipConfigurations/ipconfig1')]"
+                            },
+                            "protocol": "tcp",
+                            "frontendPort": 22322,
+                            "backendPort": 3389,
+                            "enableFloatingIP": false
+                        }
+                    }
+                ],
+                "loadBalancingRules": [
+                    {
+                        "name": "LBRule",
+                        "properties": {
+                            "frontendIPConfigurations": [
+                                {
+                                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers','loadBalancer'),'/frontendIPConfigurations/LBFE')]"
+                                }
+                            ],
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers','loadBalancer'),'/backendAddressPools/LBBE')]"
+                            },
+                            "protocol": "tcp",
+                            "frontendPort": 9200,
+                            "backendPort": 9200,
+                            "enableFloatingIP": false,
+                            "idleTimeoutInMinutes": 5
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "esAvailabilitySet",
+            "type": "Microsoft.Compute/availabilitySets",
+            "location": "[parameters('location')]",
+            "apiVersion": "2014-12-01-preview",
+            "dependsOn": [ ],
+            "tags": {
+                "displayName": "availabilitySet"
+            }
+        }
+    ],
+    "variables": {
+        "nodeSourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('nodeSourceImageName'))]",
+        "nodeVnetID": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
+        "nodeSubnet1Ref": "[concat(variables('nodeVnetID'),'/subnets/',parameters('vnetSubnet1Name'))]"
+    }
+}
