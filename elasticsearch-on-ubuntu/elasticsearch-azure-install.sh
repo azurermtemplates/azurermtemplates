@@ -411,6 +411,9 @@ fi
 echo "options timeout:1 attempts:5" >> /etc/resolvconf/resolv.conf.d/head
 resolvconf -u
 
+# Incraese maximum mmap count
+echo "vm.max_map_count = 262144" >> /etc/sysctl.conf
+
 #"action.disable_delete_all_indices: ${DISABLE_DELETE_ALL}" >> /etc/elasticsearch/elasticsearch.yml
 #"action.auto_create_index: ${AUTOCREATE_INDEX}" >> /etc/elasticsearch/elasticsearch.yml
 
