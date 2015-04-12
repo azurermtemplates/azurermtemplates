@@ -261,6 +261,25 @@ scan_partition_format()
     done
 }
 
+# Expand a list of successive ip range and filter my local local ip from the list
+# Ip list is represented as a prefix and that is appended wiht a zero to N index
+# 10.0.0.1-3 would be converted to "10.0.0.10 10.0.0.11 10.0.0.12"
+expand_ip_range() {
+    IFS='-' read -a HOST_IPS <<< "$1"
+
+    #Get the IP Addresses on this machine
+    declare -a MY_IPS=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
+    declare -a EXPAND_STATICIP_RANGE_RESULTS=()
+    for (( n=0 ; n<("${HOST_IPS[1]}"+0) ; n++))
+    do
+        HOST="${HOST_IPS[0]}${n}"
+        if ! [[ "${MY_IPS[@]}" =~ "${HOST}" ]]; then
+            EXPAND_STATICIP_RANGE_RESULTS+=($HOST)
+        fi
+    done
+    echo "${EXPAND_STATICIP_RANGE_RESULTS[@]}"
+}
+
 # Configure Elasticsearch Data Disk Folder and Permissions
 setup_data_disk()
 {
@@ -338,8 +357,10 @@ else
     log "Configured data directory does not exist for ${HOSTNAME} using defaults"
 fi
 
-#Get a list of my local IP addresses so we can trim this machines IP out of the discovery list
-MY_IPS=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
+#expand_staticip_range "$IP_RANGE"
+
+#S=$(expand_ip_range "$IP_RANGE")
+#HOSTS_CONFIG="[\"${S// /\",\"}\"]"
 
 #Format the static discovery host endpooints for elasticsearch configureion ["",""] format
 HOSTS_CONFIG="[\"${DISCOVERY_ENDPOINTS//-/\",\"}\"]"
