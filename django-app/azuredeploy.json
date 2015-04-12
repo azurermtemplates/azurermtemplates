@@ -4,21 +4,36 @@
     "parameters": {
         "newStorageAccountName": {
             "type": "string",
-            "defaultValue": "uniqueStorageName"
+            "defaultValue": "uniqueStorageName",
+            "metadata": {
+                "description": "Name of the Storage Account"
+            }
         },
         "location": {
             "type": "string",
-            "defaultValue": "West US"
+            "defaultValue": "West US",
+            "metadata": {
+                "description": "Location of all resources created by this template."
+            }
         },
         "adminUsername": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+                "description": "Username for the Administrator of the VM"
+            }
         },
         "adminPassword": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata": {
+                "description": "Password for the Administrator of the VM, must satisfy the password requirements"
+            }
         },
         "vmDnsName": {
             "type": "string",
-            "defaultValue": "uniqueDNS"
+            "defaultValue": "uniqueDNS",
+            "metadata": {
+                "description": "DNS Name for the Public IP. Must be lowercase."
+            }
         }
     },
     "variables": {
@@ -145,7 +160,7 @@
                   "https://raw.githubusercontent.com/madhana/azurermtemplates/master/django-app/install_django.sh"
               ],
               "commandToExecute": "[concat('sh install_django.sh ', parameters('vmDnsName'))]"
-              
+
             }
         }
     }]
