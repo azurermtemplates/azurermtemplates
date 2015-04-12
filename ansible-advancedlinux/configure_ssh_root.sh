@@ -13,7 +13,7 @@
 # Parameters :
 #  
 # Note : 
-# This script has only been tested on CentOS 6.5 and Ubuntu 12.04 LTS with Couchbase version XX
+# This script has only been tested on CentOS 6.5 and Ubuntu 12.04 LTS 
 ######################################################### 
 
 #---BEGIN VARIABLES---
@@ -79,7 +79,7 @@ function configure_ssh()
 {
 
     # copy root ssh key
-    mkdir ~/.ssh
+    mkdir -p ~/.ssh
     cat id_rsa.pub >> ~/.ssh/authorized_keys
     rm id_rsa.pub
     
@@ -91,8 +91,8 @@ function configure_ssh()
     then
         #restart sshd service - Ubuntu
         service ssh restart
-
-    else [[ "${DIST}" == "CentOS" ]] ; then
+    elif [[ "${DIST}" == "CentOS" ]] ;
+    then
         # configure SELinux
         restorecon -Rv ~/.ssh 
     
@@ -112,13 +112,16 @@ function ConfigureSSH()
     if [[ "${DIST}" == "Ubuntu" ]];
     then
         log "INFO:Configuring root loging for Ubuntu"
-    elif [[ "${DIST}" == "CentOS" ]] ; then
+        configure_ssh
+    elif [[ "${DIST}" == "CentOS" ]] ;
+    then
         log "INFO:Configuring root loging for CentOS"
+        configure_ssh
     else
          log "ERROR:Unsupported OS ${DIST}"
     fi
 
-    configure_ssh
+    
 }
 
 ConfigureSSH

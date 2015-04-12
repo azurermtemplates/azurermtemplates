@@ -1,14 +1,14 @@
 #!/bin/bash
 
 #########################################################
-# Script Name: couchbase-ansible.sh
+# Script Name: configure-ansible.sh
 # Author: Gonzalo Ruiz 
 # Version: 0.1
 # Date Created:           01st Marh 2015
 # Last Modified:          04st April 17:26 GMT
 # Last Modified By:       Gonzalo Ruiz
 # Description:
-#  This script automates building a Couchbase cluster. Specifically it:
+#  This script automates the installation of this VM as an ansible VM. Specifically it:
 #     installs ansible on all the nodes
 #     configures ssh keys
 # Parameters :
@@ -35,7 +35,7 @@ START_IP_INDEX=0
  function usage()
  {
     echo "INFO:"
-    echo "Usage: couchbase-ansible.sh [-i IP_ADDRESS_SPACE ] [-n NUMBER_OF_NODES ] [-r CONFIGURE_RAID ] [-f FILE_SYSTEM] "
+    echo "Usage: configure-ansible.sh [-i IP_ADDRESS_SPACE ] [-n NUMBER_OF_NODES ] [-r CONFIGURE_RAID ] [-f FILE_SYSTEM] "
     echo "The -i (ipAddressSpace) parameters specifies the starting IP space for the vms.For instance if you specify 10.0.2.2, and 3 nodes, the script will find for the VMS 10.0.2.20, 10.0.2.21,10.0.2.22.Plase note that Azure reserves the first 4 IPs, so you will have to specify an IP space in which IP x.x.x0 is available"
     echo "The -n (numberOfNodes) parameter specifies the number of VMs"
     echo "The -r (configureRAID) parameter specifies whether you want to create a RAID with all the available data disks.Allowed values : true or false"
@@ -155,7 +155,7 @@ function install_ansible_ubuntu()
 
  function install_ansible_centos()
  {
-    # sudo sed -i '/Defaults[[:space:]]\+requiretty/s/^/#/' /etc/sudoers
+
     # install EPEL Packages - sshdpass
     wget http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
     rpm -ivh epel-release-6-8.noarch.rpm
@@ -174,7 +174,7 @@ function configure_ssh()
 {
 
     # copy ssh private key
-    mkdir ~/.ssh
+    mkdir -p ~/.ssh
     mv id_rsa ~/.ssh
 
     # set permissions
@@ -182,20 +182,18 @@ function configure_ssh()
     chmod 600 ~/.ssh/id_rsa     
 
 
-    # copy root ssh key
-    mkdir ~/.ssh
+    # copy root ssh key   
     cat id_rsa.pub >> ~/.ssh/authorized_keys
     rm id_rsa.pub
     
     # set permissions
     chmod 600 ~/.ssh/authorized_keys 
 
-    if [[ "${DIST}" == "Ubuntu" ]];
-    then
+    if [[ "${DIST}" == "Ubuntu" ]]; then
         #restart sshd service - Ubuntu
         service ssh restart
 
-    else [[ "${DIST}" == "CentOS" ]] ; then
+    elif [[ "${DIST}" == "CentOS" ]] ; then
         # configure SELinux
         restorecon -Rv ~/.ssh 
     
@@ -217,13 +215,16 @@ function configure_ssh()
     
     # Accept ssh keys by default    
     printf  "[defaults]\nhost_key_checking = False\n\n" >> "${ANSIBLE_CONFIG_FILE}"   
+    # Shorten the ControlPath to avoid errors with long host names , long user names or deeply nested home directories
+    echo  $'[ssh_connection]\ncontrol_path = ~/.ssh/ansible-%%h-%%r' >> "${ANSIBLE_CONFIG_FILE}"   
     
     # Generate a new ansible host file    
-    printf  "[master]\n${IP_ADDRESS_SPACE}.${NUMBER_OF_NODES}\n\n" >> "${ANSIBLE_HOST_FILE}"   
+    # printf  "[master]\n${IP_ADDRESS_SPACE}.${NUMBER_OF_NODES}\n\n" >> "${ANSIBLE_HOST_FILE}"   
     printf  "[${TEMPLATE_ROLE}]\n${IP_ADDRESS_SPACE}[0:$(($NUMBER_OF_NODES - 1))]" >> "${ANSIBLE_HOST_FILE}"
 
     # Validate ansible configuration
-    ansible ${TEMPLATE_ROLE} -m ping
+    ansible ${TEMPLATE_ROLE} -m ping -vvvv 
+   
 
  }
 
@@ -234,12 +235,7 @@ function configure_ssh()
     log "INFO: TODO"
  }
 
- function get_couchbase_ansible()
- { 
 
-    # clone git repo
-    git clone https://github.com/couchbaselabs/ansible-couchbase-server.git
- }
 
 
 InitializeVMs()
@@ -256,15 +252,12 @@ InitializeVMs()
         log "INFO:Installing Ansible for CentOS"
         install_ansible_centos
     else
-         log "ERROR:Unsupported OS ${DIST}"
+       log "ERROR:Unsupported OS ${DIST}"
+       exit 2
     fi
     
     configure_ansible
 
-    # TODO :
-    # configure_storage_ansible
-    # get_couchbase_ansible
-    # install_couchbase_ansible
 
 }
 
