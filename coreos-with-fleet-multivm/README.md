@@ -1,4 +1,4 @@
-# Deploy a Virtual Machine with SSH Keys
+# Deploy a CoreOS cluster hosting Fleet 
 
 <a href="https://azuredeploy.net/" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
