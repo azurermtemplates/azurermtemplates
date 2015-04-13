@@ -60,7 +60,7 @@
         "scriptUrl" : "https://iaasscripts.blob.core.windows.net/scripts/InstallApplication.ps1",
 	      "scriptName" : "InstallApplication.ps1",
 	      "scriptArg" : "[parameters('applicationToInstall')]",
-        "customScriptExtensionVerstion" : "1.2",
+        "customScriptExtensionVersion" : "1.2",
         "publicIPAddressName" : "[concat(parameters('uniqueDNSNameBase'),'pubIP')]",
         "publicIPAddressType" : "Dynamic",
         "vmStorageAccountContainerName" : "vhds",
@@ -186,7 +186,7 @@
             "properties": {
                 "publisher": "Microsoft.Compute",
                 "type": "CustomScriptExtension",
-                "typeHandlerVersion": "[variables('customScriptExtensionVerstion')]",
+                "typeHandlerVersion": "[variables('customScriptExtensionVersion')]",
                 "settings": {
                     "fileUris": ["[variables('scriptUrl')]"],
                     "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file ',variables('scriptName'),' ',variables('scriptArg'))]"

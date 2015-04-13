@@ -1,0 +1,60 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "newStorageAccountName": {
+            "value": ""
+        },
+        "adminUsername": {
+            "value": ""
+        },
+        "adminPassword": {
+            "value": ""
+        },
+        "virtualNetworkName": {
+            "value": ""
+        },
+        "subscriptionId": {
+            "value": ""
+        },
+        "nicNamePrefix": {
+            "value": ""
+        },
+        "dcVmName": {
+            "value": ""
+        },
+        "sqlVmName": {
+            "value": ""
+        },
+        "ddcVmName": {
+            "value": ""
+        },
+        "dcDnsName": {
+            "value": ""
+        },
+        "sqlDnsName": {
+            "value": ""
+        },
+        "ddcDnsName": {
+            "value": ""
+        },
+        "xdIsoSourcePath": {
+            "value": ""
+        },
+        "sourcePathCredKey": {
+            "value": ""
+        },
+        "xdDscModulesUrl": {
+            "value": ""
+        },
+        "sourcePathCredUsername": {
+            "value": ""
+        },
+        "xdImagePath": {
+            "value": ""
+        },
+        "xdDscConfigurationFunction": {
+            "value": ""
+        },
+    }
+}

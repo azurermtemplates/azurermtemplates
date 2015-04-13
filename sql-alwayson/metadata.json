@@ -1,0 +1,7 @@
+{
+  "itemDisplayName": "Create SQL Server AlwaysOn Cluster",
+  "description": "This template automats the deployment of SQL Server AlwaysOn cluster with Windows Server domain",
+  "summary": "This template creates and availability set",
+  "githubUsername": "ojdude",
+  "dateUpdated": "2015-04-10"
+}

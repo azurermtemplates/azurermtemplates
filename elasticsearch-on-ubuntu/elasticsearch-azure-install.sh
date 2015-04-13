@@ -261,6 +261,25 @@ scan_partition_format()
     done
 }
 
+# Expand a list of successive ip range and filter my local local ip from the list
+# Ip list is represented as a prefix and that is appended wiht a zero to N index
+# 10.0.0.1-3 would be converted to "10.0.0.10 10.0.0.11 10.0.0.12"
+expand_ip_range() {
+    IFS='-' read -a HOST_IPS <<< "$1"
+
+    #Get the IP Addresses on this machine
+    declare -a MY_IPS=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
+    declare -a EXPAND_STATICIP_RANGE_RESULTS=()
+    for (( n=0 ; n<("${HOST_IPS[1]}"+0) ; n++))
+    do
+        HOST="${HOST_IPS[0]}${n}"
+        if ! [[ "${MY_IPS[@]}" =~ "${HOST}" ]]; then
+            EXPAND_STATICIP_RANGE_RESULTS+=($HOST)
+        fi
+    done
+    echo "${EXPAND_STATICIP_RANGE_RESULTS[@]}"
+}
+
 # Configure Elasticsearch Data Disk Folder and Permissions
 setup_data_disk()
 {
@@ -319,22 +338,29 @@ install_es
 #------------------------
 scan_partition_format
 
-#Prepare configuratino information
-#Configure permissions on data disks for elasticsearch user:group
+# Prepare configuratino information
+# Configure permissions on data disks for elasticsearch user:group
 #--------------------------
 DATAPATH_CONFIG=""
-for D in `find /datadisks/ -mindepth 1 -maxdepth 1 -type d`
-do
-    #Configure disk permssions and folder for storage
-    setup_data_disk ${D}
-    # Add to list for elasticsearch configuration
-    DATAPATH_CONFIG+="$D/elasticsearch/data,"
-done
-#Remove the extra trailing comma
-DATAPATH_CONFIG="${DATAPATH_CONFIG%?}"
+if [ -d "${DATA_BASE}" ]; then
+    for D in `find /datadisks/ -mindepth 1 -maxdepth 1 -type d`
+    do
+        #Configure disk permssions and folder for storage
+        setup_data_disk ${D}
+        # Add to list for elasticsearch configuration
+        DATAPATH_CONFIG+="$D/elasticsearch/data,"
+    done
+    #Remove the extra trailing comma
+    DATAPATH_CONFIG="${DATAPATH_CONFIG%?}"
+else
+    #If we do not find folders/disks in our data disk mount directory then use the defaults
+    log "Configured data directory does not exist for ${HOSTNAME} using defaults"
+fi
 
-#Get a list of my local IP addresses so we can trim this machines IP out of the discovery list
-MY_IPS=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'`
+#expand_staticip_range "$IP_RANGE"
+
+#S=$(expand_ip_range "$IP_RANGE")
+#HOSTS_CONFIG="[\"${S// /\",\"}\"]"
 
 #Format the static discovery host endpooints for elasticsearch configureion ["",""] format
 HOSTS_CONFIG="[\"${DISCOVERY_ENDPOINTS//-/\",\"}\"]"
@@ -384,6 +410,9 @@ fi
 # DNS Retry
 echo "options timeout:1 attempts:5" >> /etc/resolvconf/resolv.conf.d/head
 resolvconf -u
+
+# Incraese maximum mmap count
+echo "vm.max_map_count = 262144" >> /etc/sysctl.conf
 
 #"action.disable_delete_all_indices: ${DISABLE_DELETE_ALL}" >> /etc/elasticsearch/elasticsearch.yml
 #"action.auto_create_index: ${AUTOCREATE_INDEX}" >> /etc/elasticsearch/elasticsearch.yml

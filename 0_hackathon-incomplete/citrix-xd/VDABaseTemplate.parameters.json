@@ -1,0 +1,63 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "value": ""
+        },
+        "adminPassword": {
+            "value": ""
+        },
+        "numberOfInstances": {
+            "value": 1
+        },
+		"storageAccountNameFromTemplate": {
+		    "value": ""
+		},
+		"subscriptionId" : {
+			"value": "" 
+		},
+        "location": {
+            "value": ""
+        },
+		"existingVnetResourceGroup": {
+		    "value": ""
+		},
+		"existingVnetName": {
+		    "value": ""
+		},
+        "existingSubnetName": {
+            "value": ""
+        },
+        "nicNamePrefix": {
+            "value": ""
+        },
+        "vmNamePrefix": {
+            "value": ""
+        },
+		"availabilitySetName": {
+		    "value": ""
+		},
+		"dnsNamePrefix": {
+		    "value": ""
+		},
+        "passwordRef": {
+            "value": ""
+        },
+        "password": {
+            "value": ""
+        },
+        "dscModulesUrl": {
+            "value": ""
+        },
+        "dscConfigurationFunction": {
+            "value": ""
+        },
+        "dscDomainName": {
+            "value": ""
+        },
+        "dscUsername": {
+            "value": ""
+        },
+    }
+}

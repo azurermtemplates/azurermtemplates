@@ -5,3 +5,14 @@
 </a>
 
 This template allows creates a Windows VM with empty data disk
+
+In the parameters file:
+
+     "vmDiagnosticsStorageAccountResourceGroup":{ 
+         "value" : "diagnosticsResourceGroup" 
+     }, 
+     "vmDiagnosticsStorageAccountName":{ 
+         "value" : "diagnosticsStorageAccount" 
+     }, 
+
+the specified diagnostics storage account must be created in the specified diagnostics resource group.

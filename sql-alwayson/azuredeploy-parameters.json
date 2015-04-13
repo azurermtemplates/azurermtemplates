@@ -1,0 +1,50 @@
+﻿{
+"serviceName": {
+            "type": "string"
+        },
+        "resourceLocation": {
+            "type": "string"
+        },
+        "certificateThumbprint": {
+            "type": "string"
+        },
+        "certificateData": {
+            "type": "string"
+        },
+        "certificatePassword": {
+            "type": "string"
+        },
+        "dcfswSourceImageName": {
+            "type": "string"
+        },
+        "sqlSourceImageName": {
+            "type": "string"
+        },
+        "dcVMSize": {
+            "type": "string"
+        },
+        "sqlVMSize": {
+            "type": "string"
+        },
+        "administratorAccount": {
+            "type": "string"
+        },
+        "administratorPassword": {
+            "type": "string"
+        },
+        "administratorPasswordEncrypted": {
+            "type": "string"
+        },
+        "sqlServiceAccount": {
+            "type": "string"
+        },
+        "sqlServicePasswordEncrypted": {
+            "type": "string"
+        },
+        "domainName": {
+            "type": "string"
+        },
+        "domainNetBiosName": {
+            "type": "string"
+        }
+}

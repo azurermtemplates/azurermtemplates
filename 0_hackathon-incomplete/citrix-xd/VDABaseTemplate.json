@@ -1,0 +1,236 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPassword": {
+            "type": "securestring"
+        },
+        "storageAccountNameFromTemplate": {
+            "type": "string"
+        },
+        "numberOfInstances": {
+            "type": "int",
+            "defaultValue": 2
+        },
+        "subscriptionId": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "West US"
+        },
+		"existingVnetResourceGroup": {
+            "type": "string"
+		},
+		"existingVnetName": {
+            "type": "string"
+		},
+        "existingSubnetName": {
+            "type": "string"
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_A1",
+            "allowedValues": [
+                "Standard_A0",
+                "Standard_A1",
+                "Standard_A2",
+                "Standard_A3",
+                "Standard_A4"
+            ]
+        },
+        "nicNamePrefix" : {
+            "type" : "string"
+        },
+        "vmNamePrefix" : {
+            "type" : "string"
+        },
+        "vmSourceImageName": {
+            "type": "string",
+            "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201412.01-en.us-127GB.vhd"
+        },
+		"availabilitySetName": {
+		    "type": "string",
+		},
+        "publicIPAddressType": {
+            "type": "string",
+            "defaultValue": "Dynamic",
+            "allowedValues": [
+                "Dynamic",
+				"Static"
+            ]
+        },
+		"dnsNamePrefix": {
+		    "type": "string"
+		},
+        "passwordRef": {
+            "type": "string"
+        },
+        "password": {
+            "type": "string"
+        },
+        "dscModulesUrl": {
+            "type": "string"
+        },
+        "dscConfigurationFunction": {
+            "type": "string"
+        },
+        "dscDomainName": {
+            "type": "string"
+        },
+        "dscUsername": {
+            "type": "string"
+        },
+    },
+    "variables": {
+	    "vnetRef": "[concat('/subscriptions/',parameters('subscriptionId'),'/resourceGroups/',parameters('existingVnetResourceGroup'),'/providers/Microsoft.Network/virtualNetworks/',parameters('existingVnetName'))]",
+        "subnetRef": "[concat(variables('vnetRef'),'/subnets/',parameters('existingSubnetName'))]",
+        "sourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('vmSourceImageName'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('storageAccountNameFromTemplate')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "properties": {
+                "accountType": "Standard_LRS"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[parameters('availabilitySetName')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "properties": {}
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[concat(parameters('dnsNamePrefix'), copyindex())]",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "publicIPLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "[parameters('publicIPAddressType')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[concat(parameters('dnsNamePrefix'), copyindex())]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[concat(parameters('nicNamePrefix'), copyindex())]",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "nicLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
+			"dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', parameters('dnsNamePrefix'), copyindex())]",
+			],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnetRef')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(parameters('dnsNamePrefix'), copyindex()))]"
+                            },
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[concat(parameters('vmNamePrefix'), copyindex())]",
+            "location": "[parameters('location')]",
+            "copy": {
+                "name": "virtualMachineLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Network/networkInterfaces/', parameters('nicNamePrefix'), copyindex())]",
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountNameFromTemplate'))]",
+                "[concat('Microsoft.Compute/availabilitySets/', parameters('availabilitySetName'))]",
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets',parameters('availabilitySetName'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computername": "[concat(parameters('vmNamePrefix'), copyIndex())]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "sourceImage": {
+                        "id": "[variables('sourceImageName')]"
+                    },
+                    "destinationVhdsContainer": "[concat('http://',parameters('storageAccountNameFromTemplate'),'.blob.core.windows.net/vhds/')]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('nicNamePrefix'), copyindex()))]"
+                        }
+                    ]
+                }
+            }
+        },
+		 {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('vmNamePrefix'), copyIndex(),'/','dscExtension')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+			"copy": {
+                "name": "extensionLoop",
+                "count": "[parameters('numberOfInstances')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('vmNamePrefix'), copyindex())]"
+            ],
+            "properties": { 
+                "publisher": "Microsoft.Powershell", 
+                "type": "DSC", 
+                "typeHandlerVersion": "1.7", 
+				"protectedSettings" : {
+					"Items" : {
+						"18332aa3-b1e3-4a59-83b6-d9447372835f" : "[parameters('password')]",
+					}
+				},
+                "settings": { 
+                    "ModulesUrl": "[parameters('dscModulesUrl')]", 
+                    "SasToken": "", 
+                    "ConfigurationFunction": "[parameters('dscConfigurationFunction')]", 
+                    "Properties": [
+                        { "Name" : "MachineName", "Value" : "[concat(parameters('vmNamePrefix'), copyindex())]", "TypeName" : "System.String" },
+                        { "Name" : "Domain", "Value" : "[parameters('dscDomainName')]", "TypeName" : "System.String" },
+                        {
+                            "Name" : "DomainCredential",
+                            "Value" : {
+                                "Username" : "[concat(parameters('dscDomainName'),'\\',parameters('dscUsername'))]",
+                                "Password" : "[concat('PrivateSettingsRef:','18332aa3-b1e3-4a59-83b6-d9447372835f')]"},
+							"TypeName" : "System.Management.Automation.PSCredential"
+                        }
+                    ]
+				}
+            }
+        }
+    ]
+}
