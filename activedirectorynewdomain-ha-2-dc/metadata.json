@@ -1,7 +1,0 @@
-{ 
-	"TemplateName": "Create an new AD Forest and Domain with 2 Domain Controllers in an availability set", 
-	"Description": "This template creates two new Azure VMs, with a public IP address, NAT'd RDP ports, load balancer and VNet, it configures two VM to be  AD DCs for a new Forest and Domain", 
-	"ShortDescription": "This template creates 2 Azure VMs with AD", 
-	"GithubUsername": "simongdavies", 
-	"DateUpdated": "2015-04-08" 
-} 
