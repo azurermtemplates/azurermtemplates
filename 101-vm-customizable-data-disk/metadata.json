@@ -1,0 +1,7 @@
+{
+  "itemDisplayName": "Create a VM from a Windows Image with Customizable Data Disk",
+  "description": "This template allows creates a Windows VM with customizable data disk",
+  "summary": "Create a VM from a Windows Image with customizable data disk",
+  "githubUsername": "DarrylvdPeijl",
+  "dateUpdated": "2015-04-11"
+}
