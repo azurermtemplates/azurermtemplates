@@ -1,7 +1,8 @@
 {
 	"$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json#",
 	"contentVersion": "1.0.0.0",
-	"parameters": {
+	"parameters":
+	{
 		"location": {
 			"value": "West US"
 		},
@@ -14,11 +15,17 @@
 		"numberOfVMS": {
 			"value": 3
 		},
+		"serversRole":{
+				"value": "Generic"
+		},
 		"vmSize": {
 			"value": "Standard_A1"
 		},
-		"vmNumberOfDataDisks": {
-			"value": 1
+		"vmImageName": {
+			"value": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-12_04_5_LTS-amd64-server-20150309-en-us-30GB"
+		},
+		"vmFileSystem": {
+			"value": "ext4"
 		},
 		"adminUserName": {
 			"value": ""
@@ -26,16 +33,15 @@
 		"adminPassword": {
 			"value": ""
 		},
-		"sshKeyData" : { 
-             "value": "" 
-         }, 
-
+		"sshKeyData" : {
+       "value": ""
+    },
 		"customScriptConfigStorageAccountName" : {
+        "value": ""
+  	},
+    "customScriptConfigStorageAccountKey" : {
             "value": ""
-        },
-        "customScriptConfigStorageAccountKey" : {
-            "value": ""
-        }
+    }
 
 	}
 }

@@ -22,6 +22,10 @@ sudo su root
 ansible all -m ping
 ```
 
+This template also ilustrates how to use Outputs and Tags.
+ * The template will generate an output with the fqdn of the new public IP so you can easily connect to the Ansible VM.
+ * The template will associate two tags to all the VMS : ServerRole (Webserver,database etc) and ServerEnvironment (DEV,PRE,INT, PRO etc)
+
 Below are the parameters that the template expects
 
 | Name   | Description    |
@@ -34,6 +38,8 @@ Below are the parameters that the template expects
 | vmFileSystem | ext4 or xfs (* For future versions) |
 | createRAID | True or False. Specify true if you want to RAID all the data disks (* For future versions)  |
 | vmSize | Size of VMs |
+| serversRole | Servers role, for instance webtier, database.A tag will be created with the provided value. |
+| serversPurpose | Purpose of the server, for instance DEV, TEST, INT , PRO.A tag () will be created with the provided value . |
 | numberOfVms | Number of VMS |
 | adminUserName | Admin User Name |
 | adminPassword | Admin Password |
