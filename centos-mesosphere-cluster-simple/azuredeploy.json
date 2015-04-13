@@ -60,10 +60,12 @@
             "defaultValue": "https://raw.githubusercontent.com/hausdorff/azurermtemplates/mesos_template/centos-mesosphere-cluster-simple/configure_slave.sh"
         },
         "masterConfigCommand": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "sh configure_master.sh"
         },
         "slaveConfigCommand": {
-            "type": "string"
+            "type": "string",
+            "defaultValue": "sh configure_slave.sh"
         },
         "sshKeyData" : {
             "type" : "string"
