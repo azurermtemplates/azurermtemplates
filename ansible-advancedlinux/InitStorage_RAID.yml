@@ -13,12 +13,18 @@
 
     # CentOS Specific tasks
     - name: Install CentOS packages
-      yum: name=mdadm state=latest
+      yum: name={{ item }} state=latest
+      with_items:
+      - mdadm
+      - xfsprogs
       when: ansible_distribution =="CentOS"
 
     # Ubuntu Specific tasks
     - name: Install Ubuntu packages
-      apt: name=mdadm state=latest
+      apt: name={{ item }} state=latest
+      with_items:
+      - mdadm
+      - xfsprogs
       when: ansible_distribution  == "Ubuntu"
 
     - name: check for RAID device
