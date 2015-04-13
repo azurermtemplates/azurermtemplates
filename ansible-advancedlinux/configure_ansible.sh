@@ -235,7 +235,7 @@ function configure_ssh()
     log "WARNING: This process is not incremental, don't use it if you don't want to lose your existing storage configuration"
     
     # Run ansible template to configure Storage : Create RAID and Configure Filesystem 
-    ansible-playbook InitStorage_RAID.yml  --extra-vars "target=${TEMPLATE_ROLE} file_system=${FILE_SYSTEM}" --list-hosts
+    ansible-playbook InitStorage_RAID.yml  --extra-vars "target=${TEMPLATE_ROLE} file_system=${FILE_SYSTEM}"
     
  }
 

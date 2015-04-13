@@ -1,12 +1,14 @@
 ---
-- name: Create a RAID and Configure Storage 
+# This playbook configures a RAID device with all the available Azure disks
+
+- name: Create a RAID and Configure Storage
   hosts: '{{ target }}'
   vars:
      raid_device: /dev/md0
      system_devices: /dev/sda|/dev/sdb
      raid_mountpoint: /datadrive
   tasks:
-    - fail: msg="Variable file_system was not defined. Specify ext4 or xfs"
+  - fail: msg="Variable file_system was not defined. Specify ext4 or xfs"
       when: file_system is not defined
 
     # CentOS Specific tasks
@@ -55,4 +57,3 @@
         fstype={{ file_system }}
         state=mounted
         opts=defaults,noatime
-
