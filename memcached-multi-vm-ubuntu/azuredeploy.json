@@ -90,7 +90,8 @@
         "subnetDmzRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetDmzName'))]",
         "subnetMemcachedRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetMemcachedName'))]",
         "memcachedMachineNamePrefix": "memcached",
-        "scriptUrl": "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/memcached-multi-vm-ubuntu/"
+        "scriptUrlInstallMemcached": "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/memcached-multi-vm-ubuntu/install_memcached.sh",
+        "scriptUrlInstallApache": "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/memcached-multi-vm-ubuntu/install_apache.sh"
     },
     "resources": [
         {
@@ -281,7 +282,7 @@
                 "typeHandlerVersion": "1.2",
                 "settings": {
                     "fileUris": [
-                        "[concat(variables('scriptUrl'), 'install_memcached.sh')]"
+                        "[variables('scriptUrlInstallMemcached')]"
                     ],
                     "commandToExecute": "[concat('sh install_memcached.sh ', copyindex(), ' ', reference(concat('nicmemcached', copyindex())).ipConfigurations[0].properties.privateIPAddress, ' ', reference('nicapache').ipConfigurations[0].properties.privateIPAddress)]"
                 }
@@ -301,7 +302,7 @@
                 "typeHandlerVersion": "1.2",
                 "settings": {
                     "fileUris": [
-                        "[concat(variables('scriptUrl'), 'install_apache.sh')]"
+                        "[variables('scriptUrlInstallApache')]"
                     ],
                     "commandToExecute": "[concat('sh install_apache.sh ', parameters('numberOfMemcachedInstances'), ' ', parameters('subnetMemcachedPrefix'))]"
                 }
