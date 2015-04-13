@@ -8,18 +8,25 @@
 This advanced template deploys N number of Linux VMs and it configures Ansible so you can easily manage all the VMS using ansible. Don't suffer more pain configuring and managing all your VMs , just use Ansible! Ansible is a very powerful masterless configuration management system based on SSH.
 
 This template  deploys  N number of Storage Account, a Virtual Network, an Availability Sets (up to 3 Fault Domains and up to 20 Update Domains), one private NIC per VM, one public IP ,a Load Balancer and you can specify SSH keys to access your VMS remotely from your latop.
-You will need an additional certificate / public key for the Ansible configuration and they have to be uploaded to a Private storage account.  
+You will need an additional certificate / public key for the Ansible configuration and before executing the template you have upload them to a Private azure storage account.  
 
 The template uses two Custom Scripts  :
--The first script configures SSH keys (public) in all the VMs for the Root user so you can manage the VMS with ansible.
--The second script install ansible on a A1 VM so you can use it as a controller and it also deploys the certificate to /root/.ssh./.
-Before you execute the script, you will need to create a PRIVATE storage account and upload your  certificate and public keys used by ansible, as well as the bash scripts (An alternative for the certificates / keys is to use the KeyVault)
+ * The first script configures SSH keys (public) in all the VMs for the Root user so you can manage the VMS with ansible.
+ * The second script installs ansible on a A1 VM so you can use it as a controller.The script also deploys the provided certificate to /root/.ssh. Then, the script will execute an ansible playbook to create a RAID with all the available disks.
+ * Before you execute the script, you will need to create a PRIVATE storage account and upload your  certificate and public that ansible will use, as well as the bash scripts and ansible Playbooks.
+
+ Once the template finishes, ssh into the AnsibleController VM (by defult the load balancer has a NAT rule using the port 64000), then you can manage your VMS with ansible and the root user. For instance : 
+
+ ```
+sudo su root
+ansible all -m ping
+```
 
 Below are the parameters that the template expects
 
 | Name   | Description    |
 |:--- |:---|
-| location  | Location for all ths services |
+| location  | Region where you want to create all the resources |
 | storageAccountName  | Name of the storage account , the template will also append the name of the resource group |
 | storageAccountType  | Standard_LRS or Premium_LRS |
 | vmNumberOfDataDisks | Number of Data Disk (* For future versions, today a fixed number of 2 disks will be created) |

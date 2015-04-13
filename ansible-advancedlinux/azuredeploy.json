@@ -63,7 +63,7 @@
 			],
 			"defaultValue": "ext4",
 			"metadata": { 
-				"Description": "Linux File systems (For future versions)" 
+				"Description": "Linux File systems" 
 			}
 		},
 		"createRAID": {
@@ -74,7 +74,7 @@
 			],
 			"defaultValue": "true",
 			"metadata": { 
-				"Description": "Specify true if you want to RAID the data disks" 
+				"Description": "Specify true if you want to RAID the data disks (For future versions)" 
 			}
 		},
 
@@ -183,6 +183,13 @@
 			"defaultValue":"customscript/id_rsa.pub",
 			"metadata": { 
 				"Description": "Specify the location of your public key for ansible and SSH configuration" 
+			}
+		},					
+		"ansiblePlaybookLocation":{
+			"type": "string",
+			"defaultValue":"customscript/InitStorage_RAID.yml",
+			"metadata": { 
+				"Description": "Specify the location of the ansible playbook for configuring Storage" 
 			}
 		},			
 
@@ -306,6 +313,7 @@
 		"customScriptSSHRootUrl": "[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/customscript/',variables('customScriptSSHRootFile'))]",		
 		"customScriptSSHRootCommand": "[concat('bash ',variables('customScriptSSHRootFile'))]",		
 		"sshRootPubBlobUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('sshRootPubBlobLocation'))]",				
+		"ansiblePlaybookUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('ansiblePlaybookLocation'))]",				
 		
 		"newVirtualNetworkName": "[concat(parameters('virtualNetworkName'))]",
 		"publicIPName": "[concat(parameters('publicIPName'))]",
@@ -643,8 +651,9 @@
 				"settings": {
 					"fileUris": [
 						"[variables('customScriptAnsibleUrl')]",											
+						"[variables('ansiblePlaybookUrl')]",
 						"[variables('sshRootPubBlobUrl')]",						
-						"[variables('sshRootCerBlobUrl')]"
+						"[variables('sshRootCerBlobUrl')]",
 					],
 					"commandToExecute": "[concat(variables('customScriptAnsibleCommand'),variables('customScriptAnsibleParameters'))]",
 					
