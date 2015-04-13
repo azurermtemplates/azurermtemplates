@@ -1,11 +1,8 @@
 #!/bin/bash
 
 # Script parameters and their defaults
-INSTANCE_COUNT=1
-ENABLE_PERSISTENCE=1
 VERSION="3.0.0"
 CLUSTER_NAME="redis-cluster"
-IP_PREFIX="10.0.0."
 
 ########################################################
 # This script will install Redis from sources
@@ -123,7 +120,7 @@ then
 fi
 
 # Parse script parameters
-while getopts :n:v:p:h:c:p optname; do
+while getopts :n:v:h optname; do
   log "Option $optname set with value ${OPTARG}"
   
   case $optname in
@@ -132,15 +129,6 @@ while getopts :n:v:p:h:c:p optname; do
 		;;
     v)  # Version to be installed
 		VERSION=${OPTARG}
-		;;
-    p)  # Persistence option
-		ENABLE_PERSISTENCE=1
-		;;
-	c) # Number of instances
-		INSTANCE_COUNT=${OPTARG}
-		;;
-	p) # Private IP address prefix
-		IP_PREFIX==${OPTARG}
 		;;
     h)  # Helpful hints
 		help

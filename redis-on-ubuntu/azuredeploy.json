@@ -115,22 +115,26 @@
         "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]",
         "computerNamePrefix": "redisnode_",
         "scriptUrl": "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/redis-on-ubuntu/",
-        "templateUrl": "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/redis-on-ubuntu/",
+        "templateUrl": "[variables('scriptUrl')]",
         "sharedTemplateName": "shared-resources",
         "jumpboxTemplateName": "jumpbox-resources-",
         "tshirtSizeS": {
-            "numberOfInstances": 2,
+            "numberOfInstances": 3,
+			"numberOfSlaves" : 0,
             "vmSize": "Standard_A1"
         },
         "tshirtSizeM": {
-            "numberOfInstances": 4,
+            "numberOfInstances": 6,
+			"numberOfSlaves" : 1,
             "vmSize": "Standard_A2"
         },
         "tshirtSizeL": {
-            "numberOfInstances": 6,
+            "numberOfInstances": 9,
+			"numberOfSlaves" : 2,
             "vmSize": "Standard_A3"
         },
         "numberOfInstances": "[variables(concat('tshirtSize', parameters('tshirtSize'))).numberOfInstances]",
+		"numberOfSlaves": "[variables(concat('tshirtSize', parameters('tshirtSize'))).numberOfSlaves]",
         "vmSize": "[variables(concat('tshirtSize', parameters('tshirtSize'))).vmSize]"
     },
     "resources": [
@@ -307,17 +311,17 @@
                     "fileUris": [
                         "[concat(variables('scriptUrl'), 'redis-cluster-install.sh')]"
                     ],
-                    "commandToExecute": "[concat('bash redis-cluster-install.sh -c INSTALL -n ', parameters('redisClusterName'), ' -v ', parameters('redisVersion'))]"
+                    "commandToExecute": "[concat('bash redis-cluster-install.sh -n ', parameters('redisClusterName'), ' -v ', parameters('redisVersion'))]"
                 }
             }
         },
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat('myvm', '/setupcluster')]",
+            "name": "[concat('myvm0', '/setupcluster')]",
             "apiVersion": "2014-12-01-preview",
             "location": "[parameters('region')]",
             "dependsOn": [
-                "Microsoft.Compute/virtualMachines/extensions/myvm0/installredis"
+                "virtualMachineExtensionsLoop"
             ],
             "properties": {
                 "publisher": "Microsoft.OSTCExtensions",
@@ -325,9 +329,9 @@
                 "typeHandlerVersion": "1.2",
                 "settings": {
                     "fileUris": [
-                        "[concat(variables('scriptUrl'), 'redis-cluster-install.sh')]"
+                        "[concat(variables('scriptUrl'), 'redis-cluster-setup.sh')]"
                     ],
-                    "commandToExecute": "[concat('bash redis-cluster-install.sh -c CLUSTER_SETUP  -c ', variables('numberOfInstances'), ' -p ', parameters('redisNodeIPAddressPrefix'))]"
+                    "commandToExecute": "[concat('bash redis-cluster-setup.sh -c ', variables('numberOfInstances'), '-s ', variables('numberOfSlaves'), ' -p ', parameters('redisNodeIPAddressPrefix'))]"
                 }
             }
         }
