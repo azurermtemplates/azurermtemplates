@@ -3,22 +3,22 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "newStorageAccountName": {
-            "value": "cawadsciis07"
+            "value": "cawadsciis23"
         },
-        "location" : {
-            "value" : "West US"
+        "location": {
+            "value": "West US"
         },
         "dnsName": {
-            "value": "cawaiisdns07"
+            "value": "cawaiisdns23"
         },
         "publicIPAddressName": {
-            "value": "cawaiisIP07"
+            "value": "cawaiisIP23"
         },
         "publicIPAddressType": {
             "value": "Dynamic"
         },
         "vmName": {
-            "value": "cawaiisvm07"
+            "value": "cawaiisvm23"
         },
         "vmSize": {
             "value": "Standard_A2"
@@ -30,13 +30,13 @@
             "value": "test.123"
         },
         "virtualNetworkName": {
-            "value": "cawaiisvnet07"
+            "value": "cawaiisvnet23"
         },
         "subscriptionId": {
             "value": "9de7ded6-0ad3-43e6-87b8-17d93e3ff695"
         },
         "nicName": {
-            "value": "cawaiisNic07"
+            "value": "cawaiisNic23"
         },
         "vmExtensionName": {
             "value": "dscExtension"
@@ -44,20 +44,26 @@
         "modulesUrl": {
             "value": "https://cawadscstrg.blob.core.windows.net/windows-powershell-dsc/ConfigureWebServer.ps1.zip"
         },
+        "webdeploypkg": {
+            "value": "https://github.com/CawaMS/FileShare/releases/download/releasetag/WebApplication3.zip"
+        },
         "sasToken": {
-            "value": "?sv=2014-02-14&sr=c&sig=DAJnDCohNUnP44koqizaHwQN27CZBANSfq%2FYef99wa8%3D&se=2015-04-10T22%3A14%3A00Z&sp=r"
+            "value": "?sv=2014-02-14&sr=c&sig=UbYSuZI51IyEgNnV41C6Ko1XWspYEv864cF6AxXf8j8%3D&se=2015-04-13T04%3A51%3A10Z&sp=r"
         },
         "configurationFunction": {
             "value": "ConfigureWebServer.ps1\\Main"
         },
         "serverName": {
-            "value": "cawadbserver07"
+            "value": "cawadbserver23"
         },
         "serverLocation": {
             "value": "westus"
         },
         "administratorLogin": {
             "value": "dbadmin"
+        },
+        "administratorLoginPassword": { 
+            "value": "test.123"
         },
         "databaseName": {
             "value": "testdb"

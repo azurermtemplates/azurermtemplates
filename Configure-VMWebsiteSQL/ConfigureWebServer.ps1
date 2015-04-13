@@ -2,9 +2,13 @@ Configuration Main
 {
   param (
   $MachineName,
-  $WebDeployPackagePath,
-  $userName,
-  $password
+  $WebDeployPackagePath = "https://github.com/CawaMS/FileShare/releases/download/releasetag/WebApplication3.zip",
+  $UserName,
+  $Password,
+  $DbServerName,
+  $DbName,
+  $DbUserName,
+  $DbPassword
   )
 
   Node ($MachineName)
@@ -88,12 +92,16 @@ Configuration Main
             $false
         }
         SetScript ={
+
 		$WebClient = New-Object -TypeName System.Net.WebClient
-		$source = $WebDeployPackagePath 
-		$destination= "C:\WindowsAzure\WebApplication.zip" 
-		$WebClient.DownloadFile($source,$destination)
-        $argument = '-source:package="C:\WindowsAzure\WebApplication.zip"' + ' -dest:auto,ComputerName="localhost",'+"username=$userName" +",password=$password"+ " -verb:sync -allowUntrusted"
-		Start-Process 'C:\Program Files (x86)\IIS\Microsoft Web Deploy V3\msdeploy.exe' $argument -Verb runas
+		$Destination= "C:\WindowsAzure\WebApplication.zip" 
+		$WebClient.DownloadFile("https://github.com/CawaMS/FileShare/releases/download/releasetag/WebApplication3.zip",$destination)
+        $ConnectionStringName = "DefaultConnection-Web.config Connection String"
+        $ConnectionString = "Server=tcp:"+"$DbServerName"+".database.windows.net;Database="+"$DbName"+";User ID="+"$DbUserName"+";Password="+"$DbPassword"+";Trusted_Connection=False;Encrypt=True"
+        $Argument = '-source:package="C:\WindowsAzure\WebApplication.zip"' + ' -dest:auto,ComputerName="localhost",'+"username=$UserName" +",password=$Password" + ' -setParam:name="' + "$ConnectionStringName" + '"'+',value="' + "$ConnectionString" + '" -verb:sync -allowUntrusted'
+		$MSDeployPath = (Get-ChildItem "HKLM:\SOFTWARE\Microsoft\IIS Extensions\MSDeploy" | Select -Last 1).GetValue("InstallPath")
+        Start-Process "$MSDeployPath\msdeploy.exe" $Argument -Verb runas
+        
         }
 
 	}
