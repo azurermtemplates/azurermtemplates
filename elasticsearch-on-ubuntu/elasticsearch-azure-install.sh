@@ -20,7 +20,7 @@ help()
     echo "This script installs Elasticsearch cluster on Ubuntu"
     echo "Parameters:"
     echo "-n elasticsearch cluster name"
-    echo "-d static discovery endpoints 10.0.0.2-10.0.0.3-10.0.0.4"
+    echo "-d static discovery endpoints 10.0.0.1-3"
     echo "-v elasticsearch version 1.5.0"
     echo "-l install marvel yes/no"
     echo "-x configure as a dedicated master node"
@@ -359,11 +359,11 @@ fi
 
 #expand_staticip_range "$IP_RANGE"
 
-#S=$(expand_ip_range "$IP_RANGE")
-#HOSTS_CONFIG="[\"${S// /\",\"}\"]"
+S=$(expand_ip_range "$IP_RANGE")
+HOSTS_CONFIG="[\"${S// /\",\"}\"]"
 
 #Format the static discovery host endpooints for elasticsearch configureion ["",""] format
-HOSTS_CONFIG="[\"${DISCOVERY_ENDPOINTS//-/\",\"}\"]"
+#HOSTS_CONFIG="[\"${DISCOVERY_ENDPOINTS//-/\",\"}\"]"
 
 #Configure Elasticsearch settings
 #---------------------------
