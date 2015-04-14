@@ -158,7 +158,7 @@
       }
     },
     "dataNodeAvailabilitySetName": "dataNodeAvailabilitySet",
-    "templateBaseUrl": "https://raw.githubusercontent.com/trentmswanson/azurermtemplates/master/elasticsearch-on-ubuntu-big/",
+    "templateBaseUrl": "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/elasticsearch-on-ubuntu-big/",
     "sharedTemplateUrl": "[concat(variables('templateBaseUrl'), 'shared-resources.json')]",
     "masterTemplateUrl": "[concat(variables('templateBaseUrl'), 'master-nodes-resources.json')]",
     "clientTemplateUrl": "[concat(variables('templateBaseUrl'), 'client-nodes-resources.json')]",

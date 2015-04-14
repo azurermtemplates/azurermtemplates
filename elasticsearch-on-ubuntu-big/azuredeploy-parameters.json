@@ -1,9 +1,9 @@
 {
     "dnsNameforLBIP": {
-        "value":"trent7"
+        "value":""
     },
     "storageAccountPrefix" : {
-        "value":"trent7"
+        "value":""
     },
     "adminUsername": {
         "value": "trent"
@@ -21,7 +21,7 @@
         "value": "West US"
     },
     "virtualNetworkName": {
-        "value": "trentVnet"
+        "value": "fs180VNet"
     },
     "esClusterName": {
         "value": "elasticsearch-fullscale"
