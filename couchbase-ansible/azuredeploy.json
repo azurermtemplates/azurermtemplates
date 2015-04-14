@@ -1,0 +1,848 @@
+{
+
+	"$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
+	"contentVersion": "1.0.0.0",
+
+	"parameters": {
+		"location": {
+			"type": "string",
+			"defaultValue": "West US",
+			"allowedValues": [
+				"West US",
+				"North Europe"
+			],
+			"metadata": {
+				"Description": "Region where you want to create all the resources"
+			}
+		},
+
+		"storageAccountName": {
+			"type": "string",
+			"defaultValue":"cbastg",
+			"metadata": {
+				"Description": "Storage account name pattern.The template will use this value and the resource group name for all the storage accounts."
+			}
+		},
+		"storageAccountType": {
+			"type": "string",
+			"defaultValue": "Standard_LRS",
+			"allowedValues": [
+				"Standard_LRS",
+				"Premium_LRS"
+			],
+			"metadata": {
+				"Description": "Type of storage account. Standard_LRS or Premium_LRS"
+			}
+		},
+		"vmStorageAccountContainerName": {
+			"type": "string",
+			"defaultValue": "cbavhds",
+			"metadata": {
+				"Description": "Container name in which you want to place the vhds"
+			}
+		},
+		"vmNumberOfDataDisks": {
+			"type": "int",
+			"defaultValue": 3,
+			"metadata": {
+				"Description": "Number of data disks (For future versions, currently 2 disks will be created)"
+			}
+		},
+		"vmSizeDataDisks": {
+			"type": "int",
+			"defaultValue": 120,
+			"metadata": {
+				"Description": "Data disks Size in GBs"
+			}
+		},
+		"vmFileSystem": {
+			"type": "string",
+			"allowedValues": [
+				"ext4",
+				"xfs"
+			],
+			"defaultValue": "ext4",
+			"metadata": {
+				"Description": "Linux File systems"
+			}
+		},
+		"createRAID": {
+			"type": "string",
+			"allowedValues": [
+				"true",
+				"false"
+			],
+			"defaultValue": "true",
+			"metadata": {
+				"Description": "Specify true if you want to RAID the data disks (For future versions)"
+			}
+		},
+		"availabilitySetName": {
+			"type": "string",
+			"defaultValue": "CbAvSet",
+			"metadata": {
+				"Description": "AvailabilitySet name"
+			}
+		},
+		"vmName": {
+			"type": "string",
+			"defaultValue": "VMCba",
+			"metadata": {
+				"Description": "VM Name Pattern; which it wil be concatenated with an incremental number"
+			}
+		},
+		"vmSize": {
+			"type": "string",
+			"defaultValue": "Standard_D2",
+			"allowedValues": [
+				"Standard_D2",
+				"Standard_D3",
+				"Standard_D4",
+				"Standard_D11",
+				"Standard_D12",
+				"Standard_D13",
+				"Standard_D14"
+			],
+			"metadata": {
+				"Description": "VM Size"
+			}
+		},
+		"serversRole": {
+			"type": "string",
+			"metadata": {
+				"Description": "Servers role, for instance webtier, database.A tag will be created with the provided value"
+			}
+		},
+		"serversPurpose": {
+			"type": "string",
+			"defaultValue": "DEV",
+			"metadata": {
+				"Description": "Servers purpose, for instance development, test, pre-production, production.A tag will be created with the provided value"
+			}
+		},
+		"vmImageName": {
+			"type": "string",
+			"defaultValue": "5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-65-20150325",
+			"allowedValues": [
+				"5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-65-20150325",
+				"5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-66-20150128",
+				"b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-12_04_5_LTS-amd64-server-20150309-en-us-30GB",
+				"b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB"
+				],
+			"metadata": {
+				"Description": "Imange Name. Currently only CentOS 6.5 have been fully supported. Future versions will include CentOS 6.6 and Ubuntu "
+			}
+		},
+
+		"numberOfVms": {
+			"type": "int",
+			"defaultValue": 3,
+			"metadata": {
+				"Description": "Number of VMs.The template will create N number of identical VMs"
+			}
+		},
+		"adminUserName": {
+			"type": "string",
+			"metadata": {
+				"Description": "Admin user name"
+			}
+		},
+		"adminPassword": {
+			"type": "string",
+			"metadata": {
+				"Description": "Admin password"
+			}
+		},
+		"sshKeyData": {
+			"type": "string",
+			"metadata": {
+				"Description": "ssh public key for the admin user"
+			}
+		},
+		"faultDomainCount": {
+			"type": "int",
+			"defaultValue": 3,
+			"metadata": {
+				"Description": "Number of fault domains (Maximun supported value is 3)"
+			}
+		},
+		"updateDomainCount": {
+			"type": "int",
+			"defaultValue": 10,
+			"metadata": {
+				"Description": "Number of update domains (Maximun supported value is 20)"
+			}
+		},
+		"customScriptConfigStorageAccountName":{
+			"type": "string",
+			"metadata": {
+				"Description": "Private storage account name in which you are storing your certificates for ansible and the template bash scripts"
+				}
+		},
+		"customScriptConfigStorageAccountKey":{
+			"type": "string",
+			"metadata": {
+				"Description": "Private storage account key"
+				}
+		},
+		"sshRootCerBlobLocation":{
+			"type": "string",
+			"defaultValue":"customscript/id_rsa",
+			"metadata": {
+				"Description": "Specify the location of your certificate for ansible and SSH configuration"
+			}
+
+		},
+		"sshRootPubBlobLocation":{
+			"type": "string",
+			"defaultValue":"customscript/id_rsa.pub",
+			"metadata": {
+				"Description": "Specify the location of your public key for ansible and SSH configuration"
+			}
+		},
+		"ansiblePlaybookLocation":{
+			"type": "string",
+			"defaultValue":"customscript/InitStorage_RAID.yml",
+			"metadata": {
+				"Description": "Specify the location of the ansible playbook for configuring Storage"
+			}
+		},
+		"couchbasePlaybookLocation":{
+			"type": "string",
+			"defaultValue":"customscript/couchbase_setup.yml",
+			"metadata": {
+				"Description": "Specify the location of the ansible playbook for installing and initialse Couchbase"
+			}
+		},
+		"couchbaseAdminUser":{
+			"type": "string",			
+			"metadata": {
+				"Description": "Specify the Couchbase Admin User"
+			}
+		},
+		"couchbaseAdminPassword":{
+			"type": "string",			
+			"metadata": {
+				"Description": "Specify the Couchbase Admin Password"
+			}
+		},
+		"virtualNetworkName": {
+			"type": "string",
+			"defaultValue": "vnetCBA",
+			"metadata": {
+				"Description": "Virtual network name"
+			}
+		},
+		"addressPrefix": {
+			"type": "string",
+			"defaultValue": "10.0.0.0/16",
+			"metadata": {
+				"Description": "IP address space "
+			}
+		},
+		"subnet1Name": {
+			"type": "string",
+			"defaultValue": "FrontEnd",
+			"metadata": {
+				"Description": "Frontend subnet name "
+			}
+		},
+		"subnet2Name": {
+			"type": "string",
+			"defaultValue": "Backend",
+			"metadata": {
+				"Description": "Backend subnet name"
+			}
+		},
+		"subnet1Prefix": {
+			"type": "string",
+			"defaultValue": "10.0.1.0/24",
+			"metadata": {
+				"Description": "Frontend address space"
+			}
+		},
+		"subnet2Prefix": {
+			"type": "string",
+			"defaultValue": "10.0.2.0/24",
+			"metadata": {
+				"Description": "Backend address space"
+			}
+		},
+		"publicIPName": {
+			"type": "string",
+			"defaultValue": "VIPCBA",
+			"metadata": {
+				"Description": "Public IP name"
+			}
+		},
+		"publicIPType": {
+			"type": "string",
+			"defaultValue": "Dynamic",
+			"allowedValues": [
+				"Dynamic",
+				"Static"
+			],
+			"metadata": {
+				"Description": "Public IP Type (For future versions, currently only Dynamic is supported)"
+			}
+		},
+		"VMIPAddressStart": {
+			"type": "string",
+			"defaultValue": "10.0.2.2",
+			"metadata": {
+				"Description": "IPs that will be allocated to VMs.For instance, if you use 10.0.2.2, the first VM will use 10.0.2.20 and the second one 10.02.21 (Azure Reserves the first 4 IPs in a range)"
+			}
+		},
+		"vmNICNamePattern": {
+			"type": "string",
+			"defaultValue": "NicVmCba",
+			"metadata": {
+				"Description": "NIC name pattern"
+			}
+		},
+		"dnsNameLabel": {
+			"type": "string",
+			"metadata": {
+				"Description": "Public facing DNS name"
+			}
+		},
+		"loadBalancerName": {
+			"type": "string",
+			"defaultValue": "CouchbaseLB",
+			"metadata": {
+				"Description": "Load balance name"
+			}
+		},
+		"sshNatRuleFrontEndPort": {
+			"type": "string",
+			"defaultValue": "6400",
+			"metadata": {
+				"Description": "SSH Nat frontend port range"
+			}
+		},
+		"sshNatRuleBackEndPort": {
+			"type": "int",
+			"defaultValue": 22,
+			"metadata": {
+				"Description": "SSH Private port"
+			}
+		}
+	},
+
+
+	"variables": {
+
+		"vmSourceImageRef": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('vmImageName'))]",
+		"sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+
+		"customScriptAnsibleFile" :"couchbase_ansible.sh",
+		"customScriptAnsibleUrl": "[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/customscript/',variables('customScriptAnsibleFile'))]",
+		"customScriptAnsibleCommand": "[concat('bash ',variables('customScriptAnsibleFile'))]",
+		"customScriptAnsibleParameters": "[concat(' -i ',parameters('VMIPAddressStart'),' -n ',parameters('numberOfVms'),' -r ',parameters('createRAID'),' -f ',parameters('vmFileSystem'),' -u ',parameters('couchbaseAdminUser'),' -p ',parameters('couchbaseAdminPassword'))]",
+		"sshRootCerBlobUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('sshRootCerBlobLocation'))]",
+
+		"customScriptSSHRootFile" :"configure_ssh_root.sh",
+		"customScriptSSHRootUrl": "[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/customscript/',variables('customScriptSSHRootFile'))]",
+		"customScriptSSHRootCommand": "[concat('bash ',variables('customScriptSSHRootFile'))]",
+		"sshRootPubBlobUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('sshRootPubBlobLocation'))]",
+		"ansiblePlaybookUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('ansiblePlaybookLocation'))]",
+		"couchbasePlaybookUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('couchbasePlaybookLocation'))]",
+
+		"newVirtualNetworkName": "[concat(parameters('virtualNetworkName'))]",
+		"publicIPName": "[concat(parameters('publicIPName'))]",
+		"publicIPRef": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPName'))]",
+		"NICipconfig": "ipCnfgBE",
+		"NICRef": "[resourceId('Microsoft.Network/networkInterfaces',parameters('vmNICNamePattern'))]",
+		"DNSNameLB": "[concat(parameters('dnsNameLabel'))]",
+		"vnetRef": "[resourceId('Microsoft.Network/virtualNetworks',variables('newVirtualNetworkName'))]",
+		"subnetBackEndRef": "[concat(variables('vnetRef'),'/subnets/',parameters('subnet2Name'))]",
+		"FrontEndRef": "[concat(variables('vnetRef'),'/subnets/',parameters('subnet1Name'))]",
+
+		"loadBalancerRef": "[resourceId('Microsoft.Network/loadBalancers',parameters('loadBalancerName'))]",
+		"lbRuleName": "lbRuleCbAdmin",
+		"lbRuleRef": "[concat(variables('loadBalancerRef'),'/loadBalancingRules/',variables('lbRuleName'))]",
+		"lbFEConfig": "PLBcbaFrontConfg",
+		"lbFEConfigRef": "[concat(variables('loadBalancerRef'),'/frontendIPConfigurations/',variables('lbFEConfig'))]",
+		"lbBEConfig": "[concat('LBBEcbaFrontConfg')]",
+		"lbBEConfigRef": "[concat(variables('loadBalancerRef'),'/backendAddressPools/' ,variables('lbBEConfig'))]",
+		"lbcbaProbe": "[concat('cbaLBProbe')]",
+		"lbcbaProbeRef": "[concat(variables('loadBalancerRef'),'/probes/',variables('lbcbaProbe'))]",
+		"lbcbaPort": 8092,
+		"lbcbaAdminPort": 8091,
+		"lbcbaDataAcccessPort": 11211,
+		"lbcbaIdleTimeOut": 4,
+
+		"storageAccountName": "[concat(resourceGroup().name,parameters('storageAccountName'))]",
+		"storageRef": "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
+	},
+
+
+	"resources": [
+		{
+			"apiVersion": "2014-12-01-preview",
+			"type": "Microsoft.Network/virtualNetworks",
+			"name": "[variables('newVirtualNetworkName')]",
+			"location": "[parameters('location')]",
+			"properties": {
+				"addressSpace": {
+					"addressPrefixes": [
+						"[parameters('addressPrefix')]"
+					]
+				},
+				"subnets": [
+					{
+						"name": "[parameters('subnet1Name')]",
+						"properties": {
+							"addressPrefix": "[parameters('subnet1Prefix')]"
+						}
+					},
+					{
+						"name": "[parameters('subnet2Name')]",
+						"properties": {
+							"addressPrefix": "[parameters('subnet2Prefix')]"
+						}
+					}
+				]
+			}
+		},
+
+
+		{
+			"apiVersion": "2014-12-01-preview",
+			"type": "Microsoft.Network/publicIPAddresses",
+			"name": "[variables('publicIPName')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[variables('vnetRef')]"
+
+			],
+			"properties": {
+				"publicIPAllocationMethod": "[parameters('publicIPType')]",
+				"dnsSettings": {
+					"domainNameLabel": "[variables('DNSNameLB')]"
+				}
+			}
+		},
+
+
+		{
+			"type": "Microsoft.Compute/availabilitySets",
+			"name": "[parameters('availabilitySetName')]",
+			"apiVersion": "2014-12-01-preview",
+			"location": "[parameters('location')]",
+			"properties": {
+					"PlatformFaultDomainCount":"[parameters('faultDomainCount')]",
+                    "PlatformUpdateDomainCount":"[parameters('updateDomainCount')]"
+
+			}
+		},
+
+
+		{
+			"type": "Microsoft.Storage/storageAccounts",
+			"name": "[concat(variables('storageAccountName'),copyIndex())]",
+			"apiVersion": "2014-12-01-preview",
+			"location": "[parameters('location')]",
+			"copy": {
+				"name": "StorageAccountsLoop",
+				"count": "[parameters('numberOfVms')]"
+			},
+			"properties": {
+				"accountType": "[parameters('storageAccountType')]"
+			}
+		},
+
+
+		{
+			"apiVersion": "2014-12-01-preview",
+			"type": "Microsoft.Network/networkInterfaces",
+			"name": "[concat(parameters('vmNICNamePattern'),copyIndex())]",
+			"location": "[parameters('location')]",
+			"copy": {
+				"name": "NICSLoop",
+				"count": "[parameters('numberOfVMS')]"
+			},
+			"dependsOn": [
+				"[variables('vnetRef')]"
+
+			],
+			"properties": {
+				"ipConfigurations": [
+					{
+						"name": "[variables('NICipconfig')]",
+						"properties": {
+							"privateIPAllocationMethod": "Static ",
+							"privateIPAddress": "[concat(parameters('VMIPAddressStart'),copyindex())]",
+							"subnet": {
+								"id": "[variables('subnetBackEndRef')]"
+							}
+						}
+
+					}
+				]
+			}
+		},
+
+
+		{
+			"apiVersion": "2014-12-01-preview",
+			"type": "Microsoft.Compute/virtualMachines",
+			"name": "[concat(parameters('vmName'),copyIndex())]",
+			"location": "[parameters('location')]",
+			"tags": {
+				"ServerRole": "[parameters('serversRole')]",
+				"ServerEnvironment" :"[parameters('serversPurpose')]"
+				},
+			"copy": {
+				"name": "VMsLoop",
+				"count": "[parameters('numberOfVms')]"
+			},
+			"dependsOn": [
+				"[concat(variables('storageRef'),copyIndex())]",
+				"[concat(variables('NICRef'),copyIndex())]",
+				"[concat('Microsoft.Compute/availabilitySets/', parameters('availabilitySetName'))]",
+			],
+			"properties": {
+				"availabilitySet": {
+					"id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySetName'))]"
+				},
+				"hardwareProfile": {
+					"vmSize": "[parameters('vmSize')]"
+				},
+				"osProfile": {
+					"computername": "[concat(parameters('vmName'),copyIndex())]",
+					"adminUsername": "[parameters('adminUserName')]",
+					"adminPassword": "[parameters('adminPassword')]",
+					"linuxConfiguration": {
+						"disablePasswordAuthentication": "false",
+						"ssh": {
+							"publicKeys": [
+								{
+									"path": "[variables('sshKeyPath')]",
+									"keyData": "[parameters('sshKeyData')]"
+								}
+							]
+						}
+					}
+				},
+				"storageProfile": {
+					"sourceImage": {
+						"id": "[variables('vmSourceImageRef')]"
+					},
+					"destinationVhdsContainer": "[concat('http://',variables('storageAccountName'),copyIndex(),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/')]",
+					"dataDisks": [
+						{
+							"name": "[concat(parameters('vmName'),copyIndex(), 'Data_1')]",
+							"diskSizeGB": "[parameters('vmSizeDataDisks')]",
+							"lun": 0,
+							"vhd": {
+								"Uri": "[concat('http://',variables('storageAccountName'),copyIndex(),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/Data_1.vhd')]"
+							}
+						},
+						{
+							"name": "[concat(parameters('vmName'),copyIndex(), 'Data_2')]",
+							"diskSizeGB": "[parameters('vmSizeDataDisks')]",
+							"lun": 1,
+							"vhd": {
+								"Uri": "[concat('http://',variables('storageAccountName'),copyIndex(),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/Data_2.vhd')]"
+							}
+						},
+						{
+							"name": "[concat(parameters('vmName'),copyIndex(), 'Data_3')]",
+							"diskSizeGB": "[parameters('vmSizeDataDisks')]",
+							"lun": 2,
+							"vhd": {
+								"Uri": "[concat('http://',variables('storageAccountName'),copyIndex(),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/Data_3.vhd')]"
+							}
+						},
+						{
+							"name": "[concat(parameters('vmName'),copyIndex(), 'Data_4')]",
+							"diskSizeGB": "[parameters('vmSizeDataDisks')]",
+							"lun": 3,
+							"vhd": {
+								"Uri": "[concat('http://',variables('storageAccountName'),copyIndex(),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/Data_4.vhd')]"
+							}
+						}
+					]
+				},
+				"networkProfile": {
+					"networkInterfaces": [
+						{
+							"id": "[concat(variables('NICRef'),copyIndex())]"
+						}
+					]
+				}
+			}
+		},
+
+
+		{
+			"type": "Microsoft.Compute/virtualMachines/extensions",
+			"name": "[concat(parameters('vmName'),copyIndex(),'/configuressh')]",
+			"apiVersion": "2014-12-01-preview",
+			"location": "[parameters('location')]",
+			"copy": {
+				"name": "VMExtensionsLoop",
+				"count": "[parameters('numberOfVms')]"
+			},
+			"dependsOn": [
+				"VMsLoop"
+			],
+			"properties": {
+				"publisher": "Microsoft.OSTCExtensions",
+				"type": "CustomScriptForLinux",
+				"typeHandlerVersion": "1.2",
+				"settings": {
+					"fileUris": [
+						"[variables('customScriptSSHRootUrl')]",
+						"[variables('sshRootPubBlobUrl')]"
+					],
+					"commandToExecute": "[variables('customScriptSSHRootCommand')]",
+
+				},
+				"protectedSettings":{
+					"storageAccountName":"[parameters('customScriptConfigStorageAccountName')]",
+					"storageAccountKey":"[parameters('customScriptConfigStorageAccountKey')]"
+				}
+			}
+		},
+
+
+		{
+			"apiVersion": "2014-12-01-preview",
+			"type": "Microsoft.Network/networkInterfaces",
+			"name": "NICAnsibleController",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[variables('vnetRef')]"
+			],
+			"properties": {
+				"ipConfigurations": [
+					{
+						"name": "[variables('NICipconfig')]",
+						"properties": {
+							"privateIPAllocationMethod": "Static",
+							"privateIPAddress": "[concat(parameters('VMIPAddressStart'),parameters('numberOfVms'))]",
+							"subnet": {
+								"id": "[variables('subnetBackEndRef')]"
+							}
+						}
+
+					}
+				]
+			}
+		},
+
+
+		{
+			"apiVersion": "2014-12-01-preview",
+			"type": "Microsoft.Compute/virtualMachines",
+			"name": "AnsibleController",
+			"location": "[parameters('location')]",
+			"tags": {
+				"ServerRole": "AnsibleController",
+				"ServerEnvironment" :"[parameters('serversPurpose')]"
+				},
+			"dependsOn": [
+				"[concat(variables('storageRef'),'0')]",
+				"[resourceId('Microsoft.Network/networkInterfaces','NICAnsibleController')]",
+				"[concat('Microsoft.Compute/availabilitySets/', parameters('availabilitySetName'))]",
+				"VMsLoop"
+			],
+			"properties": {
+				"availabilitySet": {
+					"id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySetName'))]"
+				},
+				"hardwareProfile": {
+					"vmSize": "Standard_A1"
+				},
+				"osProfile": {
+					"computername": "AnsibleController",
+					"adminUsername": "[parameters('adminUserName')]",
+					"adminPassword": "[parameters('adminPassword')]",
+					"linuxConfiguration": {
+						"disablePasswordAuthentication": "false",
+						"ssh": {
+							"publicKeys": [
+								{
+									"path": "[variables('sshKeyPath')]",
+									"keyData": "[parameters('sshKeyData')]"
+								}
+							]
+						}
+					}
+				},
+				"storageProfile": {
+					"sourceImage": {
+						"id": "[variables('vmSourceImageRef')]"
+					},
+					"destinationVhdsContainer": "[concat('http://',variables('storageAccountName'),'0.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/')]",
+					"dataDisks": [
+					]
+				},
+				"networkProfile": {
+					"networkInterfaces": [
+						{
+							"id": "[resourceId('Microsoft.Network/networkInterfaces','NICAnsibleController')]"
+						}
+					]
+				}
+			}
+		},
+
+
+		{
+			"type": "Microsoft.Compute/virtualMachines/extensions",
+			"name": "AnsibleController/installansible",
+			"apiVersion": "2014-12-01-preview",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"Microsoft.Compute/virtualMachines/AnsibleController"
+			],
+			"properties": {
+				"publisher": "Microsoft.OSTCExtensions",
+				"type": "CustomScriptForLinux",
+				"typeHandlerVersion": "1.2",
+				"settings": {
+					"fileUris": [
+						"[variables('customScriptAnsibleUrl')]",
+						"[variables('ansiblePlaybookUrl')]",
+						"[variables('couchbasePlaybookUrl')]",
+						"[variables('sshRootPubBlobUrl')]",
+						"[variables('sshRootCerBlobUrl')]",
+					],
+					"commandToExecute": "[concat(variables('customScriptAnsibleCommand'),variables('customScriptAnsibleParameters'))]",
+
+				},
+				"protectedSettings":{
+					"storageAccountName":"[parameters('customScriptConfigStorageAccountName')]",
+					"storageAccountKey":"[parameters('customScriptConfigStorageAccountKey')]"
+				}
+			}
+		},
+
+
+		{
+			"apiVersion": "2014-12-01-preview",
+			"type": "Microsoft.Network/loadBalancers",
+			"name": "[parameters('loadBalancerName')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[variables('publicIPRef')]",
+				"VMsLoop",
+				"[resourceId('Microsoft.Compute/virtualMachines','AnsibleController')]"
+
+			],
+			"properties": {
+				"frontendIPConfigurations": [
+					{
+						"name": "[variables('lbFEConfig')]",
+						"properties": {
+							"publicIPAddress": {
+								"id": "[variables('publicIPRef')]"
+							}
+						}
+					}
+				],
+				"backendAddressPools": [
+					{
+						"name": "[variables('lbBEConfig')]",
+						"properties": {
+							"loadBalancingRules": [
+								{
+									"id": "[variables('lbRuleRef')]"
+								}
+							],
+							"backendIPConfigurations": [
+								{
+									"id": "[concat(variables('NICRef'),'0/ipConfigurations/',variables('NICipconfig'))]"
+								},
+								{
+									"id": "[concat(variables('NICRef'),'1/ipConfigurations/',variables('NICipconfig'))]"
+								}
+							]
+						}
+					}
+				],
+				"probes": [
+					{
+						"name": "[variables('lbcbaProbe')]",
+						"properties": {
+							"protocol": "tcp",
+							"port": "[variables('lbcbaPort')]",
+							"intervalInSeconds": "5",
+							"numberOfProbes": "3"
+						}
+					}
+				],
+				"loadBalancingRules": [
+					{
+						"name": "[variables('lbRuleName')]",
+						"properties": {
+							"frontendIPConfigurations": [
+								{
+									"id": "[variables('lbFEConfigRef')]"
+								}
+							],
+							"backendAddressPool": {
+								"id": "[variables('lbBEConfigRef')]"
+							},
+							"protocol": "tcp",
+							"frontendPort": "[variables('lbcbaAdminPort')]",
+							"backendPort": "[variables('lbcbaAdminPort')]",
+							"enableFloatingIP": false,
+							"idleTimeoutInMinutes": "[ variables('lbcbaIdleTimeOut')]",
+							"probe": {
+								"id": "[variables('lbcbaProbeRef')]"
+							}
+						}
+					}
+				],
+				"inboundNatRules": [
+					{
+						"name": "sshToAnsibleControllerRule",
+						"properties": {
+							"frontendIPConfigurations": [
+								{
+									"id": "[variables('lbFEConfigRef')]"
+								}
+							],
+							"backendIPConfiguration": {
+								"id": "[concat(resourceId('Microsoft.Network/networkInterfaces','NICAnsibleController'),'/ipConfigurations/',variables('NICipconfig'))]"
+							},
+							"protocol": "tcp",
+							"frontendPort": "[concat(parameters('sshNatRuleFrontEndPort'),'0')]",
+							"backendPort": "[parameters('sshNatRuleBackEndPort')]",
+							"enableFloatingIP": false
+						}
+					},
+					{
+						"name": "sshToVM1NatRule",
+						"properties": {
+							"frontendIPConfigurations": [
+								{
+									"id": "[variables('lbFEConfigRef')]"
+								}
+							],
+							"backendIPConfiguration": {
+								"id": "[concat(variables('NICRef'),'0/ipConfigurations/',variables('NICipconfig'))]"
+							},
+							"protocol": "tcp",
+							"frontendPort": "[concat(parameters('sshNatRuleFrontEndPort'),'1')]",
+							"backendPort": "[parameters('sshNatRuleBackEndPort')]",
+							"enableFloatingIP": false
+						}
+					}
+				]
+			}
+		}
+	],
+
+	"outputs":
+	{
+		"sshResourceURL":{
+				"value":"[concat('SSH Url to Ansible Controller:',parameters('adminUserName'),'@', reference(variables('publicIPRef'),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).dnsSettings.fqdn,' -p ',parameters('sshNatRuleFrontEndPort'))]",
+				"type":"string"
+		}
+	}
+}

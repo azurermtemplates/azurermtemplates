@@ -1,0 +1,61 @@
+---
+
+# Ansible playbook to install and initiliaze Couchbase Server on cluster nodes 
+
+- hosts: couchbase
+  sudo: True
+  vars_files:
+    - ../vars/{{ ansible_os_family }}.yml
+  roles:
+    - couchbase.couchbase-server
+  tasks:
+  - name: Couchbase Server Service
+    service: name=couchbase-server state=started
+
+# Initialize Couchbase after installation
+
+- hosts: couchbase
+  sudo: True
+  tasks:
+  - name: Create cluster grouping
+    group_by: key={{ node_role }}
+
+- hosts: cluster_nodes
+  sudo: True
+  roles:
+    - couchbase.couchbase-server
+  tasks:
+  - name: Couchbase Server Service
+    service: name=couchbase-server state=started
+
+- hosts: primary
+  sudo: True
+  vars_files:
+    - ../defaults/main.yml
+  vars:
+    couchbase_server_primary_node: "{{hostvars[groups['primary'][0]]['inventory_hostname']}}"
+  tasks:
+
+  - name: Get major version
+    shell: cat /opt/couchbase/VERSION.txt | cut -d '.' -f1
+    register: cb_major_version
+
+  - name: Wait for nodes
+    wait_for: port=8091 delay=7
+
+  - name: Configure cluster settings
+    shell: "{{ couchbase_server_home_path }}/bin/couchbase-cli cluster-init -c {{ couchbase_server_primary_node }}:{{ couchbase_server_admin_port }} --user={{ couchbase_server_admin }} --password={{ couchbase_server_password }} --cluster-init-username={{ couchbase_server_admin }} --cluster-init-password={{ couchbase_server_password }} --cluster-init-port={{couchbase_server_admin_port}} --cluster-init-ramsize={{ couchbase_server_ram }}"
+
+  - name: Initialize primary node
+    shell: "{{ couchbase_server_home_path }}/bin/couchbase-cli node-init -c {{ couchbase_server_primary_node }}:{{ couchbase_server_admin_port }} --user={{ couchbase_server_admin }} --password={{ couchbase_server_password }} --cluster-init-username={{ couchbase_server_admin }} --node-init-hostname={{ couchbase_server_primary_node }}"
+    when: "{{ cb_major_version['stdout'] }} != 2"
+
+  - name: Join additional cluster nodes
+    shell: "{{ couchbase_server_home_path }}/bin/couchbase-cli server-add -c {{ couchbase_server_primary_node }}:{{ couchbase_server_admin_port }} --user={{ couchbase_server_admin }} --password={{ couchbase_server_password }} --server-add={{hostvars[[item][0]]['inventory_hostname']}}:{{ couchbase_server_admin_port }} --server-add-username={{ couchbase_server_admin }} --server-add-password={{ couchbase_server_password }}"
+    with_items: groups['additional']
+
+  - name: Rebalance cluster
+    shell: "{{ couchbase_server_home_path }}/bin/couchbase-cli rebalance -c {{ couchbase_server_primary_node }}:{{ couchbase_server_admin_port }} --user={{ couchbase_server_admin }} --password={{ couchbase_server_password }}"
+
+  - name: Create new bucket
+    shell: "{{ couchbase_server_home_path }}/bin/couchbase-cli bucket-create -c {{ couchbase_server_primary_node }}:{{ couchbase_server_admin_port }} --user={{ couchbase_server_admin }} --password={{ couchbase_server_password }} --bucket={{ couchbase_server_bucket_name }} --bucket-type={{ couchbase_server_bucket_type }} --bucket-port={{ couchbase_server_bucket_port }} --bucket-ramsize={{ couchbase_server_bucket_ram }} --bucket-replica={{ couchbase_server_bucket_replica }}"
