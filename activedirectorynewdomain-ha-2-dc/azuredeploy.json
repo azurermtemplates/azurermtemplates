@@ -185,14 +185,7 @@
 			},
 			"defaultValue":"adarmtest"
 		},
-		"adPDCModulesURL":{
-			"type":"string",
-			"metadata": {
-				"Description": "The URL to the zip containing the DSC package that creates and installs AD"
-			},
-			"defaultValue":"https://raw.githubusercontent.com/simongdavies/activedirectorynewdomain-ha-2-dc/VNetLink/CreateADPDC.ps1.zip"
-		},
-		"addnsName":{
+		"dnsPrefix":{
 			"type":"string",
 			"metadata": {
 				"Description": "The DNS prefix for the public IP address used by the Load Balancer"
@@ -260,7 +253,7 @@
 			"properties": {
 				"publicIPAllocationMethod": "[parameters('publicIPAddressType')]",
 				"dnsSettings": {
-					"domainNameLabel": "[parameters('addnsName')]"
+					"domainNameLabel": "[parameters('dnsPrefix')]"
 				}
 			}
 		},
