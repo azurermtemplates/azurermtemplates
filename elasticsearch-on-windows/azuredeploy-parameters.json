@@ -1,4 +1,4 @@
-﻿{
+{
     "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
@@ -18,6 +18,7 @@
         "location": {
             "value": "East US"
         },
+        
         "nodeSize": {
             "value": "Standard_A2"
         },
@@ -25,12 +26,15 @@
         "publicIpAddressName": {
             "value": "ipaddressname"
         },
+        
         "dnsName": {
             "value": "esdns"
         },
+        
         "nodeAdminUserName": {
             "value": ""
         },
+        
         "nodeIpAddresses": {
             "value": [
                 "10.0.0.16",
@@ -38,15 +42,29 @@
                 "10.0.0.18"
             ]
         },
+        
         "nodeIPAddressesString": {
             "value": "10.0.0.16,10.0.0.17,10.0.0.18"
         },
+        
         "nodeAdminPassword": {
             "value": ""
         },
+        
         "nodes": {
             "value": 3
-        }
-
+        },
+        
+        "jdkInstallerLocation": {
+           "value": "https://jdharm.blob.core.windows.net/powershell/jdk-8u40-windows-x64.exe"
+        },
+        
+        "elasticSearchInstallerLocation": {
+            "value": "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.5.0.zip"
+        },
+        
+        "dataDiskSize": {
+            "value": 100
+        }    
     }
 }
