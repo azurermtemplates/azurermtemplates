@@ -6,13 +6,16 @@
         "value":""
     },
     "adminUsername": {
-        "value": ""
+        "value": "trent"
     },
     "adminPassword": {
         "value": ""
     },
     "dataNodeScaleUnits": {
         "value": 1
+    },
+    "dataNodesPerUnit": {
+        "value": 2
     },
     "region": {
         "value": "West US"
@@ -22,8 +25,5 @@
     },
     "esClusterName": {
         "value": "elasticsearch-fullscale"
-    },
-    "vmSizeDataNodes": {
-        "value": "Standard_A1"
     }
 }

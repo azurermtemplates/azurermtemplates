@@ -28,11 +28,10 @@
         "Description": "Location where resources will be provisioned"
       }
     },
-    "virtualNetworkName": {
-      "type": "string",
-      "defaultValue": "virtualNetwork",
+    "subnet": {
+      "type": "object",
       "metadata": {
-        "Description": "VNET resource will be deployed in to"
+        "Description": "The VNET and Subnet to deploy the nodes in to"
       }
     },
     "masterNodesIpPrefix": {
@@ -41,19 +40,6 @@
             "Description": "IP Prefix used to append index for static addresses"
         }
     },
-    "discoveryHosts": {
-        "type": "string",
-        "metadata": {
-            "Description": "Static discovery addresses"
-        }
-    },
-    "subnetName": {
-      "type": "string",
-      "defaultValue": "masterSubnet",
-      "metadata": {
-        "Description": "VNET resource will be deployed in to"
-      }
-    },
     "vmSize": {
       "type": "string",
       "defaultValue": "Standard_A0",
@@ -61,49 +47,24 @@
         "Description": "Size of the Elasticsearch master nodes"
       }
     },
-    "esClusterName": {
-      "type": "string",
-      "defaultValue": "elasticsearch",
+    "esSettings": {
+      "type": "object",
       "metadata": {
-        "Description": "The name of the elasticsearch cluster"
+        "Description": "Elasticsearch settings - cluster name, version, discovery hosts"
       }
     },
-    "esVersion": {
-      "type": "string",
-      "defaultValue": "1.5.0",
-      "allowedValues": [
-        "1.5.0",
-        "1.4.4",
-        "1.3.8"
-      ],
+    "osSettings": {
+      "type": "object",
       "metadata": {
-        "Description": "Elasticsearch versino to install"
-      }
-    },
-    "scriptUrl": {
-      "type": "string",
-      "metadata": {
-        "Description": "Url for the provisioning scritps"
+        "Description": "Elasticsearch deployment platform settings"
       }
     }
   },
   "variables": {
     "vmStorageAccountContainerName": "vhd",
-    "vmSourceImageName": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
-    "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName'))]",
-    "sourceImageName": "[concat('/', subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]"
+    "subnetRef":"[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('subnet').vnet), '/subnets/', parameters('subnet').name)]"
   },
   "resources": [
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[parameters('storageAccountName')]",
-      "apiVersion": "2014-12-01-preview",
-      "location": "[parameters('region')]",
-      "properties": {
-        "accountType": "Standard_LRS"
-      }
-    },
     {
       "apiVersion": "2014-12-01-preview",
       "type": "Microsoft.Compute/availabilitySets",
@@ -146,8 +107,7 @@
       },
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', 'masterNodeNic', copyindex())]",
-        "[concat('Microsoft.Compute/availabilitySets/', 'elasticsearchMaster')]",
-        "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
+        "[concat('Microsoft.Compute/availabilitySets/', 'elasticsearchMaster')]"
       ],
       "properties": {
         "availabilitySet": {
@@ -163,7 +123,7 @@
         },
         "storageProfile": {
           "sourceImage": {
-            "id": "[variables('sourceImageName')]"
+            "id": "[parameters('osSettings').sourceImage]"
           },
           "destinationVhdsContainer": "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
         },
@@ -195,9 +155,9 @@
         "typeHandlerVersion": "1.2",
         "settings": {
           "fileUris": [
-            "[parameters('scriptUrl')]"
+            "[parameters('osSettings').script]"
           ],
-          "commandToExecute": "[concat('bash elasticsearch-azure-install.sh -xn ', parameters('esClusterName'), ' -v ', parameters('esVersion'), ' -d ', parameters('discoveryHosts'))]"
+          "commandToExecute": "[concat('bash elasticsearch-azure-install.sh -xn ', parameters('esSettings').clusterName, ' -v ', parameters('esSettings').version, ' -d ', parameters('esSettings').discoveryHosts)]"
         }
       }
     }
