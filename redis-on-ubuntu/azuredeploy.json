@@ -331,7 +331,7 @@
                     "fileUris": [
                         "[concat(variables('scriptUrl'), 'redis-cluster-setup.sh')]"
                     ],
-                    "commandToExecute": "[concat('bash redis-cluster-setup.sh -c ', variables('numberOfInstances'), '-s ', variables('numberOfSlaves'), ' -p ', parameters('redisNodeIPAddressPrefix'))]"
+                    "commandToExecute": "[concat('bash redis-cluster-setup.sh -c ', variables('numberOfInstances'), ' -s ', variables('numberOfSlaves'), ' -p ', parameters('redisNodeIPAddressPrefix'))]"
                 }
             }
         }
