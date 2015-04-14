@@ -110,7 +110,7 @@
                 "Description": "Password for the Virtual Machine"
             }
         },
-      
+
         "subscriptionId": {
             "type": "string",
             "metadata": {
@@ -177,7 +177,31 @@
                 "Description": "Name for the elasticsearch cluster"
             }
 
+        },
+        "dataDiskSize": {
+            "type": "int",
+            "defaultValue": 100,
+            "metadata": {
+                "Description": "Size of data disk for ES to run on in GB"
+            }
+
+        },
+        "jdkInstallerLocation": {
+            "type": "string",
+            "metadata": {
+                "Description": "Location of jdk installer exe"
+            }
+
+        },
+        "elasticSearchInstallerLocation": {
+            "type": "string",
+            "metadata": {
+                "Description": "Location of elasticsearch installer zip"
+            }
+
         }
+
+
     },
 
     "resources": [
@@ -283,6 +307,16 @@
                     "sourceImage": {
                         "id": "[variables('nodeSourceImageName')]"
                     },
+                        "dataDisks" : [
+                    {
+                        "name" : "datadisk1",
+                        "diskSizeGB" : "[parameters('dataDiskSize')]",
+                        "lun" : 0,
+                        "vhd":{
+                            "Uri" : "[concat('http://',parameters('storageName'),'.blob.core.windows.net/',parameters('nodeStorageAccountContainerName'),'/','node', copyindex(),'dataDisk1' ,'.vhd')]"
+                        }
+                    }
+                ],
                     "destinationVhdsContainer": "[concat('http://', parameters('storageName'),'.blob.core.windows.net/', parameters('nodeStorageAccountContainerName'),'/')]"
                 },
                 "networkProfile": {
@@ -312,7 +346,7 @@
                 "typeHandlerVersion": "1.3",
                 "settings": {
                     "fileUris": [ "http://jdharm.blob.core.windows.net/powershell/install-elasticsearch.ps1" ],
-                    "commandToExecute": "[concat('powershell.exe -File install-elasticsearch.ps1 ',  parameters('nodeIPAddressesString'), ' ', parameters('clustername'))]"
+                    "commandToExecute": "[concat('powershell.exe -File install-elasticsearch.ps1 ',  parameters('nodeIPAddressesString'), ' ', parameters('clustername'),'  ', parameters('elasticSearchInstallerLocation'),' ', parameters('jdkInstallerLocation'))]"
                 }
             }
         },

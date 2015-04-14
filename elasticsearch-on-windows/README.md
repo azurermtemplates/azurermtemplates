@@ -12,11 +12,12 @@ Since it exposes the ElasticSearch cluster over the load balancer on port 9200 y
 
 It will use provision the resources and then on each VM it will run a powershell script that does the following:
 
-1. Download and install the jdk - this will have to be from a location you place it.
-2. Download and install ElasticSearch
-3. Install the head plugin to make it easier to visualise the cluster
-4. Modify the ElasticSearch config to set up the cluster so all the nodes can talk to each other. 
-5. Modify each node VM firewall to allow the right ports.
+1. Format the provisioned data disk.
+2. Download and install the jdk - this will have to be from a location you place it.
+3. Download and install ElasticSearch
+4. Install the head plugin to make it easier to visualise the cluster
+5. Modify the ElasticSearch config to set up the cluster so all the nodes can talk to each other. 
+6. Modify each node VM firewall to allow the right ports.
 
 Below are the parameters that the template expects
 
@@ -42,3 +43,6 @@ Below are the parameters that the template expects
 | nodeIpAddresses | Array of internal ip addresses for each node |
 | nodeIPAddressesString | A comma separated list of the values in nodeIpAddresses for passing to powershell script |
 | clusterName | Name for the elasticsearch cluster |
+| dataDiskSize | Size of data disk for ES to run on in GB |
+| jdkInstallerLocation | Location of jdk installer exe |
+| elasticSearchInstallerLocation | Location of elasticsearch installer zip |
