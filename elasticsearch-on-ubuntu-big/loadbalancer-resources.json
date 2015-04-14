@@ -22,7 +22,11 @@
       }
     },
     "internalOrExternal": {
-      "type":"string"
+      "type":"string",
+      "allowedValues":[
+        "internal",
+        "external"
+      ]
     },
     "subnet": {
       "type":"object"
