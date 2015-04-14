@@ -9,7 +9,7 @@
         "value": "trent"
     },
     "adminPassword": {
-        "value": "Blue!2010"
+        "value": ""
     },
     "dataNodeScaleUnits": {
         "value": 1
@@ -21,7 +21,7 @@
         "value": "West US"
     },
     "virtualNetworkName": {
-        "value": "fs180VNet"
+        "value": "elasticsearch"
     },
     "esClusterName": {
         "value": "elasticsearch-fullscale"
