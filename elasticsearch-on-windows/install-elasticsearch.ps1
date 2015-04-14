@@ -1,39 +1,53 @@
 param
 (
       [string]$IPaddresses = $null,
-      [string]$clusterName = $null
+      [string]$clusterName = $null,
+	  [string]$elasticSearchSource = $null,
+	  [string]$jdkSource = $null
 )
 
 try {
 
+	#formatting data disk
+	Write-Host "Initializing and formatting data disk" -ForegroundColor green
+	
+    $disks = Get-Disk | Where partitionstyle -eq 'raw' | sort number
+
+	$driveLetter = "F"
+	if($disks -ne $null)
+	{
+		$disks[0] | Initialize-Disk -PartitionStyle MBR -PassThru |	New-Partition -UseMaximumSize -DriveLetter $driveLetter | Format-Volume -FileSystem NTFS -NewFileSystemLabel "data1" -Confirm:$false -Force 
+	}
 	#with reference from: http://belczyk.com/2014/07/elasticsearch-one-click-installation-script-for-windows/
 
-	#download java from a location you choose.
-	$jdkSource = "https://jdharm.blob.core.windows.net/powershell/jdk-8u40-windows-x64.exe"
-	$jdkDestination = "D:\jdk-8u40-windows-x64.exe"
+	#download java from a location you choose to temporary drive
+	$jdkDestination = "D:\jdk-installer.exe"
 
 	Invoke-WebRequest $jdkSource -OutFile $jdkDestination
 
 	#install java
-	Start-Process -FilePath $jdkDestination -ArgumentList "/s" -PassThru -Wait
+	$jdkInstallLocation = "C:\Program Files\JAVA\JDK"
+	Start-Process -FilePath $jdkDestination -ArgumentList "/s INSTALLDIR=`"$jdkInstallLocation`"" -PassThru -Wait
 
-	# download elasticsearch
-	$source = "https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.5.0.zip"
-	$destination = "D:\elasticsearch-1.5.0.zip"
+	# download elasticsearch to temporary drive
+	$destination = "D:\elasticsearch.zip"
  
-	Invoke-WebRequest $source -OutFile $destination
+	Invoke-WebRequest $elasticSearchSource -OutFile $destination
 
 	#unzip files
 	$shell = new-object -com shell.application
 	$zip = $shell.NameSpace($destination)
+	$unzipDest = $shell.Namespace("$driveLetter`:\")
+
+	$elasticSearchPath = '$driveLetter:\elasticsearch'
 
 	foreach($item in $zip.items())
 	{
-		$shell.Namespace("C:\").copyhere($item)
+		$unzipDest.copyhere($item)
+		$elasticSearchPath = Join-path $unzipDest.Self.Path -ChildPath $item.name
 	}
 
-	$jdkPath = 'C:\Program Files\Java\jdk1.8.0_40' 
-	$elasticSearchPath = 'C:\elasticsearch-1.5.0'
+	$jdkPath = $jdkInstallLocation	
 
 	$elasticSearchBinPath = join-path $elasticSearchPath '\bin'
 	$configPath = join-path $elasticSearchPath  '\config\elasticsearch.yml'
