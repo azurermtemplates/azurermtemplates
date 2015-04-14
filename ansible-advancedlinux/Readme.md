@@ -58,6 +58,4 @@ Below are the parameters that the template expects
 - Fixed number of data disks (This is due to a current template feature limitation and is fixed at 2 in order to all A0 instances for testing)
 - Only two VM instances are added to the load balancer and only them  are accessible via SSH (The Ansible Controller and a second VM)
 - Scripts are not yet idempotent and cannot handle updates (This currently works for create ONLY)
-- Linux Storage configuration is not yet implemented.
-- Ubuntu will be implemented in future versions. Currently only CentOS 6.5 has been fully tested.
 - Current version doesn't use secured endpoints. If you are going to host confidential data make sure that you secure the VNET by using Security Groups.
