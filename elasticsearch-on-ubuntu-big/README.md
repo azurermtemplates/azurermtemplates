@@ -36,3 +36,5 @@ Below are the parameters that the template expects
 Security Warning!  The configuration allows you to enabled external load balanced endpoints on a public IP.  The endpoint is not secure and it's recommended that you keep these endpoints internal or secure them. Elasticsearch Sheild product should be considered.
 
 One of the primary advantages to this approach is that you can distribute data nodes across multiple storage accounts.  Changing the virtual machine size for data nodes will affect the amount of storage for each node as it changes the number of data disks that are attached.
+
+The multiple data node templates with varying number of data disks is a temporary workaround until the features are available allowing us to attach a configurable number of data disks.
