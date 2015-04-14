@@ -60,7 +60,7 @@
       "name": "nicJumpbox",
       "location": "[parameters('region')]",
       "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/', 'publicIP')]"
+        "[concat('Microsoft.Network/publicIPAddresses/', 'jumpboxPublicIP')]"
       ],
       "properties": {
         "ipConfigurations": [
@@ -69,7 +69,7 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses','publicIP')]"
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses','jumpboxPublicIP')]"
               },
               "subnet": {
                 "id": "[variables('subnetRef')]"
