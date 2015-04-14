@@ -33,17 +33,6 @@
     },
     "internalIp": {
       "type":"string"
-    },
-    "managementNicName": {
-      "type":"string"
-    },
-    "addManagementRule": {
-      "type":"string",
-      "defaultValue":"false",
-      "allowedValues":[
-        "true",
-        "false"
-      ]
     }
   },
   "variables": {
@@ -70,27 +59,6 @@
           }
       ],
     "feLoadBalancerConfig":"[variables(concat(parameters('internalOrExternal'), 'FELBConfig'))]",
-    "lbManagementRule-true": [
-          {
-            "name": "ssh1",
-            "properties": {
-              "frontendIPConfigurations": [
-                {
-                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers', 'loadBalancer'),'/frontendIPConfigurations/LBFE')]"
-                }
-              ],
-              "backendIPConfiguration": {
-                "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', parameters('managementNicName')),'/ipConfigurations/ipconfig1')]"
-              },
-              "protocol": "tcp",
-              "frontendPort": 22,
-              "backendPort": 22,
-              "enableFloatingIP": false
-            }
-          }
-        ],
-     "lbManagementRule-false":[],
-     "lbManagementRule": "[variables(concat('lbManagementRule-', parameters('addManagementRule')))]"
   },
   "resources": [
     {
