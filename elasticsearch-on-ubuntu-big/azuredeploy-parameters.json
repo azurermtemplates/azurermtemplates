@@ -1,29 +1,29 @@
 {
     "dnsNameforLBIP": {
-        "value":""
+        "value":"trent7"
     },
     "storageAccountPrefix" : {
-        "value":""
+        "value":"trent7"
     },
     "adminUsername": {
-        "value": ""
+        "value": "trent"
     },
     "adminPassword": {
-        "value": ""
+        "value": "Blue!2010"
     },
     "dataNodeScaleUnits": {
         "value": 1
+    },
+    "dataNodesPerUnit": {
+        "value": 2
     },
     "region": {
         "value": "West US"
     },
     "virtualNetworkName": {
-        "value": "elasticsearch"
+        "value": "trentVnet"
     },
     "esClusterName": {
         "value": "elasticsearch-fullscale"
-    },
-    "vmSizeDataNodes": {
-        "value": "Standard_A1"
     }
 }

@@ -32,12 +32,6 @@
         "Description": "Administrator password used when provisioning virtual machines"
       }
     },
-    "computerNamePrefix": {
-      "type": "string",
-      "metadata": {
-        "Description": "The global VM name prefix"
-      }
-    },
     "osSettings": {
       "type": "object",
       "metadata": {
@@ -99,7 +93,7 @@
           "platformGuestAgent": "true"
         },
         "osProfile": {
-          "computername": "[concat(parameters('computerNamePrefix'), 'jumpbox')]",
+          "computername": "jumpbox",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]",
           "linuxOperatingSystemProfile": {
