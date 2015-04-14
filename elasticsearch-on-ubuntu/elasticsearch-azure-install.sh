@@ -359,7 +359,7 @@ fi
 
 #expand_staticip_range "$IP_RANGE"
 
-S=$(expand_ip_range "$IP_RANGE")
+S=$(expand_ip_range "$DISCOVERY_ENDPOINTS")
 HOSTS_CONFIG="[\"${S// /\",\"}\"]"
 
 #Format the static discovery host endpooints for elasticsearch configureion ["",""] format
