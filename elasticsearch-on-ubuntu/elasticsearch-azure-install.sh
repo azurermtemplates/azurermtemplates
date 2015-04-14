@@ -428,7 +428,7 @@ log "Configure elasticsearch heap size - $ES_HEAP"
 echo "ES_HEAP_SIZE=${ES_HEAP}/" >> /etc/default/elasticseach
 
 #Optionally Install Marvel
-if [ ${INSTALL_MARVEL} -eq "yes" ];
+if [ "${INSTALL_MARVEL}" == "yes" ];
     then
     log "Installing Marvel Plugin"
     /usr/share/elasticsearch/bin/plugin -i elasticsearch/marvel/latest
