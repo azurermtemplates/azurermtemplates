@@ -134,7 +134,7 @@
 			"metadata": {
 				"Description": "The name of the VM Image to create the AD VM from"
 			},
-			"defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-Datacenter-201502.01-en.us-127GB.vhd"
+			"defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201503.01-en.us-127GB.vhd"
 		},
 		"vmContainerName": {
 			"type":"string",
