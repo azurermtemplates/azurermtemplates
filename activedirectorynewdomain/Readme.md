@@ -31,13 +31,13 @@ Below are the parameters that the template expects
 | adminUsername | Admin username for the VM **This will also be used as the domain admin user name**|
 | adminPassword | Admin password for the VM **This will also be used as the domain admin password and the SafeMode password** |
 | adVMSize | Size of the VM <br> <ul>**Allowed Values**<li>Standard_A0 </li><li>Standard_A1**(default)**</li><li>Standard_A2</li><li>Standard_A3</li><li>Standard_A4</li></ul>|
-| adImageName | Name of image to use for the VM <br> <ul><li>a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-Datacenter-201502.01-en.us-127GB.vhd **(default)**</li></ul>|
+| adImageName | Name of image to use for the VM <br> <ul><li>a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201503.01-en.us-127GB.vhd **(default)**</li></ul>|
 | vmContainerName | The container name in the storage account where VM disks are stored|
 | adAvailabilitySetName | The name of the availability set that the AD VM is created in|
 | domainName | The FQDN of the AD Domain created |
 | domainNetbiosName | The NetBIOS name of the AD Domain created |
 | addnsName | The DNS prefix for the public IP address used by the Load Balancer |
 | RDPPort | The public RDP port for the VM |
-|AssetLocation | The location of resources such as templates and DSC modules that the script is dependent <br> <ul><li> **https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/activedirectorynewdomain (default)**</li></ul> |
+| AssetLocation | The location of resources such as templates and DSC modules that the script is dependent <br> <ul><li> **https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/activedirectorynewdomain (default)**</li></ul> |
 
 
