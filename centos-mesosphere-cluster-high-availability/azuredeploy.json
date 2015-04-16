@@ -17,7 +17,7 @@
         },
         "numberOfSlaveInstances": {
             "type": "int",
-            "defaultValue": 40
+            "defaultValue": 6
         },
         "region": {
             "type": "string",
