@@ -280,15 +280,7 @@ check_mdadm() {
     fi
 }
 
-check_partx() {
-    dpkg -s partx >/dev/null 2>&1
-    if [ ${?} -ne 0 ]; then
-        apt-get install -y partx
-    fi
-}
-
 # Create Partitions
-check_partx
 DISKS=$(scan_for_new_disks)
 
 if [ "$RAID_CONFIGURATION" -eq 1 ]; then
