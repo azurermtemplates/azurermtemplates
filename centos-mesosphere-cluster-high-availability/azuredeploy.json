@@ -17,7 +17,7 @@
         },
         "numberOfSlaveInstances": {
             "type": "int",
-            "defaultValue": 6
+            "defaultValue": 40
         },
         "region": {
             "type": "string",
@@ -130,19 +130,6 @@
         },
         {
             "apiVersion": "2014-12-01-preview",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[concat('slavePublicIP', copyIndex())]",
-            "location": "[parameters('region')]",
-            "copy": {
-                "name": "slavePublicIPLoop",
-                "count": "[parameters('numberOfSlaveInstances')]"
-            },
-            "properties": {
-                "publicIPAllocationMethod": "Dynamic"
-            }
-        },
-        {
-            "apiVersion": "2014-12-01-preview",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[concat('masterNic', copyindex())]",
             "location": "[parameters('region')]",
@@ -151,6 +138,7 @@
                 "count": "[parameters('numberOfMasterInstances')]"
             },
             "dependsOn": [
+				"[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
                 "[concat('Microsoft.Network/publicIPAddresses/', 'masterPublicIP', copyindex())]"
             ],
             "properties": {
@@ -179,8 +167,8 @@
                 "name": "slaveNicLoop",
                 "count": "[parameters('numberOfSlaveInstances')]"
             },
-            "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', 'slavePublicIP', copyindex())]"
+			"dependsOn": [
+				"[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -188,9 +176,6 @@
                         "name": "ipconfig1",
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat('slavePublicIP', copyindex()))]"
-                            },
                             "subnet": {
                                 "id": "[variables('subnet1Ref')]"
                             }
