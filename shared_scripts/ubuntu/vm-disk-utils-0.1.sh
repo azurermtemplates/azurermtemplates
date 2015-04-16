@@ -276,7 +276,7 @@ create_striped_volume()
 check_mdadm() {
     dpkg -s mdadm >/dev/null 2>&1
     if [ ${?} -ne 0 ]; then
-        apt-get install -y mdadm
+        DEBIAN_FRONTEND=noninteractive apt-get -y install mdadm
     fi
 }
 
