@@ -864,6 +864,10 @@
 		"sshResourceURL":{
 				"value":"[concat('SSH Url to Ansible Controller:',parameters('adminUserName'),'@', reference(variables('publicIPRef'),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).dnsSettings.fqdn,' -p ',parameters('sshNatRuleFrontEndPort'))]",
 				"type":"string"
+		},
+		"couchbaseWebURL":{
+				"value":"[concat('URL To Couchbase admin console: http://', reference(variables('publicIPRef'),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).dnsSettings.fqdn,':',variables('lbcbaAdminPort'))]",
+				"type":"string"
 		}
 	}
 }

@@ -9,7 +9,7 @@
 			"value": "Standard_LRS"
 		},
 		"dnsNameLabel": {
-			"value": "csacouchcent4"
+			"value": ""
 		},
 		"numberOfVMS": {
 			"value": 3
@@ -30,28 +30,27 @@
 			"value": "ext4"
 		},
 		"adminUserName": {
-			"value": "gonzalorcsa"
+			"value": ""
 		},
 		"adminPassword": {
-			"value": "GRCSor16^"
+			"value": ""
 		},
 		"sshKeyData" : { 
-             "value": "MIIEujCCA6KgAwIBAgIJANwsqTTzEPeRMA0GCSqGSIb3DQEBBQUAMIGZMQswCQYDVQQGEwJVSzELMAkGA1UECBMCU1UxDzANBgNVBAcTBkxvbmRvbjEZMBcGA1UEChMQR29uemFsbyBSdWl6IENTQTEPMA0GA1UECxMGQ1NBIFVLMRkwFwYDVQQDExBDbG91ZCBBcmNoaXRlY3RzMSUwIwYJKoZIhvcNAQkBFhZnb256YWxvckBtaWNyb3NvZnQuY29tMB4XDTE0MTEwNDE4NDkzNVoXDTE1MTEwNDE4NDkzNVowgZkxCzAJBgNVBAYTAlVLMQswCQYDVQQIEwJTVTEPMA0GA1UEBxMGTG9uZG9uMRkwFwYDVQQKExBHb256YWxvIFJ1aXogQ1NBMQ8wDQYDVQQLEwZDU0EgVUsxGTAXBgNVBAMTEENsb3VkIEFyY2hpdGVjdHMxJTAjBgkqhkiG9w0BCQEWFmdvbnphbG9yQG1pY3Jvc29mdC5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC6Q7HqWPErnO+kNUNxSvL/G7OaxFwMvbnZgt8duEYV2RldepamCMVhMgXIrEXdqAQzF6ykXrB2n3zlkax8nVz68owNAbz6BIgfXiJaOpWP9ZdCqh/UxuwYLXYshrP1mOuX7JwjO8B26+eJvmpjQ9SPlf1ql5/AURfC6dOLBa60Y+HPjJyY2pCuodhV0+7A0kQIq6lEuaFmCwXa9Z6JJdd+NK4eOd/YAc84DOZzAawlvr5c3ZdDcHwfKoWwfSiWN+bGwvP7zlRFIJw0xE7Aoa5nYFoHfOtWRmL775LjlufGO9xAv/4NDLE8JRGh+vJ50SDFJpBWVW1juegR+BnFUtUBAgMBAAGjggEBMIH+MB0GA1UdDgQWBBRCNqWVXil20Em4QLE6n+C5AQcCwzCBzgYDVR0jBIHGMIHDgBRCNqWVXil20Em4QLE6n+C5AQcCw6GBn6SBnDCBmTELMAkGA1UEBhMCVUsxCzAJBgNVBAgTAlNVMQ8wDQYDVQQHEwZMb25kb24xGTAXBgNVBAoTEEdvbnphbG8gUnVpeiBDU0ExDzANBgNVBAsTBkNTQSBVSzEZMBcGA1UEAxMQQ2xvdWQgQXJjaGl0ZWN0czElMCMGCSqGSIb3DQEJARYWZ29uemFsb3JAbWljcm9zb2Z0LmNvbYIJANwsqTTzEPeRMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBAJQvQGmhd2dkHUOm1fT530f336S/exXJctdq28OvQup7ERmuS4fMof3Q0VVhvoTTRVYysC7yvLgVTKhEt0vpeuNi1rYkDQUtaLRzdBSV+SxEKooRhJWbkHmEiwYs24cs4ZzN6ZkmFZUtuPS3vbUZwSeGmEhnriaos6U/IanpAbJ3BqojLvx1IQLzSQKwJzjE5qOIb6EKOpNlKI+GDaprG30EaKsD6SZNWfX0TZsPuRysX4mLiGC7Yfc5RbwtlQ/K4c3k+uu6tfXUoZtKucftP1o1J/mD6/oCIzcfRhSbPFTunOunR/rwI8b9nZWGk+Oj+K0R888+tL+8do4Uxuyhkm8="  
+             "value": ""  
         },           
         "couchbaseAdminUser":{
-      		"value": "gonzalorcsa"
+      		"value": ""
     	},
     	"couchbaseAdminPassword":{
-      		"value": "GRCSor16^"
+      		"value": ""
     	},
 
 		"customScriptConfigStorageAccountName" : {
-            "value": "weugrcrepostorage"
+            "value": ""
         },
         "customScriptConfigStorageAccountKey" : {
-            "value": "GDmKPdbHd18ufSac6EaZMq8ggfw9coGfmqq0gfd7YjW6mP0fECnX7QigLz9dsLFql4LWxegs12hTZ9YQomrFsQ=="
+            "value": ""
         }
-
 
 	}
 }
