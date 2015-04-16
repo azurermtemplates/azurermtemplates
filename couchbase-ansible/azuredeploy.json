@@ -9,7 +9,10 @@
 			"defaultValue": "West US",
 			"allowedValues": [
 				"West US",
-				"North Europe"
+				"West Europe",
+				"East US",
+				"East Asia",
+				"Southeast Asia"
 			],
 			"metadata": {
 				"Description": "Region where you want to create all the resources"
@@ -214,6 +217,13 @@
 				"Description": "Specify the location of the ansible playbook for installing and initialse Couchbase"
 			}
 		},
+		"couchbasePlaybookParamsLocation":{
+			"type": "string",
+			"defaultValue":"customscript/couchbase_parameters.yml",
+			"metadata": {
+				"Description": "Specify the location of the ansible playbook that contains the installation parameters"
+			}
+		},
 		"couchbaseAdminUser":{
 			"type": "string",			
 			"metadata": {
@@ -224,6 +234,13 @@
 			"type": "string",			
 			"metadata": {
 				"Description": "Specify the Couchbase Admin Password"
+			}
+		},
+		"couchbaseMemoryAllocationPercentage":{
+			"type": "string",	
+			"defaultValue":"0.7",		
+			"metadata": {
+				"Description": "Specify the percentage of RAM Allocated to Couchbase. Leave Memory for the OS."
 			}
 		},
 		"virtualNetworkName": {
@@ -338,7 +355,7 @@
 		"customScriptAnsibleFile" :"couchbase_ansible.sh",
 		"customScriptAnsibleUrl": "[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/customscript/',variables('customScriptAnsibleFile'))]",
 		"customScriptAnsibleCommand": "[concat('bash ',variables('customScriptAnsibleFile'))]",
-		"customScriptAnsibleParameters": "[concat(' -i ',parameters('VMIPAddressStart'),' -n ',parameters('numberOfVms'),' -r ',parameters('createRAID'),' -f ',parameters('vmFileSystem'),' -u ',parameters('couchbaseAdminUser'),' -p ',parameters('couchbaseAdminPassword'))]",
+		"customScriptAnsibleParameters": "[concat(' -i ',parameters('VMIPAddressStart'),' -n ',parameters('numberOfVms'),' -r ',parameters('createRAID'),' -f ',parameters('vmFileSystem'),' -u ',parameters('couchbaseAdminUser'),' -p ',parameters('couchbaseAdminPassword') ,' -m ',parameters('couchbaseMemoryAllocationPercentage') )]",
 		"sshRootCerBlobUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('sshRootCerBlobLocation'))]",
 
 		"customScriptSSHRootFile" :"configure_ssh_root.sh",
@@ -347,6 +364,9 @@
 		"sshRootPubBlobUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('sshRootPubBlobLocation'))]",
 		"ansiblePlaybookUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('ansiblePlaybookLocation'))]",
 		"couchbasePlaybookUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('couchbasePlaybookLocation'))]",
+		"couchbaseParametersPlaybookUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('couchbasePlaybookParamsLocation'))]",
+
+		
 
 		"newVirtualNetworkName": "[concat(parameters('virtualNetworkName'))]",
 		"publicIPName": "[concat(parameters('publicIPName'))]",
@@ -708,6 +728,7 @@
 						"[variables('customScriptAnsibleUrl')]",
 						"[variables('ansiblePlaybookUrl')]",
 						"[variables('couchbasePlaybookUrl')]",
+						"[variables('couchbaseParametersPlaybookUrl')]",
 						"[variables('sshRootPubBlobUrl')]",
 						"[variables('sshRootCerBlobUrl')]",
 					],

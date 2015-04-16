@@ -5,15 +5,15 @@
 </a>
 
 
-This advanced template creates a Multi VM Couchbase Cluster and it configures Ansible so you can easily manage all the VMS. Don't suffer more pain configuring and managing all your VMs , just use Ansible! Ansible is a very powerful masterless configuration management system based on SSH.
+This advanced template creates a Multi VM Couchbase Cluster,it also configures Ansible so you can easily manage all the VMS. 
 
-This template  deploys  N number of Storage Account, a Virtual Network, an Availability Sets (up to 3 Fault Domains and up to 20 Update Domains), one private NIC per VM, one public IP ,a Load Balancer and you can specify SSH keys to access your VMS remotely from your latop. Minimun supported VM Size is Standard_D2 and by default 4 data disks will be attaached to the VM.
-You will need an additional certificate / public key for the Ansible configuration and before executing the template you have upload them to a Private azure storage account.  
+This template  deploys  N number of Storage Accounts, a Virtual Network, an Availability Sets (up to 3 Fault Domains and up to 20 Update Domains), one private NIC per VM, one public IP ,a Load Balancer.You can specify SSH keys to access your VMS remotely from your latop. Minimun recommded VM Size is Standard_D2 and by default 4 data disks will be attaached to the VM.
+You will need an additional certificate / public key for the Ansible configuration and before executing the template you have to upload them to a Private azure storage account.  
 
 The template uses two Custom Scripts  :
  * The first script configures SSH keys (public) in all the VMs for the Root user so you can manage the VMS with ansible.
  * The second script installs ansible on a A1 VM so you can use it as a controller.The script also deploys the provided certificate to /root/.ssh. Then, the script will execute an ansible playbook to create a RAID with all the available disks.
- * Then, the script will Couchbase in all the Servers using Ansible
+ * Then, the script will install Couchbase in all the Servers using Ansible and the ansible-couchbase-server  playbook.
  * Before you execute the script, you will need to create a PRIVATE storage account and upload your certificate and public key that ansible will use, as well as the bash scripts and ansible Playbooks.
 
  Once the template finishes, ssh into the AnsibleController VM (by default the load balancer has a NAT rule using the port 64000), then you can manage your VMS with ansible and the root user. For instance : 

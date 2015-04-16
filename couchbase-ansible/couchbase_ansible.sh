@@ -38,6 +38,7 @@ TEMPLATE_ROLE='couchbase'
 START_IP_INDEX=0
 CB_USER=''
 CB_PWD=''
+MOUNTPOINT='/datadrive'
 
 
  function usage()
@@ -50,6 +51,7 @@ CB_PWD=''
     echo "The -f (fileSystem) parameter specifies the file system you want to use.Allowed values : ext4 or xfs"    
     echo "The -u (couchbaseUser) parameter specifies the Couchbase Admin user"
     echo "The -p (couchbasePassword) parameter specifies the Couchbase Password "
+    echo "The -m (couchbaseAllocatedMemory) parameter specifies the percentage of memory allocated to Couchbase "
 }
 
 
@@ -62,13 +64,13 @@ function log()
 
 
 #---PARSE AND VALIDATE PARAMETERS---
-if [ $# -ne 12 ]; then
+if [ $# -ne 14 ]; then
     log "ERROR:Wrong number of arguments specified. Parameters received $#. Terminating the script."
     usage
     exit 1
 fi
 
-while getopts :i:n:r:f:u:p: optname; do
+while getopts :i:n:r:f:u:p:m: optname; do
     log "INFO:Option $optname set with value ${OPTARG}"
   case $optname in
     i) # IP address space 
@@ -103,7 +105,10 @@ while getopts :i:n:r:f:u:p: optname; do
       CB_USER=${OPTARG}
       ;;
     p) # COUCHBASE ADMIN PASSWORD 
-      CB_USER=${OPTARG}
+      CB_PWD=${OPTARG}
+      ;;
+    i) # RAM Allocation Percentage
+      MEMORY_ALLOCATION_PERCENTAGE=${OPTARG}
       ;;    
     \?) #Invalid option - show help
       log "ERROR:Option -${BOLD}$OPTARG${NORM} not allowed."
@@ -236,7 +241,10 @@ function configure_ssh()
     echo  $'[ssh_connection]\ncontrol_path = ~/.ssh/ansible-%%h-%%r' >> "${ANSIBLE_CONFIG_FILE}"   
     
     # Generate a new ansible host file    
-    printf  "[${TEMPLATE_ROLE}]\n${IP_ADDRESS_SPACE}[0:$(($NUMBER_OF_NODES - 1))]" >> "${ANSIBLE_HOST_FILE}"    
+    printf  "[${TEMPLATE_ROLE}]\n" >> "${ANSIBLE_HOST_FILE}"    
+    printf  "${IP_ADDRESS_SPACE}0 node_role=primary\n" >> "${ANSIBLE_HOST_FILE}"    
+    printf  "${IP_ADDRESS_SPACE}[1:$(($NUMBER_OF_NODES - 1))] node_role=additional\n" >> "${ANSIBLE_HOST_FILE}"     
+    
 
     # Validate ansible configuration
     ansible ${TEMPLATE_ROLE} -m ping -v 
@@ -259,12 +267,13 @@ function configure_ssh()
 function install_couchbase()
 {
    # Role copied in /etc/ansible/roles/couchbase.couchbase-server/
-   # ansible-galaxy install couchbase.couchbase-server 
+   #git clone https://github.com/couchbaselabs/ansible-couchbase-server.git
+   ansible-galaxy install couchbase.couchbase-server -p .
    log "INFO: ******** Installing Couchbase "
-   git clone https://github.com/couchbaselabs/ansible-couchbase-server.git
+   
 
    # Run ansible template to Install and Initialise Couchbase 
-   # ansible-playbook couchbase_setup.yml  --extra-vars "target=${TEMPLATE_ROLE} file_system=${FILE_SYSTEM} couchbase_server_admin=${CB_USER} couchbase_server_password=${CB_PWD}" 
+   ansible-playbook couchbase_setup.yml  --extra-vars "target=${TEMPLATE_ROLE} file_system=${FILE_SYSTEM} couchbase_server_admin=${CB_USER} couchbase_server_password=${CB_PWD} mount_point=${MOUNTPOINT} memory_allocation_percentage=${MEMORY_ALLOCATION_PERCENTAGE}" 
 
 
 
@@ -291,6 +300,7 @@ InitializeVMs()
     
     configure_ansible
     configure_storage
+    install_couchbase
 
 
 }
