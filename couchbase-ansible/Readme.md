@@ -59,6 +59,6 @@ Below are the parameters that the template expects
 
 ##Known Issues and Limitations
 - Fixed number of data disks (This is due to a current template feature limitation and is fixed at 3 in order to all A0 instances for testing)
-- Only two VM instances are added to the load balancer, and only them  are accessible via SSH (The Ansible Controller and a second VM)
+- All the Couchbase VMs will expose the Web admin console on the port 8091, and only the Ansible Controller is available for SSH using the port 6400
 - Scripts are not yet idempotent and cannot handle updates (This currently works for create ONLY)
 - Current version doesn't use secured endpoints. If you are going to host confidential data make sure that you secure the VNET by using Security Groups.
