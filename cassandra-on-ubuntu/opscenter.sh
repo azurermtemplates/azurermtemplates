@@ -49,7 +49,7 @@ ADMIN_USER=""
 SSH_KEY_PATH=""
 
 #Loop through options passed
-while getopts :d:u:e optname; do
+while getopts :d:u:p:e optname; do
     log "Option $optname set with value ${OPTARG}"
   case $optname in
   	u) #Credentials used for node install
@@ -209,6 +209,5 @@ sudo tee provision.json > /dev/null <<EOF
 }
 EOF
 
-curl -X POST
-  localhost:8888/provision
-  -d @provision.json
+curl -X POST localhost:8888/provision -d @provision.json
+
