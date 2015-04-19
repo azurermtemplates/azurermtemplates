@@ -38,7 +38,7 @@ then
 else
   echo "${HOSTNAME} not found in /etc/hosts"
   # Append it to the hsots file if not there
-  echo "127.0.0.1 $(hostname)" >> /etc/hosts
+  echo "127.0.0.1 ${HOSTNAME}" >> /etc/hosts
   log "hostname ${HOSTNAME} added to /etchosts"
 fi
 
