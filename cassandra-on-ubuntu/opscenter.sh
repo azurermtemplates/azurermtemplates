@@ -110,6 +110,9 @@ curl -L http://debian.datastax.com/debian/repo_key | sudo apt-key add -
 apt-get update
 apt-get install opscenter
 
+# Enable authentication in /etc/opscenter/opscenterd.conf
+sed -i '/^\[authentication\]$/,/^\[/ s/^enabled = False/enabled = True/' /etc/opscenter/opscenterd.conf
+
 # Start Ops Center
 sudo service opscenterd start
 
@@ -236,7 +239,22 @@ EOF
 # We seem to be trying to hit the endpoint too early the service is not listening yet
 sleep 14
 
-curl -X POST localhost:8888/provision -d @provision.json
-# {"message": "Hosts need SSH key fingerprint verification", "fingerprints": {"10.0.0.11": "2048 ee:58:a1:31:a8:b6:b2:d0:8c:0d:57:fa:3c:b3:64:9e (RSA)", "10.0.0.10": "2048 5a:f1:08:60:bc:c4:ab:0e:a4:5e:23:c6:c2:f3:10:dc (RSA)", "10.0.0.12": "2048 dd:ef:a4:a5:a4:41:e2:fd:ed:cf:8c:12:5f:56:fa:77 (RSA)"}}
+# Login and get session token
+AUTH_SESSION=$(curl -X POST -d '{"username":"admin","password":"admin"}' 'http://localhost:8888/login' | sed -e 's/^.*"sessionid"[ ]*:[ ]*"//' -e 's/".*//')
 
-# To enable password authentication, use the set_passwd.py utility to create users and set their password and role. OpsCenter currently has two available roles: admin or user.
+# Provision a new cluster with the nodes passed
+curl -H "opscenter-session: $AUTH_SESSION" -H "Accept: application/json" -X POST localhost:8888/provision -d @provision.json
+
+# If the user is still admin just udpate the password else create a new admin user
+if ["$OPS_CENTER_ADMIN" == "admin"];
+then
+  curl -H "opscenter-session: $AUTH_SESSION" -H "Accept: application/json" -d "{\"password\": \"$OPS_CENTER_ADMIN_PASS\" }" -X PUT http://127.0.0.1:8888/users/testuser
+else
+  # Create new user using the credentials passed in
+  curl -H "opscenter-session: $AUTH_SESSION" -H "Accept: application/json" -d "{\"password\": \"$OPS_CENTER_ADMIN_PASS\", \"role\": \"admin\"}" -X POST "http://127.0.0.1:8888/users/$OPS_CENTER_ADMIN"
+
+  # Remove the default admin user
+  curl -X DELETE -H "opscenter-session: $AUTH_SESSION" http://127.0.0.1:8888/users/admin
+fi
+
+exit 0
