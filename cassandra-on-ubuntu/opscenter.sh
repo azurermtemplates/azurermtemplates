@@ -248,7 +248,7 @@ curl -H "opscenter-session: $AUTH_SESSION" -H "Accept: application/json" -X POST
 # If the user is still admin just udpate the password else create a new admin user
 if ["$OPS_CENTER_ADMIN" == "admin"];
 then
-  curl -H "opscenter-session: $AUTH_SESSION" -H "Accept: application/json" -d "{\"password\": \"$OPS_CENTER_ADMIN_PASS\" }" -X PUT http://127.0.0.1:8888/users/testuser
+  curl -H "opscenter-session: $AUTH_SESSION" -H "Accept: application/json" -d "{\"password\": \"$OPS_CENTER_ADMIN_PASS\" }" -X PUT http://127.0.0.1:8888/users/admin
 else
   # Create new user using the credentials passed in
   curl -H "opscenter-session: $AUTH_SESSION" -H "Accept: application/json" -d "{\"password\": \"$OPS_CENTER_ADMIN_PASS\", \"role\": \"admin\"}" -X POST "http://127.0.0.1:8888/users/$OPS_CENTER_ADMIN"
