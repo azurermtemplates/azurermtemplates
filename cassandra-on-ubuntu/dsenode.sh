@@ -3,7 +3,7 @@
 # TEMP FIX - Re-evaluate and remove when possible
 # This is an interim fix for hostname resolution in current VM (If it does not exist add it)
 grep -q "${HOSTNAME}" /etc/hosts
-if [ $? -eq $SUCCESS ]
+if [ $? == 0 ]
 then
   echo "${HOSTNAME}found in /etc/hosts"
 else
@@ -19,3 +19,6 @@ apt-get -y update
 echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
 echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections
 apt-get -y install oracle-java7-installer
+
+#Need to see if we can find a better solution
+chmod 777 /mnt

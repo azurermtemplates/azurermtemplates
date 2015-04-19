@@ -32,7 +32,7 @@ fi
 # TEMP FIX - Re-evaluate and remove when possible
 # This is an interim fix for hostname resolution in current VM (If it does not exist add it)
 grep -q "${HOSTNAME}" /etc/hosts
-if [ $? -eq $SUCCESS ]
+if [ $? == 0 ]
 then
   echo "${HOSTNAME}found in /etc/hosts"
 else
@@ -165,14 +165,14 @@ sudo tee provision.json > /dev/null <<EOF
         "start_native_transport": true,
         "cluster_name": "${CLUSTER_NAME}",
         "column_index_size_in_kb": 64,
-        "commitlog_directory": "/mnt/resource/cassandra/commitlog",
+        "commitlog_directory": "/mnt/cassandra/commitlog",
         "commitlog_sync": "periodic",
         "commitlog_sync_period_in_ms": 10000,
         "compaction_throughput_mb_per_sec": 16,
         "concurrent_reads": 32,
         "concurrent_writes": 32,
         "data_file_directories": [
-            "/mnt/resource/cassandra/data"
+            "/mnt/cassandra/data"
         ],
         "dynamic_snitch_badness_threshold": 0.1,
         "dynamic_snitch_reset_interval_in_ms": 600000,
@@ -199,7 +199,7 @@ sudo tee provision.json > /dev/null <<EOF
         "rpc_keepalive": true,
         "rpc_port": 9160,
         "rpc_server_type": "sync",
-        "saved_caches_directory": "/mnt/resource/cassandra/saved_caches",
+        "saved_caches_directory": "/mnt/cassandra/saved_caches",
         "snapshot_before_compaction": false,
         "ssl_storage_port": 7001,
         "storage_port": 7000,
