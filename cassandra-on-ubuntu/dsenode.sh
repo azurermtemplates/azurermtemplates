@@ -22,3 +22,4 @@ apt-get -y install oracle-java7-installer
 
 #Need to see if we can find a better solution
 chmod 777 /mnt
+chmod 777 /datadisks

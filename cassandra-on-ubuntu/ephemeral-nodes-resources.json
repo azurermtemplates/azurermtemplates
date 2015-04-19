@@ -5,7 +5,7 @@
     "region": {
       "type": "string"
     },
-    "storageAccountName": {
+    "storageAccountPrefix": {
       "type": "string"
     },
     "adminUsername": {
@@ -34,7 +34,8 @@
     }
   },
   "variables": {
-    "subnetRef": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('subnet').vnet), '/subnets/', parameters('subnet').name)]"
+    "subnetRef": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('subnet').vnet), '/subnets/', parameters('subnet').name)]",
+    "storageAccountName": "[concat(parameters('storageAccountPrefix'), parameters('namespace'))]"
   },
   "resources": [
     {
@@ -44,6 +45,15 @@
       "location": "[parameters('region')]",
       "properties": {}
     },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('storageAccountName')]",
+      "apiVersion": "2014-12-01-preview",
+      "location": "[parameters('region')]",
+      "properties": {
+        "accountType": "Standard_LRS"
+      }
+    }
     {
       "apiVersion": "2014-12-01-preview",
       "type": "Microsoft.Network/networkInterfaces",
@@ -97,7 +107,17 @@
           "sourceImage": {
             "id": "[parameters('osSettings').sourceImage]"
           },
-          "destinationVhdsContainer": "[concat('http://',parameters('storageAccountName'),'.blob.core.windows.net/vhds/')]"
+          "dataDisks": [
+            {
+              "name": "datadisk1",
+              "diskSizeGB": "1023",
+              "lun": 0,
+              "vhd": {
+                "Uri": "[concat('http://', parameters('groupName'), variables('storageAccountName'),'.blob.core.windows.net/','vhds/', parameters('namespace'),'vm', copyindex(),'DataDisk1.vhd')]"
+              }
+            }
+          ],
+          "destinationVhdsContainer": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/vhds/')]"
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -127,9 +147,10 @@
         "typeHandlerVersion": "1.2",
         "settings": {
           "fileUris": [
+            "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/shared_scripts/ubuntu/vm-disk-utils-0.1.sh"
             "[parameters('osSettings').script]"
           ],
-          "commandToExecute": "bash dsenode.sh"
+          "commandToExecute": "bash vm-disk-utils-0.sh && dsenode.sh"
         }
       }
     }
