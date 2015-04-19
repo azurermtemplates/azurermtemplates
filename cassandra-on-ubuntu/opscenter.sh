@@ -50,7 +50,7 @@ ADMIN_USER=""
 SSH_KEY_PATH=""
 
 #Loop through options passed
-while getopts :n:d:u:p:e optname; do
+while getopts :n:d:u:p:j:k:e optname; do
     log "Option $optname set with value ${OPTARG}"
   case $optname in
     n)
@@ -65,6 +65,12 @@ while getopts :n:d:u:p:e optname; do
     d) #Static dicovery endpoints
       DSE_ENDPOINTS=${OPTARG}
       ;;
+    j) # Ops Center Admin Username
+       OPS_CENTER_ADMIN=${OPTARG}
+       ;;
+    k) # Ops Center Admin Password
+       OPS_CENTER_ADMIN_PASS=${OPTARG}
+       ;;
     e) #place data on local resource disk
       EPHEMERAL=1
       ;;
@@ -232,3 +238,5 @@ sleep 14
 
 curl -X POST localhost:8888/provision -d @provision.json
 # {"message": "Hosts need SSH key fingerprint verification", "fingerprints": {"10.0.0.11": "2048 ee:58:a1:31:a8:b6:b2:d0:8c:0d:57:fa:3c:b3:64:9e (RSA)", "10.0.0.10": "2048 5a:f1:08:60:bc:c4:ab:0e:a4:5e:23:c6:c2:f3:10:dc (RSA)", "10.0.0.12": "2048 dd:ef:a4:a5:a4:41:e2:fd:ed:cf:8c:12:5f:56:fa:77 (RSA)"}}
+
+# To enable password authentication, use the set_passwd.py utility to create users and set their password and role. OpsCenter currently has two available roles: admin or user.
