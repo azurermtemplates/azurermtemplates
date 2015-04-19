@@ -1,7 +1,19 @@
 #!/bin/bash
 
-#Install and configure pre-requisites for datastax cluster node
+# TEMP FIX - Re-evaluate and remove when possible
+# This is an interim fix for hostname resolution in current VM (If it does not exist add it)
+grep -q "${HOSTNAME}" /etc/hosts
+if [ $? -eq $SUCCESS ]
+then
+  echo "${HOSTNAME}found in /etc/hosts"
+else
+  echo "${HOSTNAME} not found in /etc/hosts"
+  # Append it to the hsots file if not there
+  echo "127.0.0.1 $(hostname)" >> /etc/hosts
+  log "hostname ${HOSTNAME} added to /etchosts"
+fi
 
+#Install and configure pre-requisites for datastax cluster node
 source /etc/lsb-release
 
 #Install Java
