@@ -50,7 +50,7 @@ ADMIN_USER=""
 SSH_KEY_PATH=""
 
 #Loop through options passed
-while getopts :d:u:p:e optname; do
+while getopts :n:d:u:p:e optname; do
     log "Option $optname set with value ${OPTARG}"
   case $optname in
     n)
