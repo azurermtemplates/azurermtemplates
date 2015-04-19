@@ -147,10 +147,7 @@
         "type": "CustomScriptForLinux",
         "typeHandlerVersion": "1.2",
         "settings": {
-          "fileUris": [
-            "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/shared_scripts/ubuntu/vm-disk-utils-0.1.sh",
-            "[parameters('osSettings').script]"
-          ],
+          "fileUris": "[parameters('osSettings').scripts]",
           "commandToExecute": "bash dsenode.sh"
         }
       }

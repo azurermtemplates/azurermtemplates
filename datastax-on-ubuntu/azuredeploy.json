@@ -3,22 +3,49 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "region": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "West US",
+      "metadata": {
+          "Description": "Location where resources will be provisioned"
+      }
     },
     "storageAccountPrefix": {
-      "type": "string"
+      "type": "string",
+      "defaultValue": "uniqueStorageAccountName",
+      "metadata": {
+          "Description": "Unique namespace for the Storage Account where the Virtual Machine's disks will be placed"
+      }
     },
-    "manageAdminUsername": {
-      "type": "string"
+    "virtualNetworkName": {
+      "type": "string",
+      "defaultValue": "myVNET",
+      "metadata": {
+          "Description": "The arbitrary name of the virtual network provisioned for the cluster"
+      }
     },
-    "manageAdminPassword": {
-      "type": "securestring"
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+          "Description": "Administrator user name used when provisioning virtual machines"
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+          "Description": "Administrator password used when provisioning virtual machines"
+      }
     },
     "opsCenterAdminUsername": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+          "Description": "Administrator username used when provisioning Datastax Operations Center"
+      }
     },
     "opsCenterAdminPassword": {
-      "type": "securestring"
+      "type": "securestring",
+      "metadata": {
+          "Description": "Administrator password used when provisioning Datastax Operations Center"
+      }
     },
     "clusterVmSize": {
       "type":"string",
@@ -26,23 +53,30 @@
       "allowedValues": [
         "Standard_D3",
         "Standard_D4"
-      ]
+      ],
+      "metadata": {
+          "Description": "The size of the virtual machines used when provisioning cluster nodes"
+      }
     },
     "clusterNodeCount": {
-      "type": "int"
-    },
-    "virtualNetworkName": {
-      "type": "string"
+      "type": "int",
+      "metadata": {
+          "Description": "The number of nodes provisioned in the cluster"
+      }
     },
     "clusterName": {
-      "type": "string"
+      "type": "string",
+      "metadata": {
+          "Description": "The name of the cluster provisioned"
+      }
     }
   },
   "variables": {
-    "templateBaseUrl": "https://raw.githubusercontent.com/trentmswanson/azurermtemplates/master/",
+    "templateBaseUrl": "https://raw.githubusercontent.com/trentmswanson/azurermtemplates/master/datastax-on-ubuntu/",
     "sharedTemplateUrl": "[concat(variables('templateBaseUrl'), 'shared-resources.json')]",
     "clusterNodesTemplateUrl": "[concat(variables('templateBaseUrl'), 'ephemeral-nodes-resources.json')]",
     "opsCenterTemplateUrl": "[concat(variables('templateBaseUrl'), 'opscenter-resources.json')]",
+    "opsCenterVmSize": "Standard_A1",
     "networkSettings":{
       "virtualNetworkName": "[parameters('virtualNetworkName')]",
       "addressPrefix": "10.0.0.0/16",
@@ -50,7 +84,7 @@
         "dse": {
           "name": "dse",
           "prefix": "10.0.0.0/24",
-          "vnet": "[[parameters('virtualNetworkName')]"
+          "vnet": "[parameters('virtualNetworkName')]"
         }
       },
       "statics": {
@@ -62,10 +96,12 @@
       }
     },
     "osSettings":{
-        "value":{
-            "sourceImage":"/ed8df19a-cf20-4645-80b2-663a99dd9051/services/images/b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
-            "script":"https://raw.githubusercontent.com/trentmswanson/azurermtemplates/master/cassandra-on-ubuntu/dsenode.sh"
-        }
+        "sourceImage":"/ed8df19a-cf20-4645-80b2-663a99dd9051/services/images/b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
+        "scrtips": [
+          "https://raw.githubusercontent.com/trentmswanson/azurermtemplates/master/datastax-on-ubuntu/dsenode.sh",
+          "https://raw.githubusercontent.com/trentmswanson/azurermtemplates/master/datastax-on-ubuntu/opscenter.sh",
+          "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/shared_scripts/ubuntu/vm-disk-utils-0.1.sh"
+        ]
     },
     "sharedStorageAccountName":"[concat(parameters('storageAccountPrefix'),'cmn')]",
     "nodeList":"[concat(variables('networkSettings').statics.clusterRange.base, variables('networkSettings').statics.clusterRange.start, '-', parameters('clusterNodeCount'))]"
@@ -109,10 +145,10 @@
         },
         "parameters": {
           "adminUsername": {
-            "value": "[parameters('manageAdminUsername')]"
+            "value": "[parameters('adminUsername')]"
           },
           "adminPassword": {
-            "value": "[parameters('manageAdminPassword')]"
+            "value": "[parameters('adminPassword')]"
           },
           "region": {
             "value": "[parameters('region')]"
@@ -159,22 +195,25 @@
             "value": "[variables('sharedStorageAccountName')]"
           },
           "adminUsername": {
-            "value": "[parameters('manageAdminUsername')]"
+            "value": "[parameters('adminUsername')]"
           },
           "adminPassword": {
-            "value": "[parameters('manageAdminPassword')]"
+            "value": "[parameters('adminPassword')]"
           },
           "namespace": {
             "value": "opc"
           },
           "staticIp": {
-            "value": "[variables('networkSettings').statics.opsCenter"
+            "value": "[variables('networkSettings').statics.opsCenter]"
           },
           "region": {
             "value": "[parameters('region')]"
           },
           "subnet": {
-            "value": "[variables('networkSettings').subnet.master]"
+            "value": "[variables('networkSettings').subnet.dse]"
+          },
+          "vmSize": {
+            "value": "[variables('opsCenterVmSize')]"
           },
           "osSettings": {
             "value": "[variables('osSettings')]"
