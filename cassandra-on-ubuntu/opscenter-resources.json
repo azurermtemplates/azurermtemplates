@@ -31,6 +31,9 @@
     },
     "nodeList": {
       "type": "string"
+    },
+    "clusterName": {
+      "type": "string"
     }
   },
   "variables": {
@@ -137,7 +140,7 @@
           "fileUris": [
             "[parameters('osSettings').script]"
           ],
-          "commandToExecute": "[concat('bash opscenter.sh -u ', parameters('adminUsername'), ' -p ', parameters('adminPassword'), ' -ed ', parameters('nodeList'))]"
+          "commandToExecute": "[concat('bash opscenter.sh -n \"', parameters('clusterName') , '\" -u ', parameters('adminUsername'), ' -p ', parameters('adminPassword'), ' -ed ', parameters('nodeList'))]"
         }
       }
     }

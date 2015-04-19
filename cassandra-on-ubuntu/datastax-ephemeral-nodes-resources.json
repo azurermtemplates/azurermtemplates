@@ -110,12 +110,16 @@
     },
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat(parameters('namespace'), 'vm', '/installdsenode')]",
+      "name": "[concat(parameters('namespace'), 'vm', copyindex(), '/installdsenode')]",
       "apiVersion": "2014-12-01-preview",
       "location": "[parameters('region')]",
+      "copy": {
+        "name": "[concat(parameters('namespace'), 'vmLoop')]",
+        "count": "[parameters('nodeCount')]"
+      },
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', parameters('namespace'), 'vm')]",
-        "[concat('Microsoft.Network/networkInterfaces/', parameters('namespace'), 'nic')]"
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('namespace'), 'vm', copyindex())]",
+        "[concat('Microsoft.Network/networkInterfaces/', parameters('namespace'), 'nic', copyindex())]"
       ],
       "properties": {
         "publisher": "Microsoft.OSTCExtensions",
