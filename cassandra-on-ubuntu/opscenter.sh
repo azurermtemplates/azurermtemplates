@@ -199,9 +199,9 @@ sudo tee provision.json > /dev/null <<EOF
     },
     "install_params": {
         "username": "${ADMIN_USER}",
-        "password": "somepassword",
+        "password": "${ADMIN_PASSWORD}",
         "package": "dsc",
-        "version": "1.1.2"
+        "version": "2.1.1"
     },
     "nodes": [
         $NODE_LIST
