@@ -80,14 +80,11 @@ while getopts :n:d:u:p:e optname; do
   esac
 done
 
-source /etc/lsb-release
-
 #Install Java
-echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu ${DISTRIB_CODENAME} main" | tee /etc/apt/sources.list.d/webupd8team-java.list
-echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu ${DISTRIB_CODENAME} main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886
-apt-get update
-echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+add-apt-repository -y ppa:webupd8team/java
+apt-get -y update 
+echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
+echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections
 apt-get -y install oracle-java7-installer
  
  #Tune environment
@@ -164,20 +161,18 @@ sudo tee provision.json > /dev/null <<EOF
 {
     "cassandra_config": {
         "authenticator": "org.apache.cassandra.auth.AllowAllAuthenticator",
-        "authority": "org.apache.cassandra.auth.AllowAllAuthority",
         "auto_snapshot": true,
         "start_native_transport": true,
         "cluster_name": "${CLUSTER_NAME}",
         "column_index_size_in_kb": 64,
-        "commitlog_directory": "/var/lib/cassandra/commitlog",
+        "commitlog_directory": "/mnt/resource/cassandra/commitlog",
         "commitlog_sync": "periodic",
         "commitlog_sync_period_in_ms": 10000,
-        "compaction_preheat_key_cache": true,
         "compaction_throughput_mb_per_sec": 16,
         "concurrent_reads": 32,
         "concurrent_writes": 32,
         "data_file_directories": [
-            "/mnt/cassandra/data"
+            "/mnt/resource/cassandra/data"
         ],
         "dynamic_snitch_badness_threshold": 0.1,
         "dynamic_snitch_reset_interval_in_ms": 600000,
@@ -190,30 +185,21 @@ sudo tee provision.json > /dev/null <<EOF
             "truststore_password": "cassandra"
         },
         "endpoint_snitch": "SimpleSnitch",
-        "flush_largest_memtables_at": 0.75,
         "hinted_handoff_enabled": true,
-        "hinted_handoff_throttle_delay_in_ms": 1,
-        "in_memory_compaction_limit_in_mb": 64,
         "incremental_backups": false,
         "index_interval": 128,
         "initial_token": null,
         "key_cache_save_period": 14400,
         "key_cache_size_in_mb": null,
         "max_hint_window_in_ms": 3600000,
-        "memtable_flush_queue_size": 4,
-        "multithreaded_compaction": false,
         "partitioner": "org.apache.cassandra.dht.RandomPartitioner",
-        "reduce_cache_capacity_to": 0.6,
-        "reduce_cache_sizes_at": 0.85,
         "request_scheduler": "org.apache.cassandra.scheduler.NoScheduler",
-        "row_cache_provider": "SerializingCacheProvider",
         "row_cache_save_period": 0,
         "row_cache_size_in_mb": 0,
         "rpc_keepalive": true,
         "rpc_port": 9160,
         "rpc_server_type": "sync",
-        "rpc_timeout_in_ms": 10000,
-        "saved_caches_directory": "/var/lib/cassandra/saved_caches",
+        "saved_caches_directory": "/mnt/resource/cassandra/saved_caches",
         "snapshot_before_compaction": false,
         "ssl_storage_port": 7001,
         "storage_port": 7000,
