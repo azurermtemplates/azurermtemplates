@@ -18,7 +18,7 @@
       "type": "string"
     },
     "vmSize": {
-      "type":"string"
+      "type": "string"
     },
     "osSettings": {
       "type": "object"
@@ -53,7 +53,7 @@
       "properties": {
         "accountType": "Standard_LRS"
       }
-    }
+    },
     {
       "apiVersion": "2014-12-01-preview",
       "type": "Microsoft.Network/networkInterfaces",
@@ -89,7 +89,8 @@
       },
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', parameters('namespace'), 'nic', copyindex())]",
-        "[concat('Microsoft.Compute/availabilitySets/', parameters('namespace'), 'set')]"
+        "[concat('Microsoft.Compute/availabilitySets/', parameters('namespace'), 'set')]",
+        "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
       ],
       "properties": {
         "availabilitySet": {
@@ -113,7 +114,7 @@
               "diskSizeGB": "1023",
               "lun": 0,
               "vhd": {
-                "Uri": "[concat('http://', parameters('groupName'), variables('storageAccountName'),'.blob.core.windows.net/','vhds/', parameters('namespace'),'vm', copyindex(),'DataDisk1.vhd')]"
+                "Uri": "[concat('http://', variables('storageAccountName'),'.blob.core.windows.net/','vhds/', 'vm', copyindex(),'DataDisk1.vhd')]"
               }
             }
           ],
@@ -147,10 +148,10 @@
         "typeHandlerVersion": "1.2",
         "settings": {
           "fileUris": [
-            "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/shared_scripts/ubuntu/vm-disk-utils-0.1.sh"
+            "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/shared_scripts/ubuntu/vm-disk-utils-0.1.sh",
             "[parameters('osSettings').script]"
           ],
-          "commandToExecute": "bash vm-disk-utils-0.sh && dsenode.sh"
+          "commandToExecute": "bash dsenode.sh"
         }
       }
     }

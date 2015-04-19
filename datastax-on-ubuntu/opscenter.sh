@@ -32,7 +32,7 @@ fi
 # TEMP FIX - Re-evaluate and remove when possible
 # This is an interim fix for hostname resolution in current VM (If it does not exist add it)
 grep -q "${HOSTNAME}" /etc/hosts
-if [ $? == 0 ]
+if [ $? == 0 ];
 then
   echo "${HOSTNAME}found in /etc/hosts"
 else

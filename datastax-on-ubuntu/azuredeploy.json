@@ -1,0 +1,195 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "region": {
+      "type": "string"
+    },
+    "storageAccountPrefix": {
+      "type": "string"
+    },
+    "manageAdminUsername": {
+      "type": "string"
+    },
+    "manageAdminPassword": {
+      "type": "securestring"
+    },
+    "opsCenterAdminUsername": {
+      "type": "string"
+    },
+    "opsCenterAdminPassword": {
+      "type": "securestring"
+    },
+    "clusterVmSize": {
+      "type":"string",
+      "defaultValue": "Standard_D3",
+      "allowedValues": [
+        "Standard_D3",
+        "Standard_D4"
+      ]
+    },
+    "clusterNodeCount": {
+      "type": "int"
+    },
+    "virtualNetworkName": {
+      "type": "string"
+    },
+    "clusterName": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "templateBaseUrl": "https://raw.githubusercontent.com/trentmswanson/azurermtemplates/master/",
+    "sharedTemplateUrl": "[concat(variables('templateBaseUrl'), 'shared-resources.json')]",
+    "clusterNodesTemplateUrl": "[concat(variables('templateBaseUrl'), 'ephemeral-nodes-resources.json')]",
+    "opsCenterTemplateUrl": "[concat(variables('templateBaseUrl'), 'opscenter-resources.json')]",
+    "networkSettings":{
+      "virtualNetworkName": "[parameters('virtualNetworkName')]",
+      "addressPrefix": "10.0.0.0/16",
+      "subnet": {
+        "dse": {
+          "name": "dse",
+          "prefix": "10.0.0.0/24",
+          "vnet": "[[parameters('virtualNetworkName')]"
+        }
+      },
+      "statics": {
+        "clusterRange": {
+          "base":"10.0.0.",
+          "start":5
+        },
+        "opsCenter": "10.0.0.240"
+      }
+    },
+    "osSettings":{
+        "value":{
+            "sourceImage":"/ed8df19a-cf20-4645-80b2-663a99dd9051/services/images/b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
+            "script":"https://raw.githubusercontent.com/trentmswanson/azurermtemplates/master/cassandra-on-ubuntu/dsenode.sh"
+        }
+    },
+    "sharedStorageAccountName":"[concat(parameters('storageAccountPrefix'),'cmn')]",
+    "nodeList":"[concat(variables('networkSettings').statics.clusterRange.base, variables('networkSettings').statics.clusterRange.start, '-', parameters('clusterNodeCount'))]"
+  },
+  "resources": [
+    {
+      "name": "shared",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('sharedTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "region": {
+            "value": "[parameters('region')]"
+          },
+          "networkSettings": {
+            "value": "[variables('networkSettings')]"
+          },
+          "storageAccountName": {
+            "value": "[variables('sharedStorageAccountName')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "cluster-nodes",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments/', 'shared')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('clusterNodesTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('manageAdminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('manageAdminPassword')]"
+          },
+          "region": {
+            "value": "[parameters('region')]"
+          },
+          "storageAccountPrefix": {
+            "value": "[parameters('storageAccountPrefix')]"
+          },
+          "vmSize": {
+            "value": "[parameters('clusterVmSize')]"
+          },
+          "subnet": {
+            "value": "[variables('networkSettings').subnet.dse]"
+          },
+          "osSettings": {
+            "value": "[variables('osSettings')]"
+          },
+          "staticIps": {
+            "value": "[variables('networkSettings').statics.clusterRange]"
+          },
+          "nodeCount": {
+            "value": "[parameters('clusterNodeCount')]"
+          },
+          "namespace": {
+            "value": "dc1"
+          }
+        }
+      }
+    },
+    {
+      "name": "ops-center-nodes",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments/', 'cluster-nodes')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('opsCenterTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "storageAccountName": {
+            "value": "[variables('sharedStorageAccountName')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('manageAdminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('manageAdminPassword')]"
+          },
+          "namespace": {
+            "value": "opc"
+          },
+          "staticIp": {
+            "value": "[variables('networkSettings').statics.opsCenter"
+          },
+          "region": {
+            "value": "[parameters('region')]"
+          },
+          "subnet": {
+            "value": "[variables('networkSettings').subnet.master]"
+          },
+          "osSettings": {
+            "value": "[variables('osSettings')]"
+          },
+          "opsCenterSettings": {
+            "value": {
+              "clusterName":"[parameters('clusterName')]",
+              "nodeList":"[variables('nodeList')]",
+              "adminUsername":"[parameters('opsCenterAdminUsername')]",
+              "adminPassword":"[parameters('opsCenterAdminPassword')]"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}

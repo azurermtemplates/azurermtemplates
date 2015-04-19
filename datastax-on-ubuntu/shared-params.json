@@ -1,6 +1,6 @@
 {
   "storageAccountName": {
-    "value": "trentcas10"
+    "value": "trentcas14"
   },
   "region": {
     "value": "West US"
@@ -13,7 +13,7 @@
         "dse": {
           "name": "dse",
           "prefix": "10.0.0.0/24",
-          "vnet": "[concat(resourceId('Microsoft.Network/virtualNetworks', 'dse41'),'/subnets/','dse'))]"
+          "vnet": "dse41"
         }
       }
     }

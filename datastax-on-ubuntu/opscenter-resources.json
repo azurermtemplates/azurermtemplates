@@ -18,10 +18,10 @@
       "type": "string"
     },
     "osSettings": {
-      "type":"object"
+      "type": "object"
     },
     "vmSize": {
-      "type":"string"
+      "type": "string"
     },
     "subnet": {
       "type": "object"
@@ -29,11 +29,8 @@
     "staticIp": {
       "type": "string"
     },
-    "nodeList": {
-      "type": "string"
-    },
-    "clusterName": {
-      "type": "string"
+    "opsCenterSettings": {
+      "type": "object"
     }
   },
   "variables": {
@@ -140,7 +137,7 @@
           "fileUris": [
             "[parameters('osSettings').script]"
           ],
-          "commandToExecute": "[concat('bash opscenter.sh -n \"', parameters('clusterName') , '\" -u ', parameters('adminUsername'), ' -p ', parameters('adminPassword'), ' -ed ', parameters('nodeList'))]"
+          "commandToExecute": "[concat('bash opscenter.sh -n \"', parameters('opsCenterSettings').clusterName , '\" -u ', parameters('adminUsername'), ' -p ', parameters('adminPassword'), ' -j ' , parameters('opsCenterSettings').adminUsername, ' -k ' , parameters('opsCenterSettings').adminPassword , ' -ed ', parameters('opsCenterSettings').nodeList)]"
         }
       }
     }
