@@ -209,5 +209,7 @@ sudo tee provision.json > /dev/null <<EOF
 }
 EOF
 
-curl -X POST localhost:8888/provision -d @provision.json
+# sleep 10
+
+# curl -X POST localhost:8888/provision -d @provision.json
 
