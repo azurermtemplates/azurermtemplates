@@ -229,7 +229,7 @@ sudo tee provision.json > /dev/null <<EOF
         "version": "2.1.1"
     },
     "nodes": [
-        ${NODE_LIST}
+        ${NODE_CONFIG_LIST}
     ],
     "accepted_fingerprints": {
         ${ACCEPTED_FINGERPRINTS}
