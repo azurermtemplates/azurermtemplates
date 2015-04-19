@@ -43,6 +43,7 @@ else
 fi
 
 #Script Parameters
+CLUSTER_NAME="Test Cluster"
 EPHEMERAL=0
 DSE_ENDPOINTS=""
 ADMIN_USER=""
@@ -52,6 +53,9 @@ SSH_KEY_PATH=""
 while getopts :d:u:p:e optname; do
     log "Option $optname set with value ${OPTARG}"
   case $optname in
+    n)
+      CLUSTER_NAME=${OPTARG}
+      ;;
   	u) #Credentials used for node install
       ADMIN_USER=${OPTARG}
       ;;
@@ -131,9 +135,29 @@ expand_ip_range() {
 }
 
 # Convert the DSE endpoint range to a list for the provisioniing configuration
-S=$(expand_ip_range "$DSE_ENDPOINTS")
-NODE_LIST="\"${S// /\",\"}\""
+NODE_IP_LIST=$(expand_ip_range "$DSE_ENDPOINTS")
 
+get_node_fingerprints() {
+    TR=($1)
+
+    ACCEPTED_FINGERPRINTS=""
+    for HOST in "${TR[@]}";
+    do
+        ssh-keyscan -p 22 -t rsa "$HOST" > /tmp/tmpsshkeyhost.pub
+        HOSTKEY=$(ssh-keygen -lf /tmp/tmpsshkeyhost.pub)
+
+        # TODO - This is a bit of a formatting hack job, need to clean it up
+        HOSTKEY=`echo ${HOSTKEY} | cut -d" " -f1-2`
+        HOSTKEY+=" (RSA)"
+        ACCEPTED_FINGERPRINTS+="\"$HOST\": \"$HOSTKEY\","
+    done
+    ACCEPTED_FINGERPRINTS="${ACCEPTED_FINGERPRINTS%?}"
+
+    echo "$ACCEPTED_FINGERPRINTS"
+}
+
+NODE_CONFIG_LIST="\"${NODE_IP_LIST// /\",\"}\""
+ACCEPTED_FINGERPRINTS=$(get_node_fingerprints "$NODE_IP_LIST")
 
 # Create node provisioning document
 sudo tee provision.json > /dev/null <<EOF
@@ -142,7 +166,8 @@ sudo tee provision.json > /dev/null <<EOF
         "authenticator": "org.apache.cassandra.auth.AllowAllAuthenticator",
         "authority": "org.apache.cassandra.auth.AllowAllAuthority",
         "auto_snapshot": true,
-        "cluster_name": "Test Cluster",
+        "start_native_transport": true,
+        "cluster_name": "${CLUSTER_NAME}",
         "column_index_size_in_kb": 64,
         "commitlog_directory": "/var/lib/cassandra/commitlog",
         "commitlog_sync": "periodic",
@@ -152,7 +177,7 @@ sudo tee provision.json > /dev/null <<EOF
         "concurrent_reads": 32,
         "concurrent_writes": 32,
         "data_file_directories": [
-            "/var/lib/cassandra/data"
+            "/mnt/cassandra/data"
         ],
         "dynamic_snitch_badness_threshold": 0.1,
         "dynamic_snitch_reset_interval_in_ms": 600000,
@@ -204,12 +229,20 @@ sudo tee provision.json > /dev/null <<EOF
         "version": "2.1.1"
     },
     "nodes": [
-        $NODE_LIST
-    ]
+        ${NODE_LIST}
+    ],
+    "accepted_fingerprints": {
+        ${ACCEPTED_FINGERPRINTS}
+    }
 }
 EOF
 
-# sleep 10
+# "10.0.0.11": "2048 ee:58:a1:31:a8:b6:b2:d0:8c:0d:57:fa:3c:b3:64:9e (RSA)",
+#      "10.0.0.10": "2048 5a:f1:08:60:bc:c4:ab:0e:a4:5e:23:c6:c2:f3:10:dc (RSA)",
+#      "10.0.0.12": "2048 dd:ef:a4:a5:a4:41:e2:fd:ed:cf:8c:12:5f:56:fa:77 (RSA)"
 
-# curl -X POST localhost:8888/provision -d @provision.json
+# We seem to be trying to hit the endpoint too early the service is not listening yet
+sleep 14
 
+curl -X POST localhost:8888/provision -d @provision.json
+# {"message": "Hosts need SSH key fingerprint verification", "fingerprints": {"10.0.0.11": "2048 ee:58:a1:31:a8:b6:b2:d0:8c:0d:57:fa:3c:b3:64:9e (RSA)", "10.0.0.10": "2048 5a:f1:08:60:bc:c4:ab:0e:a4:5e:23:c6:c2:f3:10:dc (RSA)", "10.0.0.12": "2048 dd:ef:a4:a5:a4:41:e2:fd:ed:cf:8c:12:5f:56:fa:77 (RSA)"}}
