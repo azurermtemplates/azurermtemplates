@@ -178,13 +178,6 @@
 			},
 			"defaultValue":"adarmtest.com"
 		},
-		"domainNetbiosName":{
-			"type":"string",
-			"metadata": {
-				"Description": "The NetBIOS name of the AD Domain created "
-			},
-			"defaultValue":"adarmtest"
-		},
 		"dnsPrefix":{
 			"type":"string",
 			"metadata": {
@@ -215,6 +208,10 @@
 		}
 	},
 	"variables": {
+		"adLBFE":"LBFE",
+		"adLBBE":"LBBE",
+		"adPDCRDPNAT":"adPDCRDP",
+		"adBDCRDPNAT":"adBDCRDP",
 		"VnetID": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
 		"adSubnetRef": "[concat(variables('VnetID'),'/subnets/',parameters('adSubnetName'))]",
 		"adSourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('adImageName'))]",
@@ -224,7 +221,10 @@
 		"adBDCIPConfigID": "[concat(variables('adBDCNicId'),'/ipConfigurations/ipconfig1')]",
 		"adLBName" : "adLoadBalancer",
 		"adlbID":"[resourceId('Microsoft.Network/loadBalancers',variables('adLBName'))]",
-		"adlbFEConfigID":"[concat(variables('adlbID'),'/frontendIPConfigurations/LBFE')]",
+		"adlbFEConfigID":"[concat(variables('adlbID'),'/frontendIPConfigurations/',variables('adLBFE'))]",
+		"adPDCRDPNATRuleID":"[concat(variables('adlbID'),'/inboundNatRules/',variables('adPDCRDPNAT'))]",
+		"adBDCRDPNATRuleID":"[concat(variables('adlbID'),'/inboundNatRules/',variables('adBDCRDPNAT'))]",
+		"adBEAddressPoolID":"[concat(variables('adlbID'),'/backendAddressPools/',variables('adLBBE'))]",
 		"adPDCDataDisk":"ADPDCDataDisk",
 		"adBDCDataDisk":"ADBDCDataDisk",
 		"adDataDiskSize":1000,
@@ -283,121 +283,124 @@
 			}
 		},
 		{
-		 "name": "[parameters('adPDCNicName')]",
-		 "type": "Microsoft.Network/networkInterfaces",
-		 "location": "[parameters('deploymentLocation')]",
-		 "dependsOn": ["Microsoft.Resources/deployments/VNet"],
-		 "apiVersion": "2014-12-01-preview",
-		 "properties": {
-			 "ipConfigurations": [
-				 {
-					 "name": "ipconfig1",
-					 "properties": {
-						"privateIPAllocationMethod": "Static",
-						"privateIPAddress" :"[parameters('adPDCNicIPAddress')]",
-						"subnet": {
-							"id": "[variables('adSubnetRef')]"
-						 }
-					 }
-				 }
-			 ]
-		 }
+			"apiVersion": "2014-12-01-preview",
+			"name": "[variables('adLBName')]",
+			"type": "Microsoft.Network/loadBalancers",
+			"location": "[parameters('deploymentLocation')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName'))]"
+			],
+			"properties": {
+				"frontendIPConfigurations": [
+					{
+						"name": "[variables('adLBFE')]",
+						"properties": {
+							"publicIPAddress": {
+								"id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName'))]"
+							},
+						}
+					}
+				],
+				"backendAddressPools": [
+					{
+						"name": "[variables('adLBBE')]"
+					}
+				],
+				"inboundNatRules": [
+					{
+						"name": "[variables('adPDCRDPNAT')]",
+						"properties": {
+							"frontendIPConfiguration": {
+								"id": "[variables('adlbFEConfigID')]"
+							},
+							"protocol": "tcp",
+							"frontendPort": "[parameters('PDCRDPPort')]",
+							"backendPort": 3389,
+							"enableFloatingIP": false
+						}
+					},
+					{
+						"name": "[variables('adBDCRDPNAT')]",
+						"properties": {
+							"frontendIPConfiguration": {
+									"id": "[variables('adlbFEConfigID')]"
+							},
+							"protocol": "tcp",
+							"frontendPort": "[parameters('BDCRDPPort')]",
+							"backendPort": 3389,
+							"enableFloatingIP": false
+						}
+					}
+				]
+			}
 		},
 		{
-		 "name": "[parameters('adBDCNicName')]",
-		 "type": "Microsoft.Network/networkInterfaces",
-		 "location": "[parameters('deploymentLocation')]",
-		 "dependsOn": ["Microsoft.Resources/deployments/VNet"],
-		 "apiVersion": "2014-12-01-preview",
-		 "properties": {
-			 "ipConfigurations": [
-				 {
-					 "name": "ipconfig1",
-					 "properties": {
-						"privateIPAllocationMethod": "Static",
-						"privateIPAddress" :"[parameters('adBDCNicIPAddress')]",
-						"subnet": {
-							"id": "[variables('adSubnetRef')]"
-						 }
-					 }
-				 }
-			 ]
-		 }
+			"name": "[parameters('adPDCNicName')]",
+			"type": "Microsoft.Network/networkInterfaces",
+			"location": "[parameters('deploymentLocation')]",
+			"dependsOn": [
+				"Microsoft.Resources/deployments/VNet",
+				"[concat('Microsoft.Network/loadBalancers/',variables('adLBName'))]"
+			],
+			"apiVersion": "2014-12-01-preview",
+			"properties": {
+				"ipConfigurations": [
+					{
+						"name": "ipconfig1",
+						"properties": {
+							"privateIPAllocationMethod": "Static",
+							"privateIPAddress" :"[parameters('adPDCNicIPAddress')]",
+							"subnet": {
+								"id": "[variables('adSubnetRef')]"
+							},
+							"loadBalancerBackendAddressPools": [
+								{
+									"id":"[variables('adBEAddressPoolID')]"
+								}
+							],
+							"loadBalancerInboundNatRules": [
+								{
+									"id": "[variables('adPDCRDPNATRuleID')]"
+								}
+							]
+						}
+					}
+				]
+			}
 		},
 		{
-		  "apiVersion": "2014-12-01-preview",
-		  "name": "[variables('adLBName')]",
-		  "type": "Microsoft.Network/loadBalancers",
-		  "location": "[parameters('deploymentLocation')]",
-		  "dependsOn": [
-			  "[concat('Microsoft.Network/networkInterfaces/', parameters('adPDCNicName'))]",
-			  "[concat('Microsoft.Network/networkInterfaces/', parameters('adBDCNicName'))]",
-			  "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName'))]"
-		  ],
-		  "properties": {
-			  "frontendIPConfigurations": [
-				  {
-					  "name": "LBFE",
-					  "properties": {
-						"publicIPAddress": {
-							"id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName'))]"
-						},
-					  }
-				  }
-			  ],
-			  "backendAddressPools": [
-				  {
-					  "name": "LBBE",
-					  "properties": {
-						  "backendIPConfigurations": [
-							  {
-								"id" : "[variables('adPDCIPConfigID')]"
-							  },
-							  {
-								"id" : "[variables('adBDCIPConfigID')]"
-							  }
-						  ]
-					  }
-				  }
-			  ],
-			  "inboundNatRules": [
-				  {
-					  "name": "adPDCRDP",
-					  "properties": {
-						  "frontendIPConfigurations": [
-							  {
-									"id": "[variables('adlbFEConfigID')]"
-							  }
-						  ],
-						  "backendIPConfiguration": {
-							  "id" : "[variables('adPDCIPConfigID')]"
-						  },
-						  "protocol": "tcp",
-						  "frontendPort": "[parameters('PDCRDPPort')]",
-						  "backendPort": 3389,
-						  "enableFloatingIP": false
-					  }
-				  },
-				  {
-					  "name": "adBDCRDP",
-					  "properties": {
-						  "frontendIPConfigurations": [
-							  {
-									"id": "[variables('adlbFEConfigID')]"
-							  }
-						  ],
-						  "backendIPConfiguration": {
-							  "id" : "[variables('adBDCIPConfigID')]"
-						  },
-						  "protocol": "tcp",
-						  "frontendPort": "[parameters('BDCRDPPort')]",
-						  "backendPort": 3389,
-						  "enableFloatingIP": false
-					  }
-				  }
-
-			  ]
-		  }
+			"name": "[parameters('adBDCNicName')]",
+			"type": "Microsoft.Network/networkInterfaces",
+			"location": "[parameters('deploymentLocation')]",
+			"dependsOn": [
+				"Microsoft.Resources/deployments/VNet",
+				"[concat('Microsoft.Network/loadBalancers/',variables('adLBName'))]"
+			],
+			"apiVersion": "2014-12-01-preview",
+			"properties": {
+				"ipConfigurations": [
+					{
+						"name": "ipconfig1",
+						"properties": {
+							"privateIPAllocationMethod": "Static",
+							"privateIPAddress" :"[parameters('adBDCNicIPAddress')]",
+							"subnet": {
+								"id": "[variables('adSubnetRef')]"
+							},
+							"loadBalancerBackendAddressPools": [
+								{
+									"id":"[variables('adBEAddressPoolID')]"
+								}
+							],
+							"loadBalancerInboundNatRules": [
+								{
+									"id": "[variables('adBDCRDPNATRuleID')]"
+								}
+							]
+						}
+					}
+				]
+			}
 		},
 		{
 			"apiVersion": "2014-12-01-preview",
@@ -468,7 +471,6 @@
 							"ConfigurationFunction": "[variables('adPDCConfigurationFunction')]",
 							"Properties": {
 								"DomainName": "[parameters('domainName')]",
-								"DomainNetBiosName":"[parameters('domainNetbiosName')]",
 								"AdminCreds":{
 									"UserName": "[parameters('adminUserName')]",
 									"Password": "PrivateSettingsRef:AdminPassword"
@@ -577,7 +579,6 @@
 					"ConfigurationFunction": "[variables('adBDCConfigurationFunction')]",
 					"Properties": {
 						"DomainName": "[parameters('domainName')]",
-						"DomainNetBiosName":"[parameters('domainNetbiosName')]",
 						"AdminCreds":{
 							"UserName": "[parameters('adminUserName')]",
 							"Password": "PrivateSettingsRef:AdminPassword"

@@ -2,10 +2,6 @@
 
 This template will deploy a new VM (along with a new VNet, Storage Account and Load Balancer) and will configure it as a Domain Controller and create a new forest and domain.
 
-There are a number of issues\workarounds in this template and the associated DSC Script:
-
-1. Version 1.7 of the DSC Extension has a problem whereby the script execution policy will not allow scripts to be executed , therefore the DSC script provided updates the execution policy before the DSC extension is run and then sets it back to default once the configuration has been applied.
-
 Click the button below to deploy
 
 <a href="https://azuredeploy.net" target="_blank">
@@ -35,7 +31,6 @@ Below are the parameters that the template expects
 | vmContainerName | The container name in the storage account where VM disks are stored|
 | adAvailabilitySetName | The name of the availability set that the AD VM is created in|
 | domainName | The FQDN of the AD Domain created |
-| domainNetbiosName | The NetBIOS name of the AD Domain created |
 | addnsName | The DNS prefix for the public IP address used by the Load Balancer |
 | RDPPort | The public RDP port for the VM |
 | AssetLocation | The location of resources such as templates and DSC modules that the script is dependent <br> <ul><li> **https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/activedirectorynewdomain (default)**</li></ul> |
