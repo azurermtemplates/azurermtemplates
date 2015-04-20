@@ -1,5 +1,24 @@
 #!/bin/bash
 
+#########################################################
+# Script Name: opscenter.sh
+# Author: Trent Swanson - Full Scale 180 Inc github:(trentmswanson)
+# Version: 0.1
+# Last Modified By:       Trent Swanson
+# Description:
+#  This scrtipt installs and configures Datastax Operations Center and deploys a cluster
+# Parameters :
+#  1 - n: Cluster name
+#  2 - u: Cluster node admin user that Operations Center uses for cluster provisioning
+#  3 - p: Cluster node admin password that Operations Center uses for cluster provisioning
+#  4 - d: List of successive cluster IP addresses represented as the starting address and a count used to increment the last octet (10.0.0.5-3)
+#  5 - j: Operations Center admin user
+#  6 - k: Operations Center admin password
+#  3 - h  Help 
+# Note : 
+# This script has only been tested on Ubuntu 12.04 LTS and must be root
+######################################################### 
+
 help()
 {
     #TODO: Add help text here
@@ -93,17 +112,6 @@ echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-
 echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections
 apt-get -y install oracle-java7-installer
  
- #Tune environment
-cat >> /etc/security/limits.d/cassandra.conf <<EOF
-* - memlock unlimited
-* - nofile 100000
-* - nproc 32768
-* - as unlimited
-EOF
- 
-echo "vm.max_map_count = 131072" >> /etc/sysctl.conf
-sudo sysctl -p
-
 #Install opscenter
 echo "deb http://debian.datastax.com/community stable main" | sudo tee -a /etc/apt/sources.list.d/datastax.community.list
 curl -L http://debian.datastax.com/debian/repo_key | sudo apt-key add -

@@ -1,5 +1,17 @@
 #!/bin/bash
 
+#########################################################
+# Script Name: dsenode.sh
+# Author: Trent Swanson - Full Scale 180 Inc github:(trentmswanson)
+# Version: 0.1
+# Last Modified By:       Trent Swanson
+# Description:
+#  This script prepares an Ubuntu VM image for Datastax OpsCenter Node Cluster Installation and Configure
+# Parameters :
+# Note : 
+# This script has only been tested on Ubuntu 14.04 LTS and must be root
+######################################################### 
+
 bash vm-disk-utils-0.1.sh
 
 # TEMP FIX - Re-evaluate and remove when possible
