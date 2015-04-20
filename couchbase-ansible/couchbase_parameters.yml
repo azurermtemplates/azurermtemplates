@@ -36,8 +36,8 @@ couchbase_server_node_data_ports: 21100:21299
 couchbase_server_config_file: "/opt/couchbase/var/lib/couchbase/config/config.dat"
 couchbase_server_home_path: "/opt/couchbase"
 couchbase_server_log_path: "/opt/couchbase/couchbase/var/lib/couchbase/logs"
-couchbase_server_data_path: "{{ mount_point }}/couchbase/var/lib/couchbase/data"
-couchbase_server_index_path: "{{ mount_point }}/couchbase/var/lib/couchbase/data"
+couchbase_server_data_path: "{{ mount_point }}/couchbase/data"
+couchbase_server_index_path: "{{ mount_point }}/couchbase/index"
 
 
 # NOT NEEDED : only needed if couchbase_server_tune_disks

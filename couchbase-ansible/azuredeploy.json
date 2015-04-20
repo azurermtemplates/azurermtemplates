@@ -196,6 +196,14 @@
 			}
 
 		},
+		"nginxConfigLocation":{
+			"type": "string",
+			"defaultValue":"customscript/nginx",
+			"metadata": {
+				"Description": "Specify the location of the nginx config template for the Couchbase Web Console"
+			}
+
+		},
 		"sshRootPubBlobLocation":{
 			"type": "string",
 			"defaultValue":"customscript/id_rsa.pub",
@@ -223,7 +231,7 @@
 			"metadata": {
 				"Description": "Specify the location of the ansible playbook that contains the installation parameters"
 			}
-		},
+		},				
 		"couchbaseAdminUser":{
 			"type": "string",			
 			"metadata": {
@@ -236,9 +244,16 @@
 				"Description": "Specify the Couchbase Admin Password"
 			}
 		},
+		"couchbaseWebConsolePort":{
+			"type": "string",			
+			"metadata": {
+				"Description": "Specify the Port assigned to the Couchbase Web admin Console"
+			},
+			"defaultValue": "16195"
+		},
 		"couchbaseMemoryAllocationPercentage":{
 			"type": "string",	
-			"defaultValue":"0.7",		
+			"defaultValue":"70",		
 			"metadata": {
 				"Description": "Specify the percentage of RAM Allocated to Couchbase. Leave Memory for the OS."
 			}
@@ -357,6 +372,7 @@
 		"customScriptAnsibleCommand": "[concat('bash ',variables('customScriptAnsibleFile'))]",
 		"customScriptAnsibleParameters": "[concat(' -i ',parameters('VMIPAddressStart'),' -n ',parameters('numberOfVms'),' -r ',parameters('createRAID'),' -f ',parameters('vmFileSystem'),' -u ',parameters('couchbaseAdminUser'),' -p ',parameters('couchbaseAdminPassword') ,' -m ',parameters('couchbaseMemoryAllocationPercentage') )]",
 		"sshRootCerBlobUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('sshRootCerBlobLocation'))]",
+		
 
 		"customScriptSSHRootFile" :"configure_ssh_root.sh",
 		"customScriptSSHRootUrl": "[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/customscript/',variables('customScriptSSHRootFile'))]",
@@ -365,7 +381,7 @@
 		"ansiblePlaybookUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('ansiblePlaybookLocation'))]",
 		"couchbasePlaybookUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('couchbasePlaybookLocation'))]",
 		"couchbaseParametersPlaybookUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('couchbasePlaybookParamsLocation'))]",
-
+		"nginxConfigTemplateUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('nginxConfigLocation'))]",		
 		
 
 		"newVirtualNetworkName": "[concat(parameters('virtualNetworkName'))]",
@@ -386,12 +402,7 @@
 		"lbFEConfigRef": "[concat(variables('loadBalancerRef'),'/frontendIPConfigurations/',variables('lbFEConfig'))]",
 		"lbBEConfig": "[concat('LBBEcbaFrontConfg')]",
 		"lbBEConfigRef": "[concat(variables('loadBalancerRef'),'/backendAddressPools/' ,variables('lbBEConfig'))]",
-		"lbcbaProbe": "[concat('cbaLBProbe')]",
-		"lbcbaProbeRef": "[concat(variables('loadBalancerRef'),'/probes/',variables('lbcbaProbe'))]",
-		"lbcbaPort": 8092,
-		"lbcbaAdminPort": 8091,
-		"lbcbaDataAcccessPort": 11211,
-		"lbcbaIdleTimeOut": 4,
+				
 
 		"storageAccountName": "[concat(resourceGroup().name,parameters('storageAccountName'))]",
 		"storageRef": "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
@@ -469,37 +480,9 @@
 				"backendAddressPools": [
 					{"name": "[variables('lbBEConfig')]"}
 				],
-				"probes": [
-					{
-						"name": "[variables('lbcbaProbe')]",
-						"properties": {
-							"protocol": "tcp",
-							"port": "[variables('lbcbaPort')]",
-							"intervalInSeconds": "5",
-							"numberOfProbes": "3"
-						}
-					}
-				],
-				"loadBalancingRules": [
-					{
-						"name": "[variables('lbRuleName')]",
-						"properties": {
-							"frontendIPConfiguration":{"id": "[variables('lbFEConfigRef')]"},							
-							"backendAddressPool": {"id": "[variables('lbBEConfigRef')]"},
-							"protocol": "tcp",
-							"frontendPort": "[variables('lbcbaAdminPort')]",
-							"backendPort": "[variables('lbcbaAdminPort')]",
-							"enableFloatingIP": false,
-							"idleTimeoutInMinutes": "[ variables('lbcbaIdleTimeOut')]",
-							"probe": {
-								"id": "[variables('lbcbaProbeRef')]"
-							}
-						}
-					}
-				],
 				"inboundNatRules": [
 					{
-						"name": "sshToAnsibleControllerNATRule",
+						"name": "sshToAnsibleControllerNAT",
 						"properties": {
 							"frontendIPConfiguration": {"id":"[variables('lbFEConfigRef')]"},		
 							"protocol": "tcp",
@@ -507,7 +490,18 @@
 							"backendPort": "[parameters('sshNatRuleBackEndPort')]",
 							"enableFloatingIP": false
 						}
-					}
+					},
+					{
+						"name": "couchbaseWebAdminConsoleNAT",
+						"properties": {
+							"frontendIPConfiguration": {"id":"[variables('lbFEConfigRef')]"},		
+							"protocol": "tcp",
+							"frontendPort": "[parameters('couchbaseWebConsolePort')]",
+							"backendPort": "[parameters('couchbaseWebConsolePort')]",
+							"enableFloatingIP": false
+						}
+					}					
+
 				]
 			}
 		},
@@ -719,7 +713,8 @@
 							"subnet": {	"id": "[variables('subnetBackEndRef')]"},
                 			"loadBalancerInboundNatRules":
                 			[
-                    			{"id": "[concat(variables('loadBalancerRef'),'/inboundNatRules/sshToAnsibleControllerNATRule')]"}                    			
+                    			{"id": "[concat(variables('loadBalancerRef'),'/inboundNatRules/sshToAnsibleControllerNAT')]"},
+                    			{"id": "[concat(variables('loadBalancerRef'),'/inboundNatRules/couchbaseWebAdminConsoleNAT')]"}
                 			]
 						}
 
@@ -806,8 +801,9 @@
 						"[variables('couchbaseParametersPlaybookUrl')]",
 						"[variables('sshRootPubBlobUrl')]",
 						"[variables('sshRootCerBlobUrl')]",
+						"[variables('nginxConfigTemplateUrl')]"
 					],
-					"commandToExecute": "[concat(variables('customScriptAnsibleCommand'),variables('customScriptAnsibleParameters'))]",
+					"commandToExecute": "[concat(variables('customScriptAnsibleCommand'),variables('customScriptAnsibleParameters'),' -q ',reference(variables('publicIPRef'),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).dnsSettings.fqdn ,' -o ', parameters('couchbaseWebConsolePort'))]",
 
 				},
 				"protectedSettings":{
@@ -826,7 +822,7 @@
 				"type":"string"
 		},
 		"couchbaseWebURL":{
-				"value":"[concat('URL To Couchbase admin console: http://', reference(variables('publicIPRef'),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).dnsSettings.fqdn,':',variables('lbcbaAdminPort'))]",
+				"value":"[concat('URL To Couchbase Admin Console: https://', reference(variables('publicIPRef'),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).dnsSettings.fqdn,':',parameters('couchbaseWebConsolePort'))]",
 				"type":"string"
 		}
 	}

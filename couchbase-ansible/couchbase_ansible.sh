@@ -38,6 +38,8 @@ TEMPLATE_ROLE='couchbase'
 START_IP_INDEX=0
 CB_USER=''
 CB_PWD=''
+CB_WEB_FQDN=''
+CB_WEB_PORT=''
 MOUNTPOINT='/datadrive'
 
 
@@ -52,6 +54,8 @@ MOUNTPOINT='/datadrive'
     echo "The -u (couchbaseUser) parameter specifies the Couchbase Admin user"
     echo "The -p (couchbasePassword) parameter specifies the Couchbase Password "
     echo "The -m (couchbaseAllocatedMemory) parameter specifies the percentage of memory allocated to Couchbase "
+    echo "The -q (couchbaseFQDN) parameter specifies the fully qualified named assigned to the Azure public IP"
+    echo "The -o (couchbaseAdminPort) parameter specifies the public Admin Port for the Couchbase Web Console"
 }
 
 
@@ -64,13 +68,13 @@ function log()
 
 
 #---PARSE AND VALIDATE PARAMETERS---
-if [ $# -ne 14 ]; then
+if [ $# -ne 18 ]; then
     log "ERROR:Wrong number of arguments specified. Parameters received $#. Terminating the script."
     usage
     exit 1
 fi
 
-while getopts :i:n:r:f:u:p:m: optname; do
+while getopts :i:n:r:f:u:p:m:q:o: optname; do
     log "INFO:Option $optname set with value ${OPTARG}"
   case $optname in
     i) # IP address space 
@@ -110,6 +114,14 @@ while getopts :i:n:r:f:u:p:m: optname; do
     i) # RAM Allocation Percentage
       MEMORY_ALLOCATION_PERCENTAGE=${OPTARG}
       ;;    
+    q) # FQDN -REMOVE LAST POINT
+      CB_WEB_FQDN=${OPTARG}
+      CB_WEB_FQDN=$(echo ${CB_WEB_FQDN} | sed s'/[.]$//' )
+      ;;    
+    o) # Couchbase Web Console Port 
+      CB_WEB_PORT=${OPTARG}
+      ;;    
+
     \?) #Invalid option - show help
       log "ERROR:Option -${BOLD}$OPTARG${NORM} not allowed."
       usage
@@ -160,36 +172,40 @@ function check_OS()
 }
 
 
-function install_ansible_ubuntu()
+function install_packages_ubuntu()
 {
     
     
     apt-get --yes --force-yes install software-properties-common
     apt-add-repository ppa:ansible/ansible
     apt-get --yes --force-yes update
-    apt-get --yes --force-yes install ansible
-    # install sshpass
-    apt-get --yes --force-yes install sshpass
+    apt-get --yes --force-yes install ansible    
+   
     # install Git
     apt-get --yes --force-yes install git
 
+    # install nginx - Reverse proxy for the Couchbase admin console
+    apt-get --yes --force-yes install nginx   
+
+
  }
 
- function install_ansible_centos()
+ function install_packages_centos()
  {
 
     # install EPEL Packages - sshdpass
-    wget http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm    
-    rpm -ivh epel-release-6-8.noarch.rpm
+    #wget http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm    
+    #rpm -ivh epel-release-6-8.noarch.rpm
+    yum -y install epel-release
     # install ansible
     yum -y install ansible
     yum -y install  libselinux-python
-
-    # needed to copy the keys to all the vms
-    yum -y install sshpass
+    
     # install Git
     yum -y install git 
 
+    # install nginx - Reverse proxy for the Couchbase admin console
+    yum -y install nginx
  }
 
 function configure_ssh()
@@ -259,24 +275,45 @@ function configure_ssh()
     log "WARNING: This process is not incremental, don't use it if you don't want to lose your existing storage configuration"
     
     # Run ansible template to configure Storage : Create RAID and Configure Filesystem 
-    ansible-playbook InitStorage_RAID.yml  --extra-vars "target=${TEMPLATE_ROLE} file_system=${FILE_SYSTEM}" 
+    ansible-playbook InitStorage_RAID.yml  --extra-vars "target=${TEMPLATE_ROLE} file_system=${FILE_SYSTEM}" -v
     
  }
 
 
 function install_couchbase()
 {
+   # Calculate Memory assigned to Couchbase
+   COUCHBASE_MEMORY=$(($(free|awk '/^Mem:/{print $2}')/1024*80/100))
+
    # Role copied in /etc/ansible/roles/couchbase.couchbase-server/
-   #git clone https://github.com/couchbaselabs/ansible-couchbase-server.git
    ansible-galaxy install couchbase.couchbase-server -p .
    log "INFO: ******** Installing Couchbase "
    
 
    # Run ansible template to Install and Initialise Couchbase 
-   ansible-playbook couchbase_setup.yml  --extra-vars "target=${TEMPLATE_ROLE} file_system=${FILE_SYSTEM} couchbase_server_admin=${CB_USER} couchbase_server_password=${CB_PWD} mount_point=${MOUNTPOINT} memory_allocation_percentage=${MEMORY_ALLOCATION_PERCENTAGE}" 
+   ansible-playbook couchbase_setup.yml  --extra-vars "target=${TEMPLATE_ROLE} file_system=${FILE_SYSTEM} couchbase_server_admin=${CB_USER} couchbase_server_password=${CB_PWD} mount_point=${MOUNTPOINT} memory_allocation_percentage=${MEMORY_ALLOCATION_PERCENTAGE}" -v
+
+}
+
+function configure_nginx()
+{
+  # Create nginx folder
+  mkdir /etc/nginx/ssl
+
+  # Generate Self-signed certificate for the web console
+  openssl req -x509 -nodes -days 1095 -newkey rsa:2048 -keyout /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.crt -subj "/C=US/ST=WA/L=Redmond/O=IT/CN=${CB_WEB_FQDN}" 
+
+  # Generate the nginx Config file 
+  cat nginx | sed "s/{PORT}/${CB_WEB_PORT}/" | sed "s/{FQDN}/${CB_WEB_FQDN}/" | sed "s/{CB_SRV1}/${NODE_LIST_IPS[0]}/" >> /etc/nginx/sites-enabled/couchbaseconsole
+
+  # Make sure that nginx Starts automatically
+  update-rc.d nginx defaults
+
+  # Start nginx service
+  service nginx start
 
 
-
+  
 }
 
 
@@ -289,18 +326,19 @@ InitializeVMs()
     if [[ "${DIST}" == "Ubuntu" ]];
     then
         log "INFO:Installing Ansible for Ubuntu"
-        install_ansible_ubuntu
+        install_packages_ubuntu
     elif [[ "${DIST}" == "CentOS" ]] ; then
         log "INFO:Installing Ansible for CentOS"
-        install_ansible_centos
+        install_packages_centos
     else
        log "ERROR:Unsupported OS ${DIST}"
        exit 2
     fi
     
-    configure_ansible
-    configure_storage
-    install_couchbase
+    configure_ansible    
+    configure_storage    
+    install_couchbase    
+    configure_nginx
 
 
 }

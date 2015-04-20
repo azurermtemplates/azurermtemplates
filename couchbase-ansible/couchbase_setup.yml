@@ -12,7 +12,6 @@
     - couchbase.couchbase-server/vars/{{ ansible_distribution  }}.yml
     - couchbase_parameters.yml
   vars:
-    couchbase_server_ram: "{{ ansible_memtotal_mb * memory_allocation_percentage}}"
     couchbase_server_primary_node: "{{hostvars[groups['primary'][0]]['inventory_hostname']}}"
   roles:
     - couchbase.couchbase-server
@@ -31,8 +30,21 @@
     register: cb_major_version
     when: node_role == "primary"
 
+  - name: Create Couchbase Folders And Set Permissions    
+    file: path={{item}} state=directory    owner=couchbase
+    with_items:
+    - "{{ couchbase_server_data_path }}"
+    - "{{ couchbase_server_index_path }}"
+
+
+  - name: Set Couchbase Data Paths
+    shell: "{{ couchbase_server_home_path }}/bin/couchbase-cli node-init -c localhost:8091 --node-init-data-path={{ couchbase_server_data_path }} --node-init-index-path={{ couchbase_server_index_path }} --user={{ couchbase_server_admin }} --password={{ couchbase_server_password }}"
+
+  - name: Set Permissions to Data Paths
+    file: dest="{{ mount_point }}/couchbase/" state=directory    owner=couchbase       mode=0770        recurse=yes
+
   - name: Configure cluster settings
-    shell: "{{ couchbase_server_home_path }}/bin/couchbase-cli cluster-init -c {{ couchbase_server_primary_node }}:{{ couchbase_server_admin_port }} --user={{ couchbase_server_admin }} --password={{ couchbase_server_password }} --cluster-init-username={{ couchbase_server_admin }} --cluster-init-password={{ couchbase_server_password }} --cluster-init-port={{couchbase_server_admin_port}} --cluster-init-ramsize={{ couchbase_server_ram }} --node-init-data-path={{ couchbase_server_data_path }} --node-init-index-path={{ couchbase_server_index_path }}"
+    shell: "{{ couchbase_server_home_path }}/bin/couchbase-cli cluster-init -c {{ couchbase_server_primary_node }}:{{ couchbase_server_admin_port }} --user={{ couchbase_server_admin }} --password={{ couchbase_server_password }} --cluster-init-username={{ couchbase_server_admin }} --cluster-init-password={{ couchbase_server_password }} --cluster-init-port={{couchbase_server_admin_port}} --cluster-init-ramsize={{((ansible_memtotal_mb |int)  * (memory_allocation_percentage| int)/100) |int  }} "
     when: node_role == "primary"
 
   - name: Initialize primary node
