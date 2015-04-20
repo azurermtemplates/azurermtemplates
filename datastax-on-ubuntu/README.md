@@ -11,7 +11,7 @@ The example expects the following parameters:
 | Name   | Description    |
 |:--- |:---|
 | storageAccountPrefix  | Unique DNS Name for the Storage Account where the Virtual Machine's disks will be placed (multiple storage accounts are created with this template using this value as a prefix for the storage account name) |
-| manageAdminUsername  | Admin user name for the Virtual Machines  |
+| adminUsername  | Admin user name for the Virtual Machines  |
 | adminPassword  | Admin password for the Virtual Machine  |
 | region | Region name where the corresponding Azure artifacts will be created |
 | virtualNetworkName | Name of the Virtual Network that is created and that resources will be deployed in to |
@@ -26,5 +26,5 @@ This template deploys a configurable number of cluster nodes of a configurable s
 ##Known Issues and Limitations
 - The template does not currently configure SSL on Datastax Operations Center virtual machine
 - The template uses username/password for provisioning cluster nodes in the cluster, and would ideally use an SSH key
-- The template deploys cassandra data nodes configured to use ephemeral storage and attaches a data disk used for data backups in the event of a cluster failure resulting in the loss of the data on the ephemeral disks.
-
+- The template deploys cassandra data nodes configured to use ephemeral storage and attaches a data disk that can be used for data backups in the event of a cluster failure resulting in the loss of the data on the ephemeral disks.
+- The deployment scripts are not currently idempotent and this template should only be used for provisioning a new cluster at the moment.
