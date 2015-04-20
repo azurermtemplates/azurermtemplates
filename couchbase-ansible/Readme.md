@@ -7,7 +7,7 @@
 
 This advanced template creates a Multi VM Couchbase Cluster,it also configures Ansible so you can easily manage all the VMS. 
 
-This template  deploys  N number of Storage Accounts, a Virtual Network, an Availability Sets (up to 3 Fault Domains and up to 20 Update Domains), one private NIC per VM, one public IP ,a Load Balancer.You can specify SSH keys to access your VMS remotely from your latop. Minimun recommded VM Size is Standard_D2 and by default 4 data disks will be attaached to the VM.
+This template  deploys  N number of Storage Accounts, a Virtual Network, an Availability Sets (up to 3 Fault Domains and up to 20 Update Domains), one private NIC per VM, one public IP ,a Load Balancer.You can specify SSH keys to access your Ansible Controller remotely from your latop. Minimun recommded VM Size is Standard_D2 and by default 4 data disks will be attaached to the VM.
 You will need an additional certificate / public key for the Ansible configuration and before executing the template you have to upload them to a Private azure storage account.  
 
 The template uses two Custom Scripts  :
@@ -18,10 +18,12 @@ The template uses two Custom Scripts  :
 
  Once the template finishes, ssh into the AnsibleController VM (by default the load balancer has a NAT rule using the port 64000), then you can manage your VMS with ansible and the root user. For instance : 
 
- ```
+```
 sudo su root
 ansible all -m ping
 ```
+
+Additionally, The Couchbase Web Admin Console will be exposed on the port indicated in the couchbaseWebConsolePort parameter. To expose the console securely, the Ansible Controller VM is configured as a nginx reverse proxy using https and self-signed certificates.
 
 This template also ilustrates how to use Outputs and Tags.
  * The template will generate an output with the fqdn of the new public IP so you can easily connect to the Ansible VM.
@@ -46,6 +48,7 @@ Below are the parameters that the template expects
 | adminPassword | Admin Password |
 | couchbaseAdminUser | Couchbase Admin User Name |
 | couchbaseAdminPassword | Couchbase Admin User Password |
+| couchbaseWebConsolePort | Couchbase Web Console Port |
 | sshKeyData | SSH Key data |
 | faultDomainCount | Number of Fault domains (Default 3, Maximum :3) |
 | updateDomainCount | Number of Update domains (Default : 10 , Maximun : 20) |
@@ -59,6 +62,6 @@ Below are the parameters that the template expects
 
 ##Known Issues and Limitations
 - Fixed number of data disks (This is due to a current template feature limitation and is fixed at 3 in order to all A0 instances for testing)
-- Only two VM instances are added to the load balancer, and only them  are accessible via SSH (The Ansible Controller and a second VM)
+- The Ansible Controller VM is configured as a Reverse Proxy for the Couchbase Admin Console,that is exposed over https using the port 16195.Also, only the Ansible Controller is available for SSH using the port 6400.
 - Scripts are not yet idempotent and cannot handle updates (This currently works for create ONLY)
-- Current version doesn't use secured endpoints. If you are going to host confidential data make sure that you secure the VNET by using Security Groups.
+- Current version uses self-signed certificates for the Couchbase Web Admin console, for production environments you should replace the self-signed certificates by your own certificates.
