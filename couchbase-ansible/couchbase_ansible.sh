@@ -111,7 +111,7 @@ while getopts :i:n:r:f:u:p:m:q:o: optname; do
     p) # COUCHBASE ADMIN PASSWORD 
       CB_PWD=${OPTARG}
       ;;
-    i) # RAM Allocation Percentage
+    m) # RAM Allocation Percentage
       MEMORY_ALLOCATION_PERCENTAGE=${OPTARG}
       ;;    
     q) # FQDN -REMOVE LAST POINT
@@ -283,7 +283,7 @@ function configure_ssh()
 function install_couchbase()
 {
    # Calculate Memory assigned to Couchbase
-   COUCHBASE_MEMORY=$(($(free|awk '/^Mem:/{print $2}')/1024*80/100))
+   # COUCHBASE_MEMORY=$(($(free|awk '/^Mem:/{print $2}')/1024*80/100))
 
    # Role copied in /etc/ansible/roles/couchbase.couchbase-server/
    ansible-galaxy install couchbase.couchbase-server -p .

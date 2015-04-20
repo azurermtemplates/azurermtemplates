@@ -47,7 +47,7 @@
     set_fact:
       couchbase_allocated_memory: "{{((ansible_memtotal_mb |int)  * (memory_allocation_percentage| int)/100) |int  }}"
   
-  - debug: msg="Memory allocated to Couchbase : {{couchbase_allocated_memory}}"
+  - debug: msg="Memory allocated to Couchbase {{couchbase_allocated_memory}}"
 
   - name: Configure cluster settings
     shell: "{{ couchbase_server_home_path }}/bin/couchbase-cli cluster-init -c {{ couchbase_server_primary_node }}:{{ couchbase_server_admin_port }} --user={{ couchbase_server_admin }} --password={{ couchbase_server_password }} --cluster-init-username={{ couchbase_server_admin }} --cluster-init-password={{ couchbase_server_password }} --cluster-init-port={{couchbase_server_admin_port}} --cluster-init-ramsize={{couchbase_allocated_memory}}"
