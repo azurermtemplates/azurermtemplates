@@ -135,7 +135,7 @@
         "typeHandlerVersion": "1.2",
         "settings": {
           "fileUris": "[parameters('osSettings').scripts]",
-          "commandToExecute": "[concat('bash opscenter.sh -n \"', parameters('opsCenterSettings').clusterName , '\" -u ', parameters('adminUsername'), ' -p ', parameters('adminPassword'), ' -j ' , parameters('opsCenterSettings').adminUsername, ' -k ' , parameters('opsCenterSettings').adminPassword , ' -ed ', parameters('opsCenterSettings').nodeList)]"
+          "commandToExecute": "[concat('bash opscenter.sh -n \"', parameters('opsCenterSettings').clusterName , '\" -u ', parameters('adminUsername'), ' -p ', parameters('adminPassword'), ' -k ' , parameters('opsCenterSettings').adminPassword , ' -ed ', parameters('opsCenterSettings').nodeList)]"
         }
       }
     }

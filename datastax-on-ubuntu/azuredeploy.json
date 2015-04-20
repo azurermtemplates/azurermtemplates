@@ -20,7 +20,7 @@
       "type": "string",
       "defaultValue": "myVNET",
       "metadata": {
-          "Description": "The arbitrary name of the virtual network provisioned for the cluster"
+          "Description": "Name of the virtual network provisioned for the cluster"
       }
     },
     "adminUsername": {
@@ -35,16 +35,10 @@
           "Description": "Administrator password used when provisioning virtual machines"
       }
     },
-    "opsCenterAdminUsername": {
-      "type": "string",
-      "metadata": {
-          "Description": "Administrator username used when provisioning Datastax Operations Center"
-      }
-    },
     "opsCenterAdminPassword": {
       "type": "securestring",
       "metadata": {
-          "Description": "Administrator password used when provisioning Datastax Operations Center"
+          "Description": "Sets the operations center admin user password"
       }
     },
     "clusterVmSize": {
@@ -222,7 +216,6 @@
             "value": {
               "clusterName":"[parameters('clusterName')]",
               "nodeList":"[variables('nodeList')]",
-              "adminUsername":"[parameters('opsCenterAdminUsername')]",
               "adminPassword":"[parameters('opsCenterAdminPassword')]"
             }
           }

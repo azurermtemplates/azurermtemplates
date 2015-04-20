@@ -12,8 +12,7 @@
 #  2 - u: Cluster node admin user that Operations Center uses for cluster provisioning
 #  3 - p: Cluster node admin password that Operations Center uses for cluster provisioning
 #  4 - d: List of successive cluster IP addresses represented as the starting address and a count used to increment the last octet (10.0.0.5-3)
-#  5 - j: Operations Center admin user
-#  6 - k: Operations Center admin password
+#  6 - k: Sets the Operations Center 'admin' password
 #  3 - h  Help 
 # Note : 
 # This script has only been tested on Ubuntu 12.04 LTS and must be root
@@ -84,9 +83,6 @@ while getopts :n:d:u:p:j:k:e optname; do
     d) #Static dicovery endpoints
       DSE_ENDPOINTS=${OPTARG}
       ;;
-    j) # Ops Center Admin Username
-       OPS_CENTER_ADMIN=${OPTARG}
-       ;;
     k) # Ops Center Admin Password
        OPS_CENTER_ADMIN_PASS=${OPTARG}
        ;;
@@ -248,21 +244,25 @@ EOF
 sleep 14
 
 # Login and get session token
-AUTH_SESSION=$(curl -X POST -d '{"username":"admin","password":"admin"}' 'http://localhost:8888/login' | sed -e 's/^.*"sessionid"[ ]*:[ ]*"//' -e 's/".*//')
+AUTH_SESSION=$(curl -X POST -d '{"username":"admin","password":"admin"}' 'http://127.0.0.1:8888/login' | sed -e 's/^.*"sessionid"[ ]*:[ ]*"//' -e 's/".*//')
 
 # Provision a new cluster with the nodes passed
-curl -H "opscenter-session: $AUTH_SESSION" -H "Accept: application/json" -X POST localhost:8888/provision -d @provision.json
+curl -H "opscenter-session: $AUTH_SESSION" -H "Accept: application/json" -X POST 127.0.0.1:8888/provision -d @provision.json
+
+#Update the admin password with the one passed as parameter
+curl -H "opscenter-session: $AUTH_SESSION" -H "Accept: application/json" -d "{\"password\": \"$OPS_CENTER_ADMIN_PASS\", \"role\": \"admin\" }" -X PUT http://127.0.0.1:8888/users/admin
+
 
 # If the user is still admin just udpate the password else create a new admin user
-if ["$OPS_CENTER_ADMIN" == "admin"];
-then
-  curl -H "opscenter-session: $AUTH_SESSION" -H "Accept: application/json" -d "{\"password\": \"$OPS_CENTER_ADMIN_PASS\" }" -X PUT http://127.0.0.1:8888/users/admin
-else
+#if ["$OPS_CENTER_ADMIN" == "admin"];
+#then
+#  curl -H "opscenter-session: $AUTH_SESSION" -H "Accept: application/json" -d "{\"password\": \"$OPS_CENTER_ADMIN_PASS\" }" -X PUT http://127.0.0.1:8888/users/admin
+#else
   # Create new user using the credentials passed in
-  curl -H "opscenter-session: $AUTH_SESSION" -H "Accept: application/json" -d "{\"password\": \"$OPS_CENTER_ADMIN_PASS\", \"role\": \"admin\"}" -X POST "http://127.0.0.1:8888/users/$OPS_CENTER_ADMIN"
+#  curl -H "opscenter-session: $AUTH_SESSION" -H "Accept: application/json" -d "{\"password\": \"$OPS_CENTER_ADMIN_PASS\", \"role\": \"admin\"}" -X POST "http://127.0.0.1:8888/users/$OPS_CENTER_ADMIN"
 
   # Remove the default admin user
-  curl -X DELETE -H "opscenter-session: $AUTH_SESSION" http://127.0.0.1:8888/users/admin
-fi
+#  curl -X DELETE -H "opscenter-session: $AUTH_SESSION" http://127.0.0.1:8888/users/admin
+#fi
 
 exit 0
