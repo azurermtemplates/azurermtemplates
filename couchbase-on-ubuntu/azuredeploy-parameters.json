@@ -1,0 +1,23 @@
+{
+    "adminUsername": {
+        "value": "couchadmin"
+    },
+    "adminPassword": {
+        "value": "P@ssword1"
+    },
+    "tshirtSize": {
+        "value": "S"
+    },
+    "storageAccountNamePrefix": {
+        "value": "f180cbdply48"
+    },
+    "targetRegion": {
+        "value": "West US"
+    },
+    "virtualNetworkName": {
+        "value": "couchVnet"
+    },
+    "cbClusterName": {
+        "value": "couchbasefs180"
+    }
+}
