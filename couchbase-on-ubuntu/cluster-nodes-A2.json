@@ -1,0 +1,192 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "Description": "Admin username used when provisioning virtual machines"
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "Description": "Admin password used when provisioning virtual machines"
+      }
+    },
+    "targetRegion": {
+      "type": "string",
+      "metadata": {
+        "Description": "Location where resources will be provisioned"
+      }
+    },
+    "tshirtSize": {
+      "type": "string",
+      "metadata": {
+        "Description": "Tshirt size abstraction for cluster size"
+      }
+    },
+    "subnet": {
+      "type": "object",
+      "metadata": {
+        "Description": "The name of the subnet to deploy resources into"
+      }
+    },
+    "availabilitySet": {
+      "type": "string",
+      "metadata": {
+        "Description": "The availabilty set to use for the data nodes"
+      }
+    },
+    "storageAccountName": {
+      "type": "string",
+      "metadata": {
+        "Description": "Name of the storage account the VM is assigned to"
+      }
+    },
+    "sourceImage": {
+      "type": "string",
+      "metadata": {
+        "Description": "Source image for the VM."
+      },
+    },
+    "nodeId": {
+      "type": "int",
+      "metadata": {
+        "Description": "Id of the node in the current cluster."
+      }
+    },
+    "vmNamePrefix": {
+      "type": "string",
+      "defaultValue": "cbnode",
+      "metadata": {
+        "Description": "Prefx for VM names on the cluster"
+      }
+    },
+    "nodesIpPrefix": {
+      "type": "string",
+      "metadata": {
+        "Description": "IP Prefix used to append index for static addresses"
+      }
+    },
+    "vmSize": {
+      "type": "string",
+      "metadata": {
+        "Description": "Size of the VM"
+      }
+    },
+    "vmScripts": {
+      "type": "object",
+      "metadata": {
+        "Description": "Sripts to download and run on the VM"
+      }
+    },
+    "commandToExecute": {
+      "type": "string",
+      "metadata": {
+        "Description": "Command to run for the script extension."
+      }
+    }
+  },
+  "variables": {
+    "vmStorageAccountContainerName": "vhd",
+    "subnetRef": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('subnet').vnet), '/subnets/', parameters('subnet').name)]",
+    "dataDiskSize": 1023
+  },
+  "resources": [{
+    "apiVersion": "2014-12-01-preview",
+    "type": "Microsoft.Network/networkInterfaces",
+    "name": "[concat('nic', parameters('nodeId'))]",
+    "location": "[parameters('targetRegion')]",
+    "properties": {
+      "ipConfigurations": [{
+        "name": "ipconfig1",
+        "properties": {
+          "privateIPAllocationMethod": "Static",
+          "privateIPAddress": "[concat(parameters('nodesIpPrefix'), parameters('nodeId'))]",
+          "subnet": {
+            "id": "[variables('subnetRef')]"
+          }
+        }
+      }]
+    }
+  }, {
+    "apiVersion": "2014-12-01-preview",
+    "type": "Microsoft.Compute/virtualMachines",
+    "name": "[concat(parameters('vmNamePrefix'), parameters('nodeId'))]",
+    "location": "[parameters('targetRegion')]",
+    "dependsOn": [
+      "[concat('Microsoft.Network/networkInterfaces/', 'nic', parameters('nodeId'))]"
+    ],
+    "properties": {
+      "availabilitySet": {
+        "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySet'))]"
+      },
+      "hardwareProfile": {
+        "vmSize": "[parameters('vmSize')]"
+      },
+      "osProfile": {
+        "computername": "[concat(parameters('vmNamePrefix'), parameters('nodeId'))]",
+        "adminUsername": "[parameters('adminUsername')]",
+        "adminPassword": "[parameters('adminPassword')]"
+      },
+      "storageProfile": {
+        "sourceImage": {
+          "id": "[parameters('sourceImage')]"
+        },
+        "dataDisks": [{
+          "name": "datadisk0",
+          "diskSizeGB": "[variables('dataDiskSize')]",
+          "lun": 0,
+          "vhd": {
+            "Uri": "[concat('http://', parameters('storageAccountName'), '.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/', parameters('vmNamePrefix'), parameters('nodeId'),'dataDisk0' ,'.vhd')]"
+          }
+        }, {
+          "name": "datadisk1",
+          "diskSizeGB": "[variables('dataDiskSize')]",
+          "lun": 1,
+          "vhd": {
+            "Uri": "[concat('http://', parameters('storageAccountName'), '.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/', parameters('vmNamePrefix'), parameters('nodeId') ,'dataDisk1','.vhd')]"
+          }
+        }, {
+          "name": "datadisk2",
+          "diskSizeGB": "[variables('dataDiskSize')]",
+          "lun": 2,
+          "vhd": {
+            "Uri": "[concat('http://', parameters('storageAccountName'), '.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/', parameters('vmNamePrefix'), parameters('nodeId') ,'dataDisk2','.vhd')]"
+          }
+        }, {
+          "name": "datadisk3",
+          "diskSizeGB": "[variables('dataDiskSize')]",
+          "lun": 3,
+          "vhd": {
+            "Uri": "[concat('http://', parameters('storageAccountName'), '.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/', parameters('vmNamePrefix'), parameters('nodeId') ,'dataDisk3','.vhd')]"
+          }
+        }],
+        "destinationVhdsContainer": "[concat('http://',parameters('storageAccountName'), '.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
+      },
+      "networkProfile": {
+        "networkInterfaces": [{
+          "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('nic', parameters('nodeId')))]"
+        }]
+      }
+    }
+  }, {
+    "type": "Microsoft.Compute/virtualMachines/extensions",
+    "name": "[concat(parameters('vmNamePrefix'), parameters('nodeId'), '/installcouchbase')]",
+    "apiVersion": "2014-12-01-preview",
+    "location": "[parameters('targetRegion')]",
+    "dependsOn": [
+      "[concat('Microsoft.Compute/virtualMachines/', parameters('vmNamePrefix'), parameters('nodeId'))]"
+    ],
+    "properties": {
+      "publisher": "Microsoft.OSTCExtensions",
+      "type": "CustomScriptForLinux",
+      "typeHandlerVersion": "1.2",
+      "settings": {
+        "fileUris": "[parameters('vmScripts').scriptsToDownload]",
+        "commandToExecute": "[parameters('commandToExecute')]"
+      }
+    }
+  }]
+}
