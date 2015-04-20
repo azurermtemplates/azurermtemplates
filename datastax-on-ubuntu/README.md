@@ -15,7 +15,6 @@ The example expects the following parameters:
 | adminPassword  | Admin password for the Virtual Machine  |
 | region | Region name where the corresponding Azure artifacts will be created |
 | virtualNetworkName | Name of the Virtual Network that is created and that resources will be deployed in to |
-| opsCenterAdminUsername | Datastax Operations Center Admin User |
 | opsCenterAdminPassword | Datastax Operations Center Admin User Password |
 | clusterName | The name of the new cluster that is provisioned with the deployment |
 
@@ -28,4 +27,4 @@ This template deploys a configurable number of cluster nodes of a configurable s
 - The template does not currently configure SSL on Datastax Operations Center virtual machine
 - The template uses username/password for provisioning cluster nodes in the cluster, and would ideally use an SSH key
 - The template deploys cassandra data nodes configured to use ephemeral storage and attaches a data disk used for data backups in the event of a cluster failure resulting in the loss of the data on the ephemeral disks.
-- Operations center default 'admin' user is not removed and is set to default password.  It is recommended that you immedietly change this
+
