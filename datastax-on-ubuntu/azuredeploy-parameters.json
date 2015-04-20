@@ -1,0 +1,32 @@
+{
+  "storageAccountPrefix": {
+    "value": ""
+  },
+  "virtualNetworkName": {
+    "value": "datastax"
+  },
+  "adminUsername": {
+    "value": ""
+  },
+  "adminPassword": {
+    "value": ""
+  },
+  "region": {
+    "value": "West US"
+  },
+  "opsCenterAdminUsername": {
+    "value": ""
+  },
+  "opsCenterAdminPassword": {
+    "value": ""
+  },
+  "clusterVmSize": {
+    "value": "Standard_D3"
+  },
+  "clusterNodeCount": {
+    "value": 3
+  },
+  "clusterName": {
+    "value": ""
+  }
+}
