@@ -1,0 +1,44 @@
+{
+    "storageAccountName": {
+        "value": "fs180mongodbc"
+    },
+    "adminUsername": {
+        "value": "MongoAdmin"
+    },
+    "adminPassword": {
+        "value": ""
+    },
+    "region": {
+        "value": "West US"
+    },
+    "virtualNetworkName": {
+        "value": "mongodbVnet"
+    },
+    "subnetName": {
+        "value": "Subnet1"
+    },
+    "addressPrefix": {
+        "value": "10.0.0.0/16"
+    },
+    "subnetPrefix": {
+        "value": "10.0.0.0/24"
+    },
+    "mongodbVersion": {
+        "value": "3.0.2"
+    },
+    "jumpbox": {
+        "value": "Enabled"
+    },
+    "tshirtSize": {
+        "value": "XSmall"
+    },
+    "osFamily": {
+        "value": "Ubuntu"
+    },
+    "replicaSetName": {
+        "value": "IloveMongoDB"
+    },
+    "replicaSetKey":  {
+        "value": ""
+    }
+}
