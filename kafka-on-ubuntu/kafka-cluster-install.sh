@@ -106,7 +106,7 @@ install_zookeeper()
 	echo "clientPort=2181" >> zookeeper-3.4.6/conf/zoo.cfg
 	echo "initLimit=5" >> zookeeper-3.4.6/conf/zoo.cfg
 	echo "syncLimit=2" >> zookeeper-3.4.6/conf/zoo.cfg
-	echo "server.1=10.0.0.20:2888:3888" >> zookeeper-3.4.6/conf/zoo.cfg
+	echo "server.1=10.0.0.40:2888:3888" >> zookeeper-3.4.6/conf/zoo.cfg
 
 	echo $(($1+1)) >> /var/lib/zookeeper/myid
 
