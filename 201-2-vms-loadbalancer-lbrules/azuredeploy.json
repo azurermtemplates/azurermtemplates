@@ -96,7 +96,7 @@
             "name": "[variables('availabilitySetName')]",
             "apiVersion": "2014-12-01-preview",
             "location": "[parameters('region')]",
-            "properties": {}
+            "properties": { }
         },
         {
             "apiVersion": "2014-12-01-preview",
@@ -152,9 +152,23 @@
                             "subnet": {
                                 "id": "[variables('subnetRef')]"
                             }
-                        }
+                        },
+
+                        "loadBalancerBackendAddressPools": [
+                            {
+                                "id": "[concat('Microsoft.Network/loadBalancers/',parameters('lbName'),'/backendAddressPools/LBBE')]"
+                            }
+                        ],
+                        "loadBalancerInboundNatRules": [
+                            {
+                                "id": "[concat('Microsoft.Network/loadBalancers/',parameters('lbName'),'/inboundNatRule/RDP-VM', copyindex())]"
+                            }
+                        ]
+
+
                     }
                 ]
+
             }
         },
         {
@@ -179,17 +193,8 @@
                 ],
                 "backendAddressPools": [
                     {
-                        "name": "LBBE",
-                        "properties": {
-                            "backendIPConfigurations": [
-                                {
-                                    "id": "[variables('backEndIPConfigID1')]"
-                                },
-                                {
-                                    "id": "[variables('backEndIPConfigID2')]"
-                                }
-                            ]
-                        }
+                        "name": "LBBE"
+
                     }
                 ],
                 "inboundNatRules": [
@@ -201,9 +206,6 @@
                                     "id": "[variables('frontEndIPConfigID')]"
                                 }
                             ],
-                            "backendIPConfiguration": {
-                                "id": "[variables('backEndIPConfigID1')]"
-                            },
                             "protocol": "tcp",
                             "frontendPort": 50001,
                             "backendPort": 3389,
@@ -218,9 +220,6 @@
                                     "id": "[variables('frontEndIPConfigID')]"
                                 }
                             ],
-                            "backendIPConfiguration": {
-                                "id": "[variables('backEndIPConfigID2')]"
-                            },
                             "protocol": "tcp",
                             "frontendPort": 50002,
                             "backendPort": 3389,
@@ -232,11 +231,9 @@
                     {
                         "name": "LBRule",
                         "properties": {
-                            "frontendIPConfigurations": [
-                                {
-                                    "id": "[variables('frontEndIPConfigID')]"
-                                }
-                            ],
+                            "frontendIPConfiguration": {
+                                "id": "[variables('frontEndIPConfigID')]"
+                            },
                             "backendAddressPool": {
                                 "id": "[variables('lbPoolID')]"
                             },
