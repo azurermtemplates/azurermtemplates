@@ -5,9 +5,6 @@
     "region": {
       "type": "string"
     },
-    "storageAccountName": {
-      "type": "string"
-    },
     "availabilitySetSettings": {
       "type": "object"
     },
