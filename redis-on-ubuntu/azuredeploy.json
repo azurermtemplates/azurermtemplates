@@ -35,13 +35,6 @@
                 "Description": "The arbitrary name of the virtual network provisioned for the cluster"
             }
         },
-        "dataDiskSize": {
-            "type": "int",
-            "defaultValue": 100,
-            "metadata": {
-                "Description": "Size of the data disk attached to Redis nodes (in GB)"
-            }
-        },
         "addressPrefix": {
             "type": "string",
             "defaultValue": "10.0.0.0/16",
@@ -63,6 +56,40 @@
                 "Description": "Address space for the virtual network subnet"
             }
         },
+        "jumpbox": {
+            "type": "string",
+            "defaultValue": "Disabled",
+            "allowedValues": [
+                "Enabled",
+                "Disabled"
+            ],
+            "metadata": {
+                "Description": "The flag allowing to enable or disable provisioning of the jumpbox VM that can be used to access the Redis deployment"
+            }
+        },
+        "tshirtSize": {
+            "type": "string",
+            "defaultValue": "Small",
+            "allowedValues": [
+                "Small",
+                "Medium",
+                "Large"
+            ],
+            "metadata": {
+                "Description": "T-shirt size of the Redis deployment"
+            }
+        },
+        "osFamily": {
+            "type": "string",
+            "defaultValue": "Ubuntu",
+            "allowedValues": [
+                "Ubuntu",
+                "CentOS"
+            ],
+            "metadata": {
+                "Description": "The target OS for the virtual machines running Redis"
+            }
+        },
         "redisVersion": {
             "type": "string",
             "defaultValue": "stable",
@@ -73,69 +100,85 @@
         "redisClusterName": {
             "type": "string",
             "metadata": {
-                "Description": "The arbitrary name of the Redis cluster (maps to cluster's configuration file name)"
-            }
-        },
-        "redisNodeIPAddressPrefix": {
-            "type": "string",
-            "defaultValue": "10.0.0.1",
-            "metadata": {
-                "Description": "The IP address prefix that will be used for constructing a static private IP address for each node in the cluster"
-            }
-        },
-        "jumpbox": {
-            "type": "string",
-            "defaultValue": "enabled",
-            "allowedValues": [
-                "enabled",
-                "disabled"
-            ],
-            "metadata": {
-                "Description": "The flag allowing to enable or disable provisioning of the jumpbox VM that can be used to access the Redis nodes"
-            }
-        },
-        "tshirtSize": {
-            "type": "string",
-            "defaultValue": "S",
-            "allowedValues": [
-                "S",
-                "M",
-                "L"
-            ],
-            "metadata": {
-                "Description": "T-shirt size of the Redis cluster"
+                "Description": "The arbitrary name of the Redis cluster"
             }
         }
     },
     "variables": {
-        "vmStorageAccountContainerName": "vhd",
+        "_comment0": "/* T-shirt sizes may vary for different reasons, and some customers may want to modify these - so feel free to go ahead and define your favorite t-shirts */",
+        "tshirtSizeSmall": {
+            "vmSizeMember": "Standard_A1",
+            "numberOfMembers": 2,
+            "totalMemberCount": 3,
+            "numberOfSlaves": 0,
+            "vmTemplate": "[concat(variables('templateBaseUrl'), 'node-resources.json')]"
+        },
+        "tshirtSizeMedium": {
+            "vmSizeMember": "Standard_A2",
+            "numberOfMembers": 5,
+            "totalMemberCount": 6,
+            "numberOfSlaves": 1,
+            "vmTemplate": "[concat(variables('templateBaseUrl'), 'node-resources.json')]"
+        },
+        "tshirtSizeLarge": {
+            "vmSizeMember": "Standard_A5",
+            "numberOfMembers": 8,
+            "totalMemberCount": 9,
+            "numberOfSlaves": 2,
+            "arbiter": "Enabled",
+            "vmTemplate": "[concat(variables('templateBaseUrl'), 'node-resources.json')]"
+        },
+        "osFamilyUbuntu": {
+            "osName": "ubuntu"
+        },
+        "osFamilyCentOS": {
+            "osName": "centos"
+        },
+        "vmStorageAccountContainerName": "vhd-redis",
+        "vmStorageAccountDomain": ".blob.core.windows.net",
         "vmSourceImageName": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
-        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
-        "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName'))]",
         "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]",
-        "computerNamePrefix": "redisnode_",
-        "scriptUrl": "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/redis-on-ubuntu/",
-        "templateUrl": "[variables('scriptUrl')]",
-        "sharedTemplateName": "shared-resources",
-        "jumpboxTemplateName": "jumpbox-resources-",
-        "tshirtSizeS": {
-            "numberOfInstances": 3,
-			"numberOfSlaves" : 0,
-            "vmSize": "Standard_A1"
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+        "scriptUrl": "https://fs180.blob.core.windows.net/public/redis-on-ubuntu/",
+        "templateBaseUrl": "[variables('scriptUrl')]",
+        "jumpboxTemplateEnabled": "jumpbox-resources.json",
+        "jumpboxTemplateDisabled": "empty-resources.json",
+        "sharedTemplateUrl": "[concat(variables('templateBaseUrl'), 'shared-resources.json')]",
+        "jumpboxTemplateUrl": "[concat(variables('templateBaseUrl'), variables(concat('jumpboxTemplate', parameters('jumpbox'))))]",
+        "commonSettings": {
+            "availabilitySetName": "redisAvailSet",
+            "region": "[parameters('region')]"
         },
-        "tshirtSizeM": {
-            "numberOfInstances": 6,
-			"numberOfSlaves" : 1,
-            "vmSize": "Standard_A2"
+        "storageSettings": {
+            "vhdStorageAccountName": "[parameters('storageAccountName')]",
+            "vhdContainerName": "[variables('vmStorageAccountContainerName')]",
+            "destinationVhdsContainer": "[concat('https://', parameters('storageAccountName'), variables('vmStorageAccountDomain'), '/', variables('vmStorageAccountContainerName'), '/')]"
         },
-        "tshirtSizeL": {
-            "numberOfInstances": 9,
-			"numberOfSlaves" : 2,
-            "vmSize": "Standard_A3"
+        "networkSettings": {
+            "virtualNetworkName": "[parameters('virtualNetworkName')]",
+            "addressPrefix": "[parameters('addressPrefix')]",
+            "subnetName": "[parameters('subnetName')]",
+            "subnetPrefix": "[parameters('subnetPrefix')]",
+            "subnetRef": "[concat(variables('vnetID'), '/subnets/', parameters('subnetName'))]",
+            "machineIpPrefix": "10.0.0.1"
         },
-        "numberOfInstances": "[variables(concat('tshirtSize', parameters('tshirtSize'))).numberOfInstances]",
-		"numberOfSlaves": "[variables(concat('tshirtSize', parameters('tshirtSize'))).numberOfSlaves]",
-        "vmSize": "[variables(concat('tshirtSize', parameters('tshirtSize'))).vmSize]"
+        "machineSettings": {
+            "adminUsername": "[parameters('adminUsername')]",
+            "machineNamePrefix": "redisnode-",
+            "osImageName": "[variables('sourceImageName')]"
+        },
+        "clusterSpec": "[variables(concat('tshirtSize', parameters('tshirtSize')))]",
+        "osFamilySpec": "[variables(concat('osFamily', parameters('osFamily')))]",
+        "installCommand": "[concat('redis-cluster-install.sh -n ', parameters('redisClusterName'), ' -v ', parameters('redisVersion'))]",
+        "setupCommand": "[concat('redis-cluster-setup.sh -c ', variables('clusterSpec').totalMemberCount, ' -s ', variables('clusterSpec').numberOfSlaves, ' -p ', variables('networkSettings').machineIpPrefix)]",
+        "vmScripts": {
+            "scriptsToDownload": [
+                "[concat(variables('scriptUrl'), 'redis-cluster-install.sh')]",
+                "[concat(variables('scriptUrl'), 'redis-cluster-setup.sh')]"
+            ],
+            "installCommand": "[concat('bash ', variables('installCommand'))]",
+            "setupCommand": "[concat('bash ', variables('installCommand'), ' ; bash ', variables('setupCommand'))]"
+        }
     },
     "resources": [
         {
@@ -145,27 +188,18 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('templateUrl'), variables('sharedTemplateName'), '.json')]",
+                    "uri": "[variables('sharedTemplateUrl')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "region": {
-                        "value": "[parameters('region')]"
+                    "commonSettings": {
+                        "value": "[variables('commonSettings')]"
                     },
-                    "storageAccountName": {
-                        "value": "[parameters('storageAccountName')]"
+                    "storageSettings": {
+                        "value": "[variables('storageSettings')]"
                     },
-                    "virtualNetworkName": {
-                        "value": "[parameters('virtualNetworkName')]"
-                    },
-                    "addressPrefix": {
-                        "value": "[parameters('addressPrefix')]"
-                    },
-                    "subnetName": {
-                        "value": "[parameters('subnetName')]"
-                    },
-                    "subnetPrefix": {
-                        "value": "[parameters('subnetPrefix')]"
+                    "networkSettings": {
+                        "value": "[variables('networkSettings')]"
                     }
                 }
             }
@@ -180,160 +214,121 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('templateUrl'), variables('jumpboxTemplateName'), parameters('jumpbox'), '.json')]",
+                    "uri": "[variables('jumpboxTemplateUrl')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "region": {
-                        "value": "[parameters('region')]"
+                    "commonSettings": {
+                        "value": "[variables('commonSettings')]"
                     },
-                    "virtualNetworkName": {
-                        "value": "[parameters('virtualNetworkName')]"
+                    "storageSettings": {
+                        "value": "[variables('storageSettings')]"
                     },
-                    "subnetName": {
-                        "value": "[parameters('subnetName')]"
+                    "networkSettings": {
+                        "value": "[variables('networkSettings')]"
                     },
-                    "storageAccountName": {
-                        "value": "[parameters('storageAccountName')]"
-                    },
-                    "adminUsername": {
-                        "value": "[parameters('adminUsername')]"
+                    "machineSettings": {
+                        "value": "[variables('machineSettings')]"
                     },
                     "adminPassword": {
                         "value": "[parameters('adminPassword')]"
-                    },
-                    "computerNamePrefix": {
-                        "value": "[variables('computerNamePrefix')]"
                     }
                 }
             }
         },
         {
-            "apiVersion": "2014-12-01-preview",
-            "type": "Microsoft.Network/networkInterfaces",
-            "name": "[concat('nic', copyindex())]",
-            "location": "[parameters('region')]",
-            "copy": {
-                "name": "nicLoop",
-                "count": "[variables('numberOfInstances')]"
-            },
+            "type": "Microsoft.Resources/deployments",
+            "name": "[concat('node-resources', copyindex())]",
+            "apiVersion": "2015-01-01",
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'shared-resources')]"
             ],
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "privateIPAllocationMethod": "Static",
-                            "privateIPAddress": "[concat(parameters('redisNodeIPAddressPrefix'), copyindex())]",
-                            "subnet": {
-                                "id": "[variables('subnetRef')]"
-                            }
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "apiVersion": "2014-12-01-preview",
-            "type": "Microsoft.Compute/virtualMachines",
-            "name": "[concat('myvm', copyindex())]",
-            "location": "[parameters('region')]",
             "copy": {
-                "name": "virtualMachineLoop",
-                "count": "[variables('numberOfInstances')]"
+                "name": "memberNodesLoop",
+                "count": "[variables('clusterSpec').numberOfMembers]"
             },
-            "dependsOn": [
-                "[concat('Microsoft.Resources/deployments/', 'shared-resources')]",
-                "[concat('Microsoft.Network/networkInterfaces/', 'nic', copyindex())]"
-            ],
             "properties": {
-                "availabilitySet": {
-                    "id": "[resourceId('Microsoft.Compute/availabilitySets', 'redisCluserAS')]"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('clusterSpec').vmTemplate]",
+                    "contentVersion": "1.0.0.0"
                 },
-                "hardwareProfile": {
-                    "vmSize": "[variables('vmSize')]",
-                    "platformGuestAgent": "true"
-                },
-                "osProfile": {
-                    "computername": "[concat(variables('computerNamePrefix'), copyIndex())]",
-                    "adminUsername": "[parameters('adminUsername')]",
-                    "adminPassword": "[parameters('adminPassword')]",
-                    "linuxOperatingSystemProfile": {
-                        "disableSshPasswordAuthentication": "false"
-                    }
-                },
-                "storageProfile": {
-                    "sourceImage": {
-                        "id": "[variables('sourceImageName')]"
+                "parameters": {
+                    "commonSettings": {
+                        "value": "[variables('commonSettings')]"
                     },
-                    "dataDisks": [
-                        {
-                            "name": "datadisk1",
-                            "diskSizeGB": "[parameters('dataDiskSize')]",
-                            "lun": 0,
-                            "vhd": {
-                                "Uri": "[concat('https://',parameters('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/','myvm','dataDisk', copyindex() ,'.vhd')]"
-                            }
+                    "storageSettings": {
+                        "value": "[variables('storageSettings')]"
+                    },
+                    "networkSettings": {
+                        "value": "[variables('networkSettings')]"
+                    },
+                    "machineSettings": {
+                        "value": {
+                            "adminUsername": "[variables('machineSettings').adminUsername]",
+                            "machineNamePrefix": "[variables('machineSettings').machineNamePrefix]",
+                            "osImageName": "[variables('machineSettings').osImageName]",
+                            "vmSize": "[variables('clusterSpec').vmSizeMember]",
+                            "machineIndex": "[copyindex()]",
+                            "vmScripts": "[variables('vmScripts').scriptsToDownload]",
+                            "commandToExecute": "[variables('vmScripts').installCommand]"
                         }
-                    ],
-
-                    "destinationVhdsContainer": "[concat('https://',parameters('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('adminPassword')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "lastnode-resources",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "memberNodesLoop"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('clusterSpec').vmTemplate]",
+                    "contentVersion": "1.0.0.0"
                 },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('nic', copyindex()))]"
+                "parameters": {
+                    "commonSettings": {
+                        "value": "[variables('commonSettings')]"
+                    },
+                    "storageSettings": {
+                        "value": "[variables('storageSettings')]"
+                    },
+                    "networkSettings": {
+                        "value": "[variables('networkSettings')]"
+                    },
+                    "machineSettings": {
+                        "value": {
+                            "adminUsername": "[variables('machineSettings').adminUsername]",
+                            "machineNamePrefix": "[variables('machineSettings').machineNamePrefix]",
+                            "osImageName": "[variables('machineSettings').osImageName]",
+                            "vmSize": "[variables('clusterSpec').vmSizeMember]",
+                            "machineIndex": "[variables('clusterSpec').numberOfMembers]",
+                            "vmScripts": "[variables('vmScripts').scriptsToDownload]",
+                            "commandToExecute": "[variables('vmScripts').setupCommand]"
                         }
-                    ]
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat('myvm', copyindex(), '/installredis')]",
-            "apiVersion": "2014-12-01-preview",
-            "location": "[parameters('region')]",
-            "copy": {
-                "name": "virtualMachineExtensionsLoop",
-                "count": "[variables('numberOfInstances')]"
-            },
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', 'myvm', copyindex())]",
-                "[concat('Microsoft.Network/networkInterfaces/', 'nic', copyindex())]"
-            ],
-            "properties": {
-                "publisher": "Microsoft.OSTCExtensions",
-                "type": "CustomScriptForLinux",
-                "typeHandlerVersion": "1.2",
-                "settings": {
-                    "fileUris": [
-                        "[concat(variables('scriptUrl'), 'redis-cluster-install.sh')]"
-                    ],
-                    "commandToExecute": "[concat('bash redis-cluster-install.sh -n ', parameters('redisClusterName'), ' -v ', parameters('redisVersion'))]"
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat('myvm0', '/setupcluster')]",
-            "apiVersion": "2014-12-01-preview",
-            "location": "[parameters('region')]",
-            "dependsOn": [
-                "virtualMachineExtensionsLoop"
-            ],
-            "properties": {
-                "publisher": "Microsoft.OSTCExtensions",
-                "type": "CustomScriptForLinux",
-                "typeHandlerVersion": "1.2",
-                "settings": {
-                    "fileUris": [
-                        "[concat(variables('scriptUrl'), 'redis-cluster-setup.sh')]"
-                    ],
-                    "commandToExecute": "[concat('bash redis-cluster-setup.sh -c ', variables('numberOfInstances'), ' -s ', variables('numberOfSlaves'), ' -p ', parameters('redisNodeIPAddressPrefix'))]"
+                    },
+                    "adminPassword": {
+                        "value": "[parameters('adminPassword')]"
+                    }
                 }
             }
         }
-    ]
+    ],
+    "outputs": {
+        "installCommand": {
+            "value": "[variables('vmScripts').installCommand]",
+            "type": "string"
+        },
+        "setupCommand": {
+            "value": "[variables('vmScripts').setupCommand]",
+            "type": "string"
+        }
+    }
 }
