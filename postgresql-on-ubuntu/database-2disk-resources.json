@@ -27,8 +27,8 @@
       "type": "string"
     },
     "diskSize": {
-      "type": "string",
-      "defaultValue": "1023"
+      "type": "int",
+      "defaultValue": 1023
     },
     "osSettings": {
       "type": "object"
