@@ -3,6 +3,10 @@
 # Script parameters and their defaults
 VERSION="3.0.0"
 CLUSTER_NAME="redis-cluster"
+IS_LAST_NODE=0
+INSTANCE_COUNT=1
+SLAVE_COUNT=0
+IP_PREFIX="10.0.0."
 
 ########################################################
 # This script will install Redis from sources
@@ -18,7 +22,7 @@ help()
 log()
 {
 	# If you want to enable this logging add a un-comment the line below and add your account key 
-    	#curl -X POST -H "content-type:text/plain" --data-binary "$(date) | ${HOSTNAME} | $1" https://logs-01.loggly.com/inputs/[account-key]/tag/redis-extension,${HOSTNAME}
+    #curl -X POST -H "content-type:text/plain" --data-binary "$(date) | ${HOSTNAME} | $1" https://logs-01.loggly.com/inputs/[account-key]/tag/redis-extension,${HOSTNAME}
 	echo "$1"
 }
 
@@ -120,7 +124,7 @@ then
 fi
 
 # Parse script parameters
-while getopts :n:v:h optname; do
+while getopts :n:v:c:s:p:lh optname; do
   log "Option $optname set with value ${OPTARG}"
   
   case $optname in
@@ -130,6 +134,18 @@ while getopts :n:v:h optname; do
     v)  # Version to be installed
 		VERSION=${OPTARG}
 		;;
+	c) # Number of instances
+		INSTANCE_COUNT=${OPTARG}
+		;;
+	s) # Number of slave nodes
+		SLAVE_COUNT=${OPTARG}
+		;;		
+	p) # Private IP address prefix
+		IP_PREFIX=${OPTARG}
+		;;			
+    l)  # Indicator of the last node
+		IS_LAST_NODE=1
+		;;		
     h)  # Helpful hints
 		help
 		exit 2
@@ -209,3 +225,8 @@ tuneNetwork
 # Start the Redis service
 /etc/init.d/redis-server start
 log "Redis service was started successfully"
+
+# Cluster setup must run on the last node (a nasty workaround until ARM can recognize multiple CSEs)
+if [ "$IS_LAST_NODE" -eq 1 ]; then
+	sudo bash redis-cluster-setup.sh -c $INSTANCE_COUNT -s $SLAVE_COUNT -p $IP_PREFIX
+fi
