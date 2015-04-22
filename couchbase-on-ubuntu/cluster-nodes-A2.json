@@ -89,8 +89,8 @@
       },
       "osProfile": {
         "computername": "[concat(parameters('machineSettings').machineNamePrefix, parameters('nodeId'))]",
-        "adminUsername": "[parameters('adminUsername')]",
-        "adminPassword": "[parameters('adminPassword')]"
+        "adminUsername": "[parameters('machineSettings').adminUsername]",
+        "adminPassword": "[parameters('machineSettings').adminPassword]"
       },
       "storageProfile": {
         "sourceImage": {
