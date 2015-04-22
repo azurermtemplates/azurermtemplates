@@ -6,12 +6,12 @@
         "value": "P@ssword1"
     },
     "tshirtSize": {
-        "value": "S"
+        "value": "Small"
     },
     "storageAccountNamePrefix": {
-        "value": "f180cbdply48"
+        "value": "f180cbdply50"
     },
-    "targetRegion": {
+    "region": {
         "value": "West US"
     },
     "virtualNetworkName": {

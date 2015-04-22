@@ -2,25 +2,22 @@
     "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "targetRegion": {
-            "type": "string",
-            "defaultValue": "West US",
+        "commonSettings": {
+            "type": "object",
             "metadata": {
-                "Description": "Location where resources will be provisioned"
+                "Description": "Common settings object"
+            },
+        },
+        "networkSettings": {
+            "type": "object",
+            "metadata": {
+                "Description": "Network settings object"
             }
         },
-        "virtualNetworkName": {
-            "type": "string",
-            "defaultValue": "myVNET",
+        "machineSettings": {
+            "type": "object",
             "metadata": {
-                "Description": "The arbitrary name of the virtual network provisioned for the cluster"
-            }
-        },
-        "subnetName": {
-            "type": "string",
-            "defaultValue": "Subnet-1",
-            "metadata": {
-                "Description": "Subnet name for the virtual network that resources will be provisioned in to"
+                "Description": "Machine settings object"
             }
         },
         "storageAccountNamePrefix": {
@@ -29,24 +26,6 @@
             "metadata": {
                 "Description": "Unique namespace for the Storage Account where the Virtual Machine's disks will be placed"
             }
-        },
-        "adminUsername": {
-            "type": "string",
-            "metadata": {
-                "Description": "Administrator user name used when provisioning virtual machines"
-            }
-        },
-        "adminPassword": {
-            "type": "securestring",
-            "metadata": {
-                "Description": "Administrator password used when provisioning virtual machines"
-            }
-        },
-        "vmNamePrefix": {
-            "type": "string",
-            "metadata": {
-                "Description": "The global VM name prefix."
-            }
         }
     },
     "variables": {
@@ -54,15 +33,14 @@
         "vmSourceImageName": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
         "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]",
         "winSourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/a699494373c04fc0bc8f2bb1389d6106__Windows-Server-Technical-Preview-201504.01-en.us-127GB.vhd')]",
-        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
-        "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName'))]",
+        "subnetRef": "[concat(resourceId('Microsoft.Network/virtualNetworks',parameters('networkSettings').virtualNetworkName),'/subnets/',parameters('networkSettings').subnet.name)]",
         "storageAccountName": "[concat(parameters('storageAccountNamePrefix'), 'jb')]"
     },
     "resources": [{
         "type": "Microsoft.Storage/storageAccounts",
         "name": "[variables('storageAccountName')]",
         "apiVersion": "2014-12-01-preview",
-        "location": "[parameters('targetregion')]",
+        "location": "[parameters('commonSettings').region]",
         "properties": {
             "accountType": "Standard_LRS"
         }
@@ -70,7 +48,7 @@
         "apiVersion": "2014-12-01-preview",
         "type": "Microsoft.Network/publicIPAddresses",
         "name": "publicIP",
-        "location": "[parameters('targetRegion')]",
+        "location": "[parameters('commonSettings').region]",
         "properties": {
             "publicIPAllocationMethod": "Dynamic"
         }
@@ -78,7 +56,7 @@
         "apiVersion": "2014-12-01-preview",
         "type": "Microsoft.Network/networkInterfaces",
         "name": "nicJumpbox",
-        "location": "[parameters('targetRegion')]",
+        "location": "[parameters('commonSettings').region]",
         "dependsOn": [
             "[concat('Microsoft.Network/publicIPAddresses/', 'publicIP')]"
         ],
@@ -100,7 +78,7 @@
         "apiVersion": "2014-12-01-preview",
         "type": "Microsoft.Compute/virtualMachines",
         "name": "jumpbox",
-        "location": "[parameters('targetRegion')]",
+        "location": "[parameters('commonSettings').region]",
         "dependsOn": [
             "[concat('Microsoft.Network/networkInterfaces/', 'nicJumpbox')]",
             "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
@@ -111,7 +89,7 @@
                 "platformGuestAgent": "true"
             },
             "osProfile": {
-                "computername": "[concat(parameters('vmNamePrefix'), 'jumpbox')]",
+                "computername": "[concat(parameters('machineSettings').machineNamePrefix, 'jumpbox')]",
                 "adminUsername": "[parameters('adminUsername')]",
                 "adminPassword": "[parameters('adminPassword')]",
                 "linuxOperatingSystemProfile": {
@@ -137,12 +115,11 @@
                 }]
             }
         }
-    },
-    {
+    }, {
         "apiVersion": "2014-12-01-preview",
         "type": "Microsoft.Network/publicIPAddresses",
         "name": "publicIPWin",
-        "location": "[parameters('targetRegion')]",
+        "location": "[parameters('commonSettings').region]",
         "properties": {
             "publicIPAllocationMethod": "Dynamic"
         }
@@ -150,7 +127,7 @@
         "apiVersion": "2014-12-01-preview",
         "type": "Microsoft.Network/networkInterfaces",
         "name": "nicWin",
-        "location": "[parameters('targetRegion')]",
+        "location": "[parameters('commonSettings').region]",
         "dependsOn": [
             "[concat('Microsoft.Network/publicIPAddresses/', 'publicIPWin')]"
         ],
@@ -172,7 +149,7 @@
         "apiVersion": "2014-12-01-preview",
         "type": "Microsoft.Compute/virtualMachines",
         "name": "windows",
-        "location": "[parameters('targetRegion')]",
+        "location": "[parameters('commonSettings').region]",
         "dependsOn": [
             "[concat('Microsoft.Network/networkInterfaces/', 'nicWin')]",
             "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
@@ -183,7 +160,7 @@
                 "platformGuestAgent": "true"
             },
             "osProfile": {
-                "computername": "[concat(parameters('vmNamePrefix'), 'win')]",
+                "computername": "[concat(parameters('machineSettings').machineNamePrefix, 'win')]",
                 "adminUsername": "[parameters('adminUsername')]",
                 "adminPassword": "[parameters('adminPassword')]",
                 "linuxOperatingSystemProfile": {
