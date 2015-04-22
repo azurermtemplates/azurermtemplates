@@ -1,12 +1,12 @@
 {
     "dnsNameForPublicIP" : {
-        "value" : "uniqueDNSNameForPublicIP"
+        "value" : ""
     },
     "location" : {
         "value" : "West US"
     },
     "publicIPAddressName": {
-        "value": "cloudguyIP"
+        "value": ""
     },
     "virtualNetworkName": {
         "value": "cloudguyIP"
