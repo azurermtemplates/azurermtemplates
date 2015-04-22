@@ -110,7 +110,7 @@
         },
 
         "sourceImageName": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-12_04_5_LTS-amd64-server-20150413-en-us-30GB",
-        "sourceImage": "[concat('/',subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]",
+        "sourceImage": "[concat('/',subscription().subscriptionId,'/services/images/',variables('sourceImageName'))]",
         "templateBaseUrl": "https://raw.githubusercontent.com/ercenk/azurermtemplates/master/couchbase-on-ubuntu/",
         "storageAccountSuffixForNodeSmall0": "0",
         "storageAccountSuffixForNodeSmall1": "0",
@@ -132,7 +132,7 @@
             "couchbaseRamQuota": 2700,
             "vmSize": "Standard_A2",
             "maxNumberOfDataDisksForVmSizeNotUsedButHereForReference": 4,
-            "vmTemplate": "[concat(variables('tempLateBaseUrl'), 'cluster-nodes-A2.json')]",
+            "vmTemplate": "[concat(variables('templateBaseUrl'), 'cluster-nodes-A2.json')]",
             "backendIPConfigurations": [{
                 "id": "[concat(resourceId('Microsoft.Network/networkInterfaces',  'nic0'),'/ipConfigurations/ipconfig1')]"
             }, {
@@ -168,7 +168,7 @@
             "couchbaseRamQuota": 88000,
             "vmSize": "Standard_D14",
             "maxNumberOfDataDisksForVmSizeNotUsedButHereForReference": 32,
-            "vmTemplate": "[concat(variables('tempLateBaseUrl'), 'cluster-nodes-D14.json')]",
+            "vmTemplate": "[concat(variables('templateBaseUrl'), 'cluster-nodes-D14.json')]",
             "backendIPConfigurations": [{
                 "id": "[concat(resourceId('Microsoft.Network/networkInterfaces',  'nic0'),'/ipConfigurations/ipconfig1')]"
             }, {
@@ -185,7 +185,7 @@
             "scriptsToDownload": [
                 "[concat(variables('templateBaseUrl'), 'couchbase-azure-install.sh')]",
                 "[concat(parameters('cbPackageDownloadBase'), parameters('cbPackage'))]",
-                "[concat(variables('tempLateBaseUrl'), 'vm-disk-utils-0.1.sh')]"
+                "[concat(variables('templateBaseUrl'), 'vm-disk-utils-0.1.sh')]"
             ],
             "installCommand": "[concat('bash couchbase-azure-install.sh -d ', parameters('cbPackage'), ' -n ', parameters('cbClusterName'), ' -i ', concat(variables('networkSettings').nodesIpPrefix, '-', variables('clusterSpec').clusterSize), ' -a ', variables('machineSettings').adminUsername, ' -p ', variables('machineSettings').adminPassword, ' -r ', variables('clusterSpec').couchbaseRamQuota)]",
             "setupCommand": "[concat('bash couchbase-azure-install.sh -d ', parameters('cbPackage'), ' -n ', parameters('cbClusterName'), ' -i ', concat(variables('networkSettings').nodesIpPrefix, '-', variables('clusterSpec').clusterSize), ' -a ', variables('machineSettings').adminUsername, ' -p ', variables('machineSettings').adminPassword, ' -r ', variables('clusterSpec').couchbaseRamQuota, ' -l')]"
@@ -199,7 +199,7 @@
         "properties": {
             "mode": "Incremental",
             "templateLink": {
-                "uri": "[concat(variables('tempLateBaseUrl'), 'shared-resources.json')]",
+                "uri": "[concat(variables('templateBaseUrl'), 'shared-resources.json')]",
                 "contentVersion": "1.0.0.0"
             },
             "parameters": {
@@ -319,7 +319,7 @@
         "properties": {
             "mode": "Incremental",
             "templateLink": {
-                "uri": "[concat(variables('tempLateBaseUrl'), 'jumpbox-resources-', parameters('jumpbox'), '.json')]",
+                "uri": "[concat(variables('templateBaseUrl'), 'jumpbox-resources-', parameters('jumpbox'), '.json')]",
                 "contentVersion": "1.0.0.0"
             },
             "parameters": {
