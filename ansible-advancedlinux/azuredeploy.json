@@ -9,13 +9,15 @@
 			"defaultValue": "West US",
 			"allowedValues": [
 				"West US",
-				"North Europe"
+				"West Europe",
+				"East US",
+				"East Asia",
+				"Southeast Asia"
 			],
 			"metadata": {
 				"Description": "Region where you want to create all the resources"
 			}
 		},
-
 		"storageAccountName": {
 			"type": "string",
 			"defaultValue":"cbastg",
@@ -93,12 +95,15 @@
 		},
 		"vmSize": {
 			"type": "string",
-			"defaultValue": "Standard_A2",
+			"defaultValue": "Standard_D2",
 			"allowedValues": [
-				"Standard_A1",
-				"Standard_A2",
-				"Standard_A3",
-				"Standard_A4"
+				"Standard_D2",
+				"Standard_D3",
+				"Standard_D4",
+				"Standard_D11",
+				"Standard_D12",
+				"Standard_D13",
+				"Standard_D14"
 			],
 			"metadata": {
 				"Description": "VM Size"
@@ -130,7 +135,6 @@
 				"Description": "Imange Name. Currently only CentOS 6.5 have been fully supported. Future versions will include CentOS 6.6 and Ubuntu "
 			}
 		},
-
 		"numberOfVms": {
 			"type": "int",
 			"defaultValue": 3,
@@ -344,11 +348,10 @@
 		"lbFEConfigRef": "[concat(variables('loadBalancerRef'),'/frontendIPConfigurations/',variables('lbFEConfig'))]",
 		"lbBEConfig": "[concat('LBBEcbaFrontConfg')]",
 		"lbBEConfigRef": "[concat(variables('loadBalancerRef'),'/backendAddressPools/' ,variables('lbBEConfig'))]",
-		"lbcbaProbe": "[concat('cbaLBProbe')]",
+		"lbcbaProbe": "cbaLBProbe",
 		"lbcbaProbeRef": "[concat(variables('loadBalancerRef'),'/probes/',variables('lbcbaProbe'))]",
-		"lbcbaPort": 8092,
-		"lbcbaAdminPort": 8091,
-		"lbcbaDataAcccessPort": 11211,
+		"lbProbePort": 8092,
+		"lbExposedPort": 80,		
 		"lbcbaIdleTimeOut": 4,
 
 		"storageAccountName": "[concat(resourceGroup().name,parameters('storageAccountName'))]",
@@ -385,7 +388,6 @@
 			}
 		},
 
-
 		{
 			"apiVersion": "2014-12-01-preview",
 			"type": "Microsoft.Network/publicIPAddresses",
@@ -400,6 +402,73 @@
 				"dnsSettings": {
 					"domainNameLabel": "[variables('DNSNameLB')]"
 				}
+			}
+		},
+
+		{
+			"apiVersion": "2014-12-01-preview",
+			"type": "Microsoft.Network/loadBalancers",
+			"name": "[parameters('loadBalancerName')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[variables('publicIPRef')]"
+			],
+			"properties": {
+				
+				"frontendIPConfigurations": [
+					{
+					"name": "[variables('lbFEConfig')]",
+					"properties": {
+							"publicIPAddress": {
+								"id": "[variables('publicIPRef')]"
+							}
+						}
+
+					}
+				],
+				"backendAddressPools": [
+					{"name": "[variables('lbBEConfig')]"}
+				],
+				"probes": [
+					{
+						"name": "[variables('lbcbaProbe')]",
+						"properties": {
+							"protocol": "tcp",
+							"port": "[variables('lbProbePort')]",
+							"intervalInSeconds": "5",
+							"numberOfProbes": "3"
+						}
+					}
+				],
+				"loadBalancingRules": [
+					{
+						"name": "[variables('lbRuleName')]",
+						"properties": {
+							"frontendIPConfiguration":{"id": "[variables('lbFEConfigRef')]"},							
+							"backendAddressPool": {"id": "[variables('lbBEConfigRef')]"},
+							"protocol": "tcp",
+							"frontendPort": "[variables('lbExposedPort')]",
+							"backendPort": "[variables('lbExposedPort')]",
+							"enableFloatingIP": false,
+							"idleTimeoutInMinutes": "[ variables('lbcbaIdleTimeOut')]",
+							"probe": {
+								"id": "[variables('lbcbaProbeRef')]"
+							}
+						}
+					}
+				],
+				"inboundNatRules": [
+					{
+						"name": "sshToAnsibleControllerNATRule",
+						"properties": {
+							"frontendIPConfiguration": {"id":"[variables('lbFEConfigRef')]"},		
+							"protocol": "tcp",
+							"frontendPort": "[concat(parameters('sshNatRuleFrontEndPort'),'0')]",
+							"backendPort": "[parameters('sshNatRuleBackEndPort')]",
+							"enableFloatingIP": false
+						}
+					}
+				]
 			}
 		},
 
@@ -431,7 +500,6 @@
 			}
 		},
 
-
 		{
 			"apiVersion": "2014-12-01-preview",
 			"type": "Microsoft.Network/networkInterfaces",
@@ -442,8 +510,8 @@
 				"count": "[parameters('numberOfVMS')]"
 			},
 			"dependsOn": [
-				"[variables('vnetRef')]"
-
+				"[variables('vnetRef')]",
+				"[variables('loadBalancerRef')]"
 			],
 			"properties": {
 				"ipConfigurations": [
@@ -454,14 +522,17 @@
 							"privateIPAddress": "[concat(parameters('VMIPAddressStart'),copyindex())]",
 							"subnet": {
 								"id": "[variables('subnetBackEndRef')]"
-							}
+							},
+							"loadBalancerBackendAddressPools": 
+							[    
+			                    {"id": "[variables('lbBEConfigRef')]"}
+                			]
 						}
 
 					}
 				]
 			}
 		},
-
 
 		{
 			"apiVersion": "2014-12-01-preview",
@@ -570,14 +641,14 @@
 			}
 		},
 
-
 		{
 			"apiVersion": "2014-12-01-preview",
 			"type": "Microsoft.Network/networkInterfaces",
 			"name": "NICAnsibleController",
 			"location": "[parameters('location')]",
 			"dependsOn": [
-				"[variables('vnetRef')]"
+				"[variables('vnetRef')]",
+				"[variables('loadBalancerRef')]"
 			],
 			"properties": {
 				"ipConfigurations": [
@@ -586,9 +657,11 @@
 						"properties": {
 							"privateIPAllocationMethod": "Static",
 							"privateIPAddress": "[concat(parameters('VMIPAddressStart'),parameters('numberOfVms'))]",
-							"subnet": {
-								"id": "[variables('subnetBackEndRef')]"
-							}
+							"subnet": {	"id": "[variables('subnetBackEndRef')]"},
+                			"loadBalancerInboundNatRules":
+                			[
+                    			{"id": "[concat(variables('loadBalancerRef'),'/inboundNatRules/sshToAnsibleControllerNATRule')]"}                    			
+                			]
 						}
 
 					}
@@ -680,122 +753,6 @@
 					"storageAccountName":"[parameters('customScriptConfigStorageAccountName')]",
 					"storageAccountKey":"[parameters('customScriptConfigStorageAccountKey')]"
 				}
-			}
-		},
-
-
-		{
-			"apiVersion": "2014-12-01-preview",
-			"type": "Microsoft.Network/loadBalancers",
-			"name": "[parameters('loadBalancerName')]",
-			"location": "[parameters('location')]",
-			"dependsOn": [
-				"[variables('publicIPRef')]",
-				"VMsLoop",
-				"[resourceId('Microsoft.Compute/virtualMachines','AnsibleController')]"
-
-			],
-			"properties": {
-				"frontendIPConfigurations": [
-					{
-						"name": "[variables('lbFEConfig')]",
-						"properties": {
-							"publicIPAddress": {
-								"id": "[variables('publicIPRef')]"
-							}
-						}
-					}
-				],
-				"backendAddressPools": [
-					{
-						"name": "[variables('lbBEConfig')]",
-						"properties": {
-							"loadBalancingRules": [
-								{
-									"id": "[variables('lbRuleRef')]"
-								}
-							],
-							"backendIPConfigurations": [
-								{
-									"id": "[concat(variables('NICRef'),'0/ipConfigurations/',variables('NICipconfig'))]"
-								},
-								{
-									"id": "[concat(variables('NICRef'),'1/ipConfigurations/',variables('NICipconfig'))]"
-								}
-							]
-						}
-					}
-				],
-				"probes": [
-					{
-						"name": "[variables('lbcbaProbe')]",
-						"properties": {
-							"protocol": "tcp",
-							"port": "[variables('lbcbaPort')]",
-							"intervalInSeconds": "5",
-							"numberOfProbes": "3"
-						}
-					}
-				],
-				"loadBalancingRules": [
-					{
-						"name": "[variables('lbRuleName')]",
-						"properties": {
-							"frontendIPConfigurations": [
-								{
-									"id": "[variables('lbFEConfigRef')]"
-								}
-							],
-							"backendAddressPool": {
-								"id": "[variables('lbBEConfigRef')]"
-							},
-							"protocol": "tcp",
-							"frontendPort": "[variables('lbcbaAdminPort')]",
-							"backendPort": "[variables('lbcbaAdminPort')]",
-							"enableFloatingIP": false,
-							"idleTimeoutInMinutes": "[ variables('lbcbaIdleTimeOut')]",
-							"probe": {
-								"id": "[variables('lbcbaProbeRef')]"
-							}
-						}
-					}
-				],
-				"inboundNatRules": [
-					{
-						"name": "sshToAnsibleControllerRule",
-						"properties": {
-							"frontendIPConfigurations": [
-								{
-									"id": "[variables('lbFEConfigRef')]"
-								}
-							],
-							"backendIPConfiguration": {
-								"id": "[concat(resourceId('Microsoft.Network/networkInterfaces','NICAnsibleController'),'/ipConfigurations/',variables('NICipconfig'))]"
-							},
-							"protocol": "tcp",
-							"frontendPort": "[concat(parameters('sshNatRuleFrontEndPort'),'0')]",
-							"backendPort": "[parameters('sshNatRuleBackEndPort')]",
-							"enableFloatingIP": false
-						}
-					},
-					{
-						"name": "sshToVM1NatRule",
-						"properties": {
-							"frontendIPConfigurations": [
-								{
-									"id": "[variables('lbFEConfigRef')]"
-								}
-							],
-							"backendIPConfiguration": {
-								"id": "[concat(variables('NICRef'),'0/ipConfigurations/',variables('NICipconfig'))]"
-							},
-							"protocol": "tcp",
-							"frontendPort": "[concat(parameters('sshNatRuleFrontEndPort'),'1')]",
-							"backendPort": "[parameters('sshNatRuleBackEndPort')]",
-							"enableFloatingIP": false
-						}
-					}
-				]
 			}
 		}
 	],

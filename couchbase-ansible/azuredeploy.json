@@ -196,6 +196,14 @@
 			}
 
 		},
+		"nginxConfigLocation":{
+			"type": "string",
+			"defaultValue":"customscript/nginx",
+			"metadata": {
+				"Description": "Specify the location of the nginx config template for the Couchbase Web Console"
+			}
+
+		},
 		"sshRootPubBlobLocation":{
 			"type": "string",
 			"defaultValue":"customscript/id_rsa.pub",
@@ -223,7 +231,7 @@
 			"metadata": {
 				"Description": "Specify the location of the ansible playbook that contains the installation parameters"
 			}
-		},
+		},				
 		"couchbaseAdminUser":{
 			"type": "string",			
 			"metadata": {
@@ -236,9 +244,16 @@
 				"Description": "Specify the Couchbase Admin Password"
 			}
 		},
+		"couchbaseWebConsolePort":{
+			"type": "string",			
+			"metadata": {
+				"Description": "Specify the Port assigned to the Couchbase Web admin Console"
+			},
+			"defaultValue": "16195"
+		},
 		"couchbaseMemoryAllocationPercentage":{
 			"type": "string",	
-			"defaultValue":"0.7",		
+			"defaultValue":"70",		
 			"metadata": {
 				"Description": "Specify the percentage of RAM Allocated to Couchbase. Leave Memory for the OS."
 			}
@@ -357,6 +372,7 @@
 		"customScriptAnsibleCommand": "[concat('bash ',variables('customScriptAnsibleFile'))]",
 		"customScriptAnsibleParameters": "[concat(' -i ',parameters('VMIPAddressStart'),' -n ',parameters('numberOfVms'),' -r ',parameters('createRAID'),' -f ',parameters('vmFileSystem'),' -u ',parameters('couchbaseAdminUser'),' -p ',parameters('couchbaseAdminPassword') ,' -m ',parameters('couchbaseMemoryAllocationPercentage') )]",
 		"sshRootCerBlobUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('sshRootCerBlobLocation'))]",
+		
 
 		"customScriptSSHRootFile" :"configure_ssh_root.sh",
 		"customScriptSSHRootUrl": "[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/customscript/',variables('customScriptSSHRootFile'))]",
@@ -365,7 +381,7 @@
 		"ansiblePlaybookUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('ansiblePlaybookLocation'))]",
 		"couchbasePlaybookUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('couchbasePlaybookLocation'))]",
 		"couchbaseParametersPlaybookUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('couchbasePlaybookParamsLocation'))]",
-
+		"nginxConfigTemplateUrl" :"[concat('https://',parameters('customScriptConfigStorageAccountName'),'.blob.core.windows.net/',parameters('nginxConfigLocation'))]",		
 		
 
 		"newVirtualNetworkName": "[concat(parameters('virtualNetworkName'))]",
@@ -381,16 +397,12 @@
 		"loadBalancerRef": "[resourceId('Microsoft.Network/loadBalancers',parameters('loadBalancerName'))]",
 		"lbRuleName": "lbRuleCbAdmin",
 		"lbRuleRef": "[concat(variables('loadBalancerRef'),'/loadBalancingRules/',variables('lbRuleName'))]",
-		"lbFEConfig": "PLBcbaFrontConfg",
+		"lbFEConfig": "LBcbaFrontConfg",
+
 		"lbFEConfigRef": "[concat(variables('loadBalancerRef'),'/frontendIPConfigurations/',variables('lbFEConfig'))]",
 		"lbBEConfig": "[concat('LBBEcbaFrontConfg')]",
 		"lbBEConfigRef": "[concat(variables('loadBalancerRef'),'/backendAddressPools/' ,variables('lbBEConfig'))]",
-		"lbcbaProbe": "[concat('cbaLBProbe')]",
-		"lbcbaProbeRef": "[concat(variables('loadBalancerRef'),'/probes/',variables('lbcbaProbe'))]",
-		"lbcbaPort": 8092,
-		"lbcbaAdminPort": 8091,
-		"lbcbaDataAcccessPort": 11211,
-		"lbcbaIdleTimeOut": 4,
+				
 
 		"storageAccountName": "[concat(resourceGroup().name,parameters('storageAccountName'))]",
 		"storageRef": "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
@@ -444,6 +456,56 @@
 			}
 		},
 
+		{
+			"apiVersion": "2014-12-01-preview",
+			"type": "Microsoft.Network/loadBalancers",
+			"name": "[parameters('loadBalancerName')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[variables('publicIPRef')]"
+			],
+			"properties": {
+				
+				"frontendIPConfigurations": [
+					{
+					"name": "[variables('lbFEConfig')]",
+					"properties": {
+							"publicIPAddress": {
+								"id": "[variables('publicIPRef')]"
+							}
+						}
+
+					}
+				],
+				"backendAddressPools": [
+					{"name": "[variables('lbBEConfig')]"}
+				],
+				"inboundNatRules": [
+					{
+						"name": "sshToAnsibleControllerNAT",
+						"properties": {
+							"frontendIPConfiguration": {"id":"[variables('lbFEConfigRef')]"},		
+							"protocol": "tcp",
+							"frontendPort": "[concat(parameters('sshNatRuleFrontEndPort'),'0')]",
+							"backendPort": "[parameters('sshNatRuleBackEndPort')]",
+							"enableFloatingIP": false
+						}
+					},
+					{
+						"name": "couchbaseWebAdminConsoleNAT",
+						"properties": {
+							"frontendIPConfiguration": {"id":"[variables('lbFEConfigRef')]"},		
+							"protocol": "tcp",
+							"frontendPort": "[parameters('couchbaseWebConsolePort')]",
+							"backendPort": "[parameters('couchbaseWebConsolePort')]",
+							"enableFloatingIP": false
+						}
+					}					
+
+				]
+			}
+		},
+
 
 		{
 			"type": "Microsoft.Compute/availabilitySets",
@@ -472,7 +534,7 @@
 			}
 		},
 
-
+		
 		{
 			"apiVersion": "2014-12-01-preview",
 			"type": "Microsoft.Network/networkInterfaces",
@@ -483,8 +545,8 @@
 				"count": "[parameters('numberOfVMS')]"
 			},
 			"dependsOn": [
-				"[variables('vnetRef')]"
-
+				"[variables('vnetRef')]",
+				"[variables('loadBalancerRef')]"
 			],
 			"properties": {
 				"ipConfigurations": [
@@ -495,7 +557,11 @@
 							"privateIPAddress": "[concat(parameters('VMIPAddressStart'),copyindex())]",
 							"subnet": {
 								"id": "[variables('subnetBackEndRef')]"
-							}
+							},
+							"loadBalancerBackendAddressPools": 
+							[    
+			                    {"id": "[variables('lbBEConfigRef')]"}
+                			]
 						}
 
 					}
@@ -634,7 +700,8 @@
 			"name": "NICAnsibleController",
 			"location": "[parameters('location')]",
 			"dependsOn": [
-				"[variables('vnetRef')]"
+				"[variables('vnetRef')]",
+				"[variables('loadBalancerRef')]"
 			],
 			"properties": {
 				"ipConfigurations": [
@@ -643,9 +710,12 @@
 						"properties": {
 							"privateIPAllocationMethod": "Static",
 							"privateIPAddress": "[concat(parameters('VMIPAddressStart'),parameters('numberOfVms'))]",
-							"subnet": {
-								"id": "[variables('subnetBackEndRef')]"
-							}
+							"subnet": {	"id": "[variables('subnetBackEndRef')]"},
+                			"loadBalancerInboundNatRules":
+                			[
+                    			{"id": "[concat(variables('loadBalancerRef'),'/inboundNatRules/sshToAnsibleControllerNAT')]"},
+                    			{"id": "[concat(variables('loadBalancerRef'),'/inboundNatRules/couchbaseWebAdminConsoleNAT')]"}
+                			]
 						}
 
 					}
@@ -731,8 +801,9 @@
 						"[variables('couchbaseParametersPlaybookUrl')]",
 						"[variables('sshRootPubBlobUrl')]",
 						"[variables('sshRootCerBlobUrl')]",
+						"[variables('nginxConfigTemplateUrl')]"
 					],
-					"commandToExecute": "[concat(variables('customScriptAnsibleCommand'),variables('customScriptAnsibleParameters'))]",
+					"commandToExecute": "[concat(variables('customScriptAnsibleCommand'),variables('customScriptAnsibleParameters'),' -q ',reference(variables('publicIPRef'),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).dnsSettings.fqdn ,' -o ', parameters('couchbaseWebConsolePort'))]",
 
 				},
 				"protectedSettings":{
@@ -740,123 +811,8 @@
 					"storageAccountKey":"[parameters('customScriptConfigStorageAccountKey')]"
 				}
 			}
-		},
-
-
-		{
-			"apiVersion": "2014-12-01-preview",
-			"type": "Microsoft.Network/loadBalancers",
-			"name": "[parameters('loadBalancerName')]",
-			"location": "[parameters('location')]",
-			"dependsOn": [
-				"[variables('publicIPRef')]",
-				"VMsLoop",
-				"[resourceId('Microsoft.Compute/virtualMachines','AnsibleController')]"
-
-			],
-			"properties": {
-				"frontendIPConfigurations": [
-					{
-						"name": "[variables('lbFEConfig')]",
-						"properties": {
-							"publicIPAddress": {
-								"id": "[variables('publicIPRef')]"
-							}
-						}
-					}
-				],
-				"backendAddressPools": [
-					{
-						"name": "[variables('lbBEConfig')]",
-						"properties": {
-							"loadBalancingRules": [
-								{
-									"id": "[variables('lbRuleRef')]"
-								}
-							],
-							"backendIPConfigurations": [
-								{
-									"id": "[concat(variables('NICRef'),'0/ipConfigurations/',variables('NICipconfig'))]"
-								},
-								{
-									"id": "[concat(variables('NICRef'),'1/ipConfigurations/',variables('NICipconfig'))]"
-								}
-							]
-						}
-					}
-				],
-				"probes": [
-					{
-						"name": "[variables('lbcbaProbe')]",
-						"properties": {
-							"protocol": "tcp",
-							"port": "[variables('lbcbaPort')]",
-							"intervalInSeconds": "5",
-							"numberOfProbes": "3"
-						}
-					}
-				],
-				"loadBalancingRules": [
-					{
-						"name": "[variables('lbRuleName')]",
-						"properties": {
-							"frontendIPConfigurations": [
-								{
-									"id": "[variables('lbFEConfigRef')]"
-								}
-							],
-							"backendAddressPool": {
-								"id": "[variables('lbBEConfigRef')]"
-							},
-							"protocol": "tcp",
-							"frontendPort": "[variables('lbcbaAdminPort')]",
-							"backendPort": "[variables('lbcbaAdminPort')]",
-							"enableFloatingIP": false,
-							"idleTimeoutInMinutes": "[ variables('lbcbaIdleTimeOut')]",
-							"probe": {
-								"id": "[variables('lbcbaProbeRef')]"
-							}
-						}
-					}
-				],
-				"inboundNatRules": [
-					{
-						"name": "sshToAnsibleControllerRule",
-						"properties": {
-							"frontendIPConfigurations": [
-								{
-									"id": "[variables('lbFEConfigRef')]"
-								}
-							],
-							"backendIPConfiguration": {
-								"id": "[concat(resourceId('Microsoft.Network/networkInterfaces','NICAnsibleController'),'/ipConfigurations/',variables('NICipconfig'))]"
-							},
-							"protocol": "tcp",
-							"frontendPort": "[concat(parameters('sshNatRuleFrontEndPort'),'0')]",
-							"backendPort": "[parameters('sshNatRuleBackEndPort')]",
-							"enableFloatingIP": false
-						}
-					},
-					{
-						"name": "sshToVM1NatRule",
-						"properties": {
-							"frontendIPConfigurations": [
-								{
-									"id": "[variables('lbFEConfigRef')]"
-								}
-							],
-							"backendIPConfiguration": {
-								"id": "[concat(variables('NICRef'),'0/ipConfigurations/',variables('NICipconfig'))]"
-							},
-							"protocol": "tcp",
-							"frontendPort": "[concat(parameters('sshNatRuleFrontEndPort'),'1')]",
-							"backendPort": "[parameters('sshNatRuleBackEndPort')]",
-							"enableFloatingIP": false
-						}
-					}
-				]
-			}
 		}
+		
 	],
 
 	"outputs":
@@ -866,7 +822,7 @@
 				"type":"string"
 		},
 		"couchbaseWebURL":{
-				"value":"[concat('URL To Couchbase admin console: http://', reference(variables('publicIPRef'),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).dnsSettings.fqdn,':',variables('lbcbaAdminPort'))]",
+				"value":"[concat('URL To Couchbase Admin Console: https://', reference(variables('publicIPRef'),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).dnsSettings.fqdn,':',parameters('couchbaseWebConsolePort'))]",
 				"type":"string"
 		}
 	}
