@@ -99,56 +99,56 @@
         },
         "dataDisks": [{
           "name": "datadisk0",
-          "diskSizeGB": "[parameters('macHineSettings').dataDiskSize]",
+          "diskSizeGB": "[parameters('machineSettings').dataDiskSize]",
           "lun": 0,
           "vhd": {
             "Uri": "[concat('http://', parameters('storageAccountName'), '.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/', parameters('machineSettings').machineNamePrefix, parameters('nodeId'),'dataDisk0' ,'.vhd')]"
           }
         }, {
           "name": "datadisk1",
-          "diskSizeGB": "[parameters('macHineSettings').dataDiskSize]",
+          "diskSizeGB": "[parameters('machineSettings').dataDiskSize]",
           "lun": 1,
           "vhd": {
             "Uri": "[concat('http://', parameters('storageAccountName'), '.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/', parameters('machineSettings').machineNamePrefix, parameters('nodeId') ,'dataDisk1','.vhd')]"
           }
         }, {
           "name": "datadisk2",
-          "diskSizeGB": "[parameters('macHineSettings').dataDiskSize]",
+          "diskSizeGB": "[parameters('machineSettings').dataDiskSize]",
           "lun": 2,
           "vhd": {
             "Uri": "[concat('http://', parameters('storageAccountName'), '.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/', parameters('machineSettings').machineNamePrefix, parameters('nodeId') ,'dataDisk2','.vhd')]"
           }
         }, {
           "name": "datadisk3",
-          "diskSizeGB": "[parameters('macHineSettings').dataDiskSize]",
+          "diskSizeGB": "[parameters('machineSettings').dataDiskSize]",
           "lun": 3,
           "vhd": {
             "Uri": "[concat('http://', parameters('storageAccountName'), '.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/', parameters('machineSettings').machineNamePrefix, parameters('nodeId') ,'dataDisk3','.vhd')]"
           }
         }, {
           "name": "datadisk4",
-          "diskSizeGB": "[parameters('macHineSettings').dataDiskSize]",
+          "diskSizeGB": "[parameters('machineSettings').dataDiskSize]",
           "lun": 4,
           "vhd": {
             "Uri": "[concat('http://', parameters('storageAccountName'), '.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/', parameters('machineSettings').machineNamePrefix, parameters('nodeId'),'dataDisk4' ,'.vhd')]"
           }
         }, {
           "name": "datadisk5",
-          "diskSizeGB": "[parameters('macHineSettings').dataDiskSize]",
+          "diskSizeGB": "[parameters('machineSettings').dataDiskSize]",
           "lun": 5,
           "vhd": {
             "Uri": "[concat('http://', parameters('storageAccountName'), '.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/', parameters('machineSettings').machineNamePrefix, parameters('nodeId') ,'dataDisk5','.vhd')]"
           }
         }, {
           "name": "datadisk6",
-          "diskSizeGB": "[parameters('macHineSettings').dataDiskSize]",
+          "diskSizeGB": "[parameters('machineSettings').dataDiskSize]",
           "lun": 6,
           "vhd": {
             "Uri": "[concat('http://', parameters('storageAccountName'), '.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/', parameters('machineSettings').machineNamePrefix, parameters('nodeId') ,'dataDisk6','.vhd')]"
           }
         }, {
           "name": "datadisk7",
-          "diskSizeGB": "[parameters('macHineSettings').dataDiskSize]",
+          "diskSizeGB": "[parameters('machineSettings').dataDiskSize]",
           "lun": 7,
           "vhd": {
             "Uri": "[concat('http://', parameters('storageAccountName'), '.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/', parameters('machineSettings').machineNamePrefix, parameters('nodeId') ,'dataDisk7','.vhd')]"
