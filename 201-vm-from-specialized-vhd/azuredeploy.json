@@ -64,7 +64,7 @@
                     "vhd": {
                         "uri": "[parameters('osDiskVhdUri')]"
                     },
-                    "createOption": "FromImage"
+                    "createOption": "Attach"
                 }
             },
             "networkProfile": {

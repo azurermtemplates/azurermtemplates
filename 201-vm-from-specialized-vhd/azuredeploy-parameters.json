@@ -1,10 +1,4 @@
 ﻿{
-    "adminUsername": {
-        "value": ""
-    },
-    "adminPassword": {
-        "value": ""
-    },
     "osDiskVhdUri": {
         "value" : "https://test.blob.core.windows.net/vhds/example.vhd"
     },
