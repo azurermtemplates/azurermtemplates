@@ -97,7 +97,7 @@
             "addressPrefix": "10.0.0.0/16",
             "subnet": {
                 "name": "couchSubnet",
-                "prefix": "10.0.0.0/24",
+                "prefix": "10.0.0.0/24"
             },
             "nodesIpPrefix": "10.0.0.1"
         },
@@ -105,11 +105,11 @@
             "adminUsername": "[parameters('adminUsername')]",
             "adminPassword": "[parameters('adminPassword')]",
             "machineNamePrefix": "[parameters('vmNamePrefix')]",
-            "osImageName": "[variables('sourceImageName')]",
+            "osImageName": "[variables('sourceImage')]",
             "dataDiskSize": 1023
         },
 
-        "vmSourceImageName": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-12_04_5_LTS-amd64-server-20150413-en-us-30GB",
+        "sourceImageName": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-12_04_5_LTS-amd64-server-20150413-en-us-30GB",
         "sourceImage": "[concat('/',subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]",
         "templateBaseUrl": "https://raw.githubusercontent.com/ercenk/azurermtemplates/master/couchbase-on-ubuntu/",
         "storageAccountSuffixForNodeSmall0": "0",
@@ -257,9 +257,6 @@
                 "storageAccountName": {
                     "value": "[concat(parameters('storageAccountNamePrefix'), variables(concat('storageAccountSuffixForNode', parameters('tshirtSize'), copyindex())))]"
                 },
-                "sourceImage": {
-                    "value": "[variables('sourceImage')]"
-                },
                 "nodeId": {
                     "value": "[copyindex()]"
                 },
@@ -299,9 +296,6 @@
                 },
                 "storageAccountName": {
                     "value": "[concat(parameters('storageAccountNamePrefix'), variables(concat('storageAccountSuffixForNode', parameters('tshirtSize'), variables('clusterSpec').lastNodeId)))]"
-                },
-                "sourceImage": {
-                    "value": "[variables('sourceImage')]"
                 },
                 "nodeId": {
                     "value": "[variables('clusterSpec').lastNodeId]"

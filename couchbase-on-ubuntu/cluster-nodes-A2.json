@@ -25,12 +25,6 @@
           "Description": "Name of the storage account the VM is assigned to"
         }
       },
-      "sourceImage": {
-        "type": "string",
-        "metadata": {
-          "Description": "Source image for the VM."
-        },
-      },
       "nodeId": {
         "type": "int",
         "metadata": {
@@ -99,7 +93,7 @@
         },
         "storageProfile": {
           "sourceImage": {
-            "id": "[parameters('sourceImage')]"
+            "id": "[parameters('machineSettings').osImageName]"
           },
           "dataDisks": [{
             "name": "datadisk0",

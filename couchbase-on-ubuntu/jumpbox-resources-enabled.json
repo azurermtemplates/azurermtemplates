@@ -30,8 +30,6 @@
     },
     "variables": {
         "vmStorageAccountContainerName": "vhd",
-        "vmSourceImageName": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
-        "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]",
         "winSourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/a699494373c04fc0bc8f2bb1389d6106__Windows-Server-Technical-Preview-201504.01-en.us-127GB.vhd')]",
         "subnetRef": "[concat(resourceId('Microsoft.Network/virtualNetworks',parameters('networkSettings').virtualNetworkName),'/subnets/',parameters('networkSettings').subnet.name)]",
         "storageAccountName": "[concat(parameters('storageAccountNamePrefix'), 'jb')]"
@@ -98,7 +96,7 @@
             },
             "storageProfile": {
                 "sourceImage": {
-                    "id": "[variables('sourceImageName')]"
+                    "id": "[parameters('machineSettings').osImageName]"
                 },
                 "destinationVhdsContainer": "[concat('https://' ,variables('storageAccountName'), '.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
             },
