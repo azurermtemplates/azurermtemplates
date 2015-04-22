@@ -16,23 +16,21 @@
         },
         "storageAccountName": {
             "type": "string",
-            "defaultValue": "uniqueStorageAccountName",
             "metadata": {
                 "Description": "Unique namespace for the Storage Account where the Virtual Machine's disks will be placed"
             }
         },
         "region": {
             "type": "string",
-            "defaultValue": "West US",
             "metadata": {
                 "Description": "Location where resources will be provisioned"
             }
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "myVNET",
+            "defaultValue": "redisVirtNet",
             "metadata": {
-                "Description": "The arbitrary name of the virtual network provisioned for the cluster"
+                "Description": "The arbitrary name of the virtual network provisioned for the Redis cluster"
             }
         },
         "addressPrefix": {
@@ -44,7 +42,7 @@
         },
         "subnetName": {
             "type": "string",
-            "defaultValue": "Subnet-1",
+            "defaultValue": "redisSubnet1",
             "metadata": {
                 "Description": "Subnet name for the virtual network that resources will be provisioned in to"
             }
@@ -56,6 +54,13 @@
                 "Description": "Address space for the virtual network subnet"
             }
         },
+        "nodeAddressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.1",
+            "metadata": {
+                "Description": "The IP address prefix that will be used for constructing a static private IP address for each node in the cluster"
+            }
+        },
         "jumpbox": {
             "type": "string",
             "defaultValue": "Disabled",
@@ -64,7 +69,7 @@
                 "Disabled"
             ],
             "metadata": {
-                "Description": "The flag allowing to enable or disable provisioning of the jumpbox VM that can be used to access the Redis deployment"
+                "Description": "The flag allowing to enable or disable provisioning of the jumpbox VM that can be used to access the Redis nodes"
             }
         },
         "tshirtSize": {
@@ -79,17 +84,6 @@
                 "Description": "T-shirt size of the Redis deployment"
             }
         },
-        "osFamily": {
-            "type": "string",
-            "defaultValue": "Ubuntu",
-            "allowedValues": [
-                "Ubuntu",
-                "CentOS"
-            ],
-            "metadata": {
-                "Description": "The target OS for the virtual machines running Redis"
-            }
-        },
         "redisVersion": {
             "type": "string",
             "defaultValue": "stable",
@@ -99,6 +93,7 @@
         },
         "redisClusterName": {
             "type": "string",
+            "defaultValue": "redis-cluster",
             "metadata": {
                 "Description": "The arbitrary name of the Redis cluster"
             }
@@ -128,12 +123,6 @@
             "arbiter": "Enabled",
             "vmTemplate": "[concat(variables('templateBaseUrl'), 'node-resources.json')]"
         },
-        "osFamilyUbuntu": {
-            "osName": "ubuntu"
-        },
-        "osFamilyCentOS": {
-            "osName": "centos"
-        },
         "vmStorageAccountContainerName": "vhd-redis",
         "vmStorageAccountDomain": ".blob.core.windows.net",
         "vmSourceImageName": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
@@ -160,7 +149,7 @@
             "subnetName": "[parameters('subnetName')]",
             "subnetPrefix": "[parameters('subnetPrefix')]",
             "subnetRef": "[concat(variables('vnetID'), '/subnets/', parameters('subnetName'))]",
-            "machineIpPrefix": "10.0.0.1"
+            "machineIpPrefix": "[parameters('nodeAddressPrefix')]"
         },
         "machineSettings": {
             "adminUsername": "[parameters('adminUsername')]",
@@ -168,7 +157,6 @@
             "osImageName": "[variables('sourceImageName')]"
         },
         "clusterSpec": "[variables(concat('tshirtSize', parameters('tshirtSize')))]",
-        "osFamilySpec": "[variables(concat('osFamily', parameters('osFamily')))]",
         "installCommand": "[concat('redis-cluster-install.sh -n ', parameters('redisClusterName'), ' -v ', parameters('redisVersion'), ' -c ', variables('clusterSpec').totalMemberCount, ' -s ', variables('clusterSpec').numberOfSlaves, ' -p ', variables('networkSettings').machineIpPrefix)]",
         "vmScripts": {
             "scriptsToDownload": [
