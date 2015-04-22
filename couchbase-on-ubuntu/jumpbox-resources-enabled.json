@@ -88,8 +88,8 @@
             },
             "osProfile": {
                 "computername": "[concat(parameters('machineSettings').machineNamePrefix, 'jumpbox')]",
-                "adminUsername": "[parameters('adminUsername')]",
-                "adminPassword": "[parameters('adminPassword')]",
+                "adminUsername": "[parameters('machineSettings').adminUsername]",
+                "adminPassword": "[parameters('machineSettings').adminPassword]",
                 "linuxOperatingSystemProfile": {
                     "disableSshPasswordAuthentication": "false"
                 }
@@ -159,8 +159,8 @@
             },
             "osProfile": {
                 "computername": "[concat(parameters('machineSettings').machineNamePrefix, 'win')]",
-                "adminUsername": "[parameters('adminUsername')]",
-                "adminPassword": "[parameters('adminPassword')]",
+                "adminUsername": "[parameters('machineSettings').adminUsername]",
+                "adminPassword": "[parameters('machineSettings').adminPassword]",
                 "linuxOperatingSystemProfile": {
                     "disableSshPasswordAuthentication": "false"
                 }
