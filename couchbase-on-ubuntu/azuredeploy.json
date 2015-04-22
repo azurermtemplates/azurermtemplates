@@ -204,7 +204,7 @@
             },
             "parameters": {
                 "commonSettings": {
-                    "value": "[parameters('cOmmonseTtings').avaIlaBilitySetName]"
+                    "value": "[parameters('cOmmonseTtings').availabilitySetName]"
                 },
                 "networkSettings": {
                     "value": "[variables('networkSettings')]"
@@ -246,7 +246,7 @@
             },
             "parameters": {
                 "commonSettings": {
-                    "value": "[]variables('commonSettings"
+                    "value": "[variables('commonSettings')]"
                 },
                 "networkSettings": {
                     "value": "[variables('networkSettings')]"
@@ -286,7 +286,7 @@
             },
             "parameters": {
                 "commonSettings": {
-                    "value": "[]variables('commonSettings"
+                    "value": "[variables('commonSettings')]"
                 },
                 "networkSettings": {
                     "value": "[variables('networkSettings')]"
@@ -324,7 +324,7 @@
             },
             "parameters": {
                 "commonSettings": {
-                    "value": "[]variables('commonSettings"
+                    "value": "[variables('commonSettings')]"
                 },
                 "networkSettings": {
                     "value": "[variables('networkSettings')]"
