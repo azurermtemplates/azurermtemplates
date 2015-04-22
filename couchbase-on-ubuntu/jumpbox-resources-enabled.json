@@ -6,7 +6,7 @@
             "type": "object",
             "metadata": {
                 "Description": "Common settings object"
-            },
+            }
         },
         "networkSettings": {
             "type": "object",
