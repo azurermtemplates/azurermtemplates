@@ -65,7 +65,7 @@
         "name": "ipconfig1",
         "properties": {
           "privateIPAllocationMethod": "Static",
-          "privateIPAddress": "[concat(parameters('netoworkSettings').nodesIpPrefix, parameters('nodeId'))]",
+          "privateIPAddress": "[concat(parameters('networkSettings').nodesIpPrefix, parameters('nodeId'))]",
           "subnet": {
             "id": "[variables('subnetRef')]"
           }
