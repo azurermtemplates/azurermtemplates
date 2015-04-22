@@ -121,26 +121,26 @@
         "subnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetName'))]",
         "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]",
         "computerNamePrefix": "kafkanode",
-        "scriptUrl": "https://raw.githubusercontent.com/CognosysTech/AzureDeployKafkaV2/master/",
+        "scriptUrl": "https://raw.githubusercontent.com/CognosysTech/AzureDeployKafkaV3/master/",
         "templateUrl": "[variables('scriptUrl')]",
         "sharedTemplateName": "shared-resources",
         "jumpboxTemplateName": "jumpbox-resources-",
         "tshirtSizeS": {
-            "numberOfZooInstances": 1,
-			"numberOfKafkaInstances" : 2,
+            "numberOfZookeeperInstances": 1,
+			"numberOfKafkaInstances" : 3,
             "vmSize": "Standard_A1"
         },
         "tshirtSizeM": {
-            "numberOfZooInstances": 3,
+            "numberOfZookeeperInstances": 3,
 			"numberOfKafkaInstances" : 3,
             "vmSize": "Standard_A2"
         },
         "tshirtSizeL": {
-            "numberOfZooInstances": 4,
-			"numberOfKafkaInstances" : 5,
-            "vmSize": "Standard_A3"
+            "numberOfZookeeperInstances": 5,
+			"numberOfKafkaInstances" : 7,
+            "vmSize": "Standard_A7"
         },
-        "numberOfZooInstances": "[variables(concat('tshirtSize', parameters('tshirtSize'))).numberOfZooInstances]",
+        "numberOfZookeeperInstances": "[variables(concat('tshirtSize', parameters('tshirtSize'))).numberOfZookeeperInstances]",
 		"numberOfKafkaInstances": "[variables(concat('tshirtSize', parameters('tshirtSize'))).numberOfKafkaInstances]",
         "vmSize": "[variables(concat('tshirtSize', parameters('tshirtSize'))).vmSize]"
     },
@@ -222,7 +222,7 @@
             "location": "[parameters('region')]",
             "copy": {
                 "name": "nicLoop",
-                "count": "[variables('numberOfZooInstances')]"
+                "count": "[variables('numberOfZookeeperInstances')]"
             },
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'shared-resources')]"
@@ -276,7 +276,7 @@
             "location": "[parameters('region')]",
             "copy": {
                 "name": "virtualZookeeperMachineLoop",
-                "count": "[variables('numberOfZooInstances')]"
+                "count": "[variables('numberOfZookeeperInstances')]"
             },
             "dependsOn": [
                 "[concat('Microsoft.Resources/deployments/', 'shared-resources')]",
@@ -291,7 +291,7 @@
                     "platformGuestAgent": "true"
                 },
                 "osProfile": {
-                    "computername": "[concat(variables('computerNamePrefix'), copyIndex())]",
+                    "computername": "[concat(variables('computerNamePrefix'),'z', copyIndex())]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]",
                     "linuxOperatingSystemProfile": {
@@ -378,7 +378,7 @@
             "location": "[parameters('region')]",
             "copy": {
                 "name": "virtualMachineExtensionsLoop",
-                "count": "[variables('numberOfZooInstances')]"
+                "count": "[variables('numberOfZookeeperInstances')]"
             },
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', 'myvmzoo', copyindex())]",
@@ -392,7 +392,7 @@
                     "fileUris": [
                         "[concat(variables('scriptUrl'), 'kafka-cluster-install.sh')]"
                     ],
-                    "commandToExecute": "[concat('bash kafka-cluster-install.sh -z ',' 1 ')]"
+                    "commandToExecute": "[concat('bash kafka-cluster-install.sh -z ',' 1 ',' -c ', variables('numberOfZookeeperInstances'),' -i ', parameters('kafkaZooNodeIPAddressPrefix'))]"
                 }
             }
         },
@@ -417,7 +417,7 @@
                     "fileUris": [
                         "[concat(variables('scriptUrl'), 'kafka-cluster-install.sh')]"
                     ],
-                    "commandToExecute": "[concat('bash kafka-cluster-install.sh -b ',copyindex())]"
+                    "commandToExecute": "[concat('bash kafka-cluster-install.sh -b ',copyindex(),' -c ', variables('numberOfZookeeperInstances'),' -i ', parameters('kafkaZooNodeIPAddressPrefix'))]"
                 }
             }
         }

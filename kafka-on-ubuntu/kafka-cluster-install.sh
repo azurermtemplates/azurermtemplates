@@ -24,6 +24,13 @@ help()
     echo "-h view this help content"
 }
 
+log()
+{
+	# If you want to enable this logging add a un-comment the line below and add your account key 
+    	#curl -X POST -H "content-type:text/plain" --data-binary "$(date) | ${HOSTNAME} | $1" https://logs-01.loggly.com/inputs/[account-key]/tag/redis-extension,${HOSTNAME}
+	echo "$1"
+}
+
 log "Begin execution of kafka script extension on ${HOSTNAME}"
 
 if [ "${UID}" -ne 0 ];
@@ -50,10 +57,13 @@ fi
 KF_VERSION="0.8.2.1"
 BROKER_ID=0
 ZOOKEEPER1KAFKA0="0"
-ZOOKEEPER_IPPORT="10.0.0.40:2181"
+
+ZOOKEEPER_IP_PREFIX="10.0.0.4"
+INSTANCE_COUNT=1
+ZOOKEEPER_PORT="2181"
 
 #Loop through options passed
-while getopts :k:b:z:i:h optname; do
+while getopts :k:b:z:i:c:p:h optname; do
     log "Option $optname set with value ${OPTARG}"
   case $optname in
     k)  #kafka version
@@ -65,9 +75,12 @@ while getopts :k:b:z:i:h optname; do
     z)  #zookeeper not kafka
       ZOOKEEPER1KAFKA0=${OPTARG}
       ;;
-    i)  #zookeeper not kafka
-      ZOOKEEPER_IPPORT=${OPTARG}
+    i)  #zookeeper Private IP address prefix
+      ZOOKEEPER_IP_PREFIX=${OPTARG}
       ;;
+    c) # Number of instances
+	INSTANCE_COUNT=${OPTARG}
+	;;
     h)  #show help
       help
       exit 2
@@ -91,6 +104,37 @@ install_java()
     apt-get -y install oracle-java7-installer
 }
 
+# Expand a list of successive IP range defined by a starting address prefix (e.g. 10.0.0.1) and the number of machines in the range
+# 10.0.0.1-3 would be converted to "10.0.0.10 10.0.0.11 10.0.0.12"
+
+expand_ip_range_for_server_properties() {
+    IFS='-' read -a HOST_IPS <<< "$1"
+    for (( n=0 ; n<("${HOST_IPS[1]}"+0) ; n++))
+    do
+        echo "server.$(expr ${n} + 1)=${HOST_IPS[0]}${n}:2888:3888" >> zookeeper-3.4.6/conf/zoo.cfg       
+    done
+}
+
+function join { local IFS="$1"; shift; echo "$*"; }
+
+expand_ip_range() {
+    IFS='-' read -a HOST_IPS <<< "$1"
+
+    declare -a EXPAND_STATICIP_RANGE_RESULTS=()
+
+    for (( n=0 ; n<("${HOST_IPS[1]}"+0) ; n++))
+    do
+        HOST="${HOST_IPS[0]}${n}:${ZOOKEEPER_PORT}"
+                EXPAND_STATICIP_RANGE_RESULTS+=($HOST)
+    done
+
+    echo "${EXPAND_STATICIP_RANGE_RESULTS[@]}"
+}
+
+#TEST echo $(expand_ip_range "${ZOOKEEPER_IP_PREFIX}-${INSTANCE_COUNT}")
+#TEST echo $(join , $(expand_ip_range "${ZOOKEEPER_IP_PREFIX}-${INSTANCE_COUNT}"))
+
+
 # Install Zookeeper
 install_zookeeper()
 {
@@ -106,7 +150,8 @@ install_zookeeper()
 	echo "clientPort=2181" >> zookeeper-3.4.6/conf/zoo.cfg
 	echo "initLimit=5" >> zookeeper-3.4.6/conf/zoo.cfg
 	echo "syncLimit=2" >> zookeeper-3.4.6/conf/zoo.cfg
-	echo "server.1=10.0.0.40:2888:3888" >> zookeeper-3.4.6/conf/zoo.cfg
+	# OLD Test echo "server.1=${ZOOKEEPER_IP_PREFIX}:2888:3888" >> zookeeper-3.4.6/conf/zoo.cfg
+	$(expand_ip_range_for_server_properties "${ZOOKEEPER_IP_PREFIX}-${INSTANCE_COUNT}")
 
 	echo $(($1+1)) >> /var/lib/zookeeper/myid
 
@@ -116,8 +161,6 @@ install_zookeeper()
 # Install kafka
 install_kafka()
 {
-# wait for kafka - zookeeper
-# Ping --- 
 	cd /usr/local
 	name=kafka
 	version=${KF_VERSION}
@@ -142,7 +185,7 @@ install_kafka()
 	cd kafka_${kafkaversion}-${version}
 	
 	sed -r -i "s/(broker.id)=(.*)/\1=${BROKER_ID}/g" config/server.properties 
-	sed -r -i "s/(zookeeper.connect)=(.*)/\1=${ZOOKEEPER_IPPORT}/g" config/server.properties 
+	sed -r -i "s/(zookeeper.connect)=(.*)/\1=$(join , $(expand_ip_range "${ZOOKEEPER_IP_PREFIX}-${INSTANCE_COUNT}"))/g" config/server.properties 
 #	cp config/server.properties config/server-1.properties 
 #	sed -r -i "s/(broker.id)=(.*)/\1=1/g" config/server-1.properties 
 #	sed -r -i "s/^(port)=(.*)/\1=9093/g" config/server-1.properties````
