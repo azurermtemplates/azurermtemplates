@@ -24,7 +24,7 @@
 			"value": "Standard_D2"
 		},
 		"vmImageName": {
-			"value": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-12_04_5_LTS-amd64-server-20150309-en-us-30G"
+			"value": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-12_04_5_LTS-amd64-server-20150309-en-us-30GB"
 		},
 		"vmFileSystem": {
 			"value": "ext4"
