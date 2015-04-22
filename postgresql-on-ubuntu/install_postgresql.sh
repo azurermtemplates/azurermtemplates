@@ -78,6 +78,8 @@ install_postgresql_service() {
 
 setup_datadisks() {
 
+	MOUNTPOINT="/datadisks/disk1"
+
 	bash vm-disk-utils-0.1.sh -s
 
 	# Move database files to the striped disk
