@@ -11,10 +11,10 @@ The example expects the following parameters:
 
 | Name   | Description    | Default Value |
 |:--- |:---|:---|
-| adminUsername  | Administrator user name used when provisioning virtual machines | None |
-| adminPassword  | Administrator password used when provisioning virtual machines | None |
-| storageAccountName  | Unique namespace for the Storage Account where the Virtual Machine's disks will be placed | None |
-| region | Location where resources will be provisioned | None |
+| adminUsername  | Administrator user name used when provisioning virtual machines | |
+| adminPassword  | Administrator password used when provisioning virtual machines | |
+| storageAccountName  | Unique namespace for the Storage Account where the Virtual Machine's disks will be placed | |
+| region | Location where resources will be provisioned | |
 | virtualNetworkName | The arbitrary name of the virtual network provisioned for the Redis cluster | redisVirtNet |
 | addressPrefix | The network address space for the virtual network | 10.0.0.0/16 |
 | subnetName | Subnet name for the virtual network that resources will be provisioned in to | redisSubnet1 |
