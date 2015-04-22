@@ -53,8 +53,7 @@
   },
   "variables": {
     "vmStorageAccountContainerName": "vhd",
-    "subnetRef": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('networkSettings').virtualNetworkName), '/subnets/', parameters('networkSettings').subnet.name)]",
-    "dataDiskSize": 1023
+    "subnetRef": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('networkSettings').virtualNetworkName), '/subnets/', parameters('networkSettings').subnet.name)]"
   },
   "resources": [{
     "apiVersion": "2014-12-01-preview",
