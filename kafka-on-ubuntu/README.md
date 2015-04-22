@@ -4,8 +4,6 @@
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
-Currently this template is giving a Internal Server Error, we are working on resolving same asap.
-
 This template deploys a Kafka cluster on the Ubuntu virtual machines. This template also provisions a storage account, virtual network, availability sets, public IP addresses and network interfaces required by the installation.
 The template also creates 1 publicly accessible VM acting as a "jumpbox" and allowing to ssh into the Kafka nodes for diagnostics or troubleshooting purposes.
 
@@ -24,7 +22,8 @@ The example expects the following parameters:
 | subnetPrefix | The subnet mask used by the Virtual Network subnet |
 | kafkaVersion | Kafka version number to be installed |
 | kafkaClusterName | Name of the Kafka cluster |
-| kafkaNodeIPAddressPrefix | The IP address prefix that will be used for constructing a static private IP address for each node in the cluster |
+| kafkaNodeIPAddressPrefix | The IP address prefix that will be used for constructing a static private IP address for each Kafka broker node in the cluster |
+| kafkaZooNodeIPAddressPrefix | The IP address prefix that will be used for constructing a static private IP address for each Zookeeper node in the cluster |
 | jumpbox | The flag allowing to enable or disable provisioning of the jumpbox VM that can be used to access the Kafka nodes |
 | tshirtSize | The t-shirt size of the Kafka node (small, medium, large) |
 
