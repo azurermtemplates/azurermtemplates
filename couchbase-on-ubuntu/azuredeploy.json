@@ -89,7 +89,7 @@
     },
     "variables": {
         "commonSettings": {
-            "availabilitySetName": "cbClusterAvailabilitySet",
+            "availabilitySet": "cbClusterAvailabilitySet",
             "region": "[parameters('region')]"
         },
         "networkSettings": {
