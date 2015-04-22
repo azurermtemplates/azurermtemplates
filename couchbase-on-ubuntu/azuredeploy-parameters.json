@@ -6,13 +6,13 @@
         "value": "P@ssword1"
     },
     "tshirtSize": {
-        "value": "S"
+        "value": "Large"
     },
     "storageAccountNamePrefix": {
-        "value": "f180cbdply48"
+        "value": "f180cbdply70"
     },
-    "targetRegion": {
-        "value": "West US"
+    "region": {
+        "value": "East Asia"
     },
     "virtualNetworkName": {
         "value": "couchVnet"

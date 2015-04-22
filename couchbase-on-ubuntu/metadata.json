@@ -1,7 +1,7 @@
 {
-  "TemplateName": "Create Couchbase Cluster",
-  "Description": "This template creates and Couchbase cluster using the specified location and name",
-  "ShortDescription": "This template creates an Couchbase cluster",
-  "GithubUsername": "ercenk",
-  "DateUpdated": "2015-04-20"
+	"itemDisplayName": "Provision a Couchbase cluster on Ubuntu Virtual Machines",
+	"description": "This template installs and configures  a Couchbase 3.0.3 cluster on Ubuntu Virtual Machines.",
+	"summary": "This template creates Provision a Couchbase cluster on Ubuntu virtual machines",
+	"githubUsername": "ercenk",
+	"dateUpdated": "2015-04-20"
 }
