@@ -23,6 +23,9 @@
     "subnetPrefix": {
         "value": "10.0.0.0/24"
     },
+    "nodeAddressPrefix": {
+        "value": "10.0.0.1"
+    },
     "redisVersion": {
         "value": "3.0.0"
     },
