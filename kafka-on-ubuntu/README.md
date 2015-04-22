@@ -29,9 +29,7 @@ The example expects the following parameters:
 Topology
 --------
 
-The deployment topology is comprised of _numberOfInstances_ nodes running in the cluster mode.
-The AOF persistence is enabled by default, whereas the RDB persistence is tuned to perform less-frequent dumps (once every 60 minutes).
-In addition, some critical memory- and network-specific optimizations are applied to ensure the optimal performance and throughput.
+The deployment topology is comprised of Kafka Brokers and Zookeeper nodes running in the cluster mode.
 
 NOTE: To access the individual Kafka nodes, you need to use the publicly accessible jumpbox VM and ssh from it into the VM instances running Kafka.
 
