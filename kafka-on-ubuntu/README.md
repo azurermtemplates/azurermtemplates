@@ -22,7 +22,8 @@ The example expects the following parameters:
 | subnetPrefix | The subnet mask used by the Virtual Network subnet |
 | kafkaVersion | Kafka version number to be installed |
 | kafkaClusterName | Name of the Kafka cluster |
-| kafkaNodeIPAddressPrefix | The IP address prefix that will be used for constructing a static private IP address for each node in the cluster |
+| kafkaNodeIPAddressPrefix | The IP address prefix that will be used for constructing a static private IP address for each Kafka broker node in the cluster |
+| kafkaZooNodeIPAddressPrefix | The IP address prefix that will be used for constructing a static private IP address for each Zookeeper node in the cluster |
 | jumpbox | The flag allowing to enable or disable provisioning of the jumpbox VM that can be used to access the Kafka nodes |
 | tshirtSize | The t-shirt size of the Kafka node (small, medium, large) |
 

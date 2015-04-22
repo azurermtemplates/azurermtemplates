@@ -32,6 +32,9 @@
     "kafkaNodeIPAddressPrefix": {
         "value": "10.0.0.1"
     },
+    "kafkaZooNodeIPAddressPrefix": {
+        "value": "10.0.0.4"
+    },
     "jumpbox": {
         "value": "enabled"
     },
