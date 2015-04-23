@@ -4,7 +4,6 @@
     "parameters": {
         "newStorageAccountName": {
             "type": "string",
-            "defaultValue": "uniqueStorageName",
             "metadata": {
                 "description": "Name of the Storage Account"
             }
@@ -30,7 +29,6 @@
         },
         "vmDnsName": {
             "type": "string",
-            "defaultValue": "uniqueDNS",
             "metadata": {
                 "description": "DNS Name for the Public IP. Must be lowercase."
             }
