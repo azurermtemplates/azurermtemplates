@@ -5,13 +5,18 @@
         "location": {
             "type": "string",
             "defaultValue": "East US",
-            "allowedValues": [
-                "East US"
-            ]
+            "metadata" :
+            {
+              "Description": "The location to where the Apprenda cluster will be deployed."
+            }
         },
         "newStorageAccountName": {
             "type": "string",
-            "defaultValue": "apprendaTest"
+            "defaultValue": "apprendaTest",
+            "metadata" :
+            {
+              "Description": "The name of the storage account for your VMs"
+            }
         },
         "storageAccountType": {
             "type": "string",
@@ -19,11 +24,19 @@
             "allowedValues": [
                 "Standard_LRS",
                 "Standard_GRS"
-            ]
+            ],
+            "metadata" :
+            {
+              "Description": "The type of storage account. Default is Standard_LRS"
+            }
         },
         "platformNode": {
             "type": "string",
-            "defaultValue": "apprenda01"
+            "defaultValue": "apprenda01",
+            "metadata" :
+            {
+              "Description": "The name of the platform node. Default is apprenda01."
+            }
         },
         "vmSize": {
             "type": "string",
@@ -34,32 +47,64 @@
                 "Standard_A2",
                 "Standard_A3",
                 "Standard_A4"
-            ]
+            ],
+            "metadata" :
+            {
+              "Description": "The sizing of each VM."
+            }
         },
         "vmName": {
             "type": "string",
-            "defaultValue": "apprenda"
+            "defaultValue": "apprenda",
+            "metadata" :
+            {
+              "Description": "The name of the virtual machine."
+            }
         },
         "adminUsername": {
-            "type": "string"
+            "type": "string",
+            "metadata" :
+            {
+              "Description": "Select a name for the administrative user."
+            }
         },
         "adminPassword": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata" :
+            {
+              "Description": "The location to where the Apprenda cluster will be deployed."
+            }
         },
         "subscriptionId": {
-            "type": "string"
+            "type": "string",
+            "metadata" :
+            {
+              "Description": "The location to where the Apprenda cluster will be deployed."
+            }
         },
         "vmSourceImageName": {
             "type": "string",
-            "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201412.01-en.us-127GB.vhd"
+            "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201412.01-en.us-127GB.vhd",
+            "metadata" :
+            {
+              "Description": "The location to where the Apprenda cluster will be deployed."
+            }
         },
         "vmExpressImageName": {
             "type": "string",
-            "defaultValue": "ApprendaAzureCertifiedTemplateV1.0-os-2014-09-24_Copy.vhd"
+            "defaultValue": "ApprendaAzureCertifiedTemplateV1.0-os-2014-09-24_Copy.vhd",
+            "metadata" :
+            {
+              "Description": "The location to where the Apprenda cluster will be deployed."
+            }
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "apprendaVNet"
+            "defaultValue": "apprendaVNet",
+            "metadata" :
+            {
+              "Description": "The location to where the Apprenda cluster will be deployed."
+            }
         }
     },
     "variables": {
