@@ -200,10 +200,10 @@ install_spark()
 	echo 'export SPARK_REPL_OPTS=" -Djava.io.tmpdir=/srv/spark/tmp/repl/\$USER "' >> spark-env.sh
 	echo 'export SPARK_APP_OPTS=" -Djava.io.tmpdir=/srv/spark/tmp/app/\$USER "' >> spark-env.sh
 	echo 'export PYSPARK_PYTHON="/usr/bin/python"' >> spark-env.sh
-	echo 'export SPARK_MASTER_IP="${MASTERIP}"' >> spark-env.sh
+	echo "export SPARK_MASTER_IP=\"$MASTERIP\"" >> spark-env.sh
 	echo 'export SPARK_MASTER_PORT=7077' >> spark-env.sh
-	echo 'export SPARK_PUBLIC_DNS="${MASTERIP}"' >> spark-env.sh
-	echo 'export SPARK_WORKER_INSTANCES=${NUMBEROFSLAVES}' >> spark-env.sh
+	echo "export SPARK_PUBLIC_DNS=\"$MASTERIP\"" >> spark-env.sh
+	echo "export SPARK_WORKER_INSTANCES=\"${NUMBEROFSLAVES}\"" >> spark-env.sh
 	#=========================================================
 
 	cp -p spark-defaults.conf.template spark-defaults.conf
@@ -212,7 +212,7 @@ install_spark()
 	#=========================================================
 	#SPARK-DEFAULTS (ADD BELOW)
 	 
-	echo 'spark.master            spark://${MASTERIP}:7077' >> spark-defaults.conf
+	echo "spark.master            spark://${MASTERIP}:7077" >> spark-defaults.conf
 	echo 'spark.executor.memory   512m' >> spark-defaults.conf
 	echo 'spark.eventLog.enabled  true' >> spark-defaults.conf
 	echo 'spark.serializer        org.apache.spark.serializer.KryoSerializer' >> spark-defaults.conf
