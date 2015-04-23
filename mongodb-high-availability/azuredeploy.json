@@ -5,34 +5,40 @@
         "adminUsername": {
             "type": "string",
             "metadata": {
-                "Description": "Administrator user name used when provisioning virtual machines"
+                "Description": "Administrator user name used when provisioning virtual machines (which also becomes a system user administrator in MongoDB)"
             }
         },
         "adminPassword": {
             "type": "securestring",
             "metadata": {
-                "Description": "Administrator password used when provisioning virtual machines"
+                "Description": "Administrator password used when provisioning virtual machines (which is also a password for the system administrator in MongoDB)"
             }
         },
         "storageAccountName": {
             "type": "string",
-            "defaultValue": "uniqueStorageAccountName",
+            "defaultValue": "",
             "metadata": {
-                "Description": "Unique namespace for the Storage Account where the Virtual Machine's disks will be placed"
+                "Description": "Unique namespace for the Storage Account where the Virtual Machine's disks will be placed (this name will be used as a prefix to create one or more storage accounts as per t-shirt size)"
             }
         },
         "region": {
             "type": "string",
-            "defaultValue": "West US",
             "metadata": {
                 "Description": "Location where resources will be provisioned"
             }
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "myVNET",
+            "defaultValue": "mongodbVnet",
             "metadata": {
-                "Description": "The arbitrary name of the virtual network provisioned for the cluster"
+                "Description": "The arbitrary name of the virtual network provisioned for the MongoDB deployment"
+            }
+        },
+        "subnetName": {
+            "type": "string",
+            "defaultValue": "mongodbSubnet",
+            "metadata": {
+                "Description": "Subnet name for the virtual network that resources will be provisioned in to"
             }
         },
         "addressPrefix": {
@@ -42,18 +48,18 @@
                 "Description": "The network address space for the virtual network"
             }
         },
-        "subnetName": {
-            "type": "string",
-            "defaultValue": "Subnet-1",
-            "metadata": {
-                "Description": "Subnet name for the virtual network that resources will be provisioned in to"
-            }
-        },
         "subnetPrefix": {
             "type": "string",
             "defaultValue": "10.0.0.0/24",
             "metadata": {
-                "Description": "Address space for the virtual network subnet"
+                "Description": "The network address space for the virtual subnet"
+            }
+        },
+        "nodeAddressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.1",
+            "metadata": {
+                "Description": "The IP address prefix that will be used for constructing a static private IP address for each node in the cluster"
             }
         },
         "jumpbox": {
@@ -102,6 +108,7 @@
         },
         "replicaSetName": {
             "type": "string",
+            "defaultValue": "rs0",
             "metadata": {
                 "Description": "The name of the MongoDB replica set"
             }
@@ -118,7 +125,8 @@
         "tshirtSizeXSmall": {
             "vmSizeMember": "Standard_D1",
             "vmSizeArbiter": "Standard_A1",
-            "numberOfMembers": 2,
+            "numberOfMembers": 1,
+            "totalMemberCount": 2,
             "arbiter": "Enabled",
             "vmTemplate": "[concat(variables('templateBaseUrl'), 'member-resources-D1.json')]",
             "storageAccountCount": 1,
@@ -127,7 +135,8 @@
         "tshirtSizeSmall": {
             "vmSizeMember": "Standard_D1",
             "vmSizeArbiter": "Standard_A1",
-            "numberOfMembers": 3,
+            "numberOfMembers": 2,
+            "totalMemberCount": 3,
             "arbiter": "Disabled",
             "vmTemplate": "[concat(variables('templateBaseUrl'), 'member-resources-D1.json')]",
             "storageAccountCount": 1,
@@ -136,16 +145,18 @@
         "tshirtSizeMedium": {
             "vmSizeMember": "Standard_D2",
             "vmSizeArbiter": "Standard_A1",
-            "numberOfMembers": 4,
+            "numberOfMembers": 3,
+            "totalMemberCount": 4,
             "arbiter": "Enabled",
             "vmTemplate": "[concat(variables('templateBaseUrl'), 'member-resources-D2.json')]",
-            "storageAccountCount": 1,
+            "storageAccountCount": 2,
             "dataDiskSize": 250
         },
         "tshirtSizeLarge": {
             "vmSizeMember": "Standard_D2",
             "vmSizeArbiter": "Standard_A1",
-            "numberOfMembers": 8,
+            "numberOfMembers": 7,
+            "totalMemberCount": 8,
             "arbiter": "Enabled",
             "vmTemplate": "[concat(variables('templateBaseUrl'), 'member-resources-D2.json')]",
             "storageAccountCount": 4,
@@ -154,7 +165,8 @@
         "tshirtSizeXLarge": {
             "vmSizeMember": "Standard_D3",
             "vmSizeArbiter": "Standard_A1",
-            "numberOfMembers": 8,
+            "numberOfMembers": 7,
+            "totalMemberCount": 8,
             "arbiter": "Enabled",
             "vmTemplate": "[concat(variables('templateBaseUrl'), 'member-resources-D3.json')]",
             "storageAccountCount": 4,
@@ -163,7 +175,8 @@
         "tshirtSizeXXLarge": {
             "vmSizeMember": "Standard_D3",
             "vmSizeArbiter": "Standard_A1",
-            "numberOfMembers": 16,
+            "numberOfMembers": 15,
+            "totalMemberCount": 16,
             "arbiter": "Disabled",
             "vmTemplate": "[concat(variables('templateBaseUrl'), 'member-resources-D3.json')]",
             "storageAccountCount": 8,
@@ -184,6 +197,7 @@
         "vmSourceImageName": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
         "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]",
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
+        "sharedScriptUrl": "[concat('https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/shared_scripts/', variables('osFamilySpec').osName, '/')]",
         "scriptUrl": "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/mongodb-high-availability/",
         "templateBaseUrl": "[variables('scriptUrl')]",
         "jumpboxTemplateEnabled": "jumpbox-resources.json",
@@ -209,7 +223,7 @@
             "subnetName": "[parameters('subnetName')]",
             "subnetPrefix": "[parameters('subnetPrefix')]",
             "subnetRef": "[concat(variables('vnetID'), '/subnets/', parameters('subnetName'))]",
-            "machineIpPrefix": "10.0.0.1"
+            "machineIpPrefix": "[parameters('nodeAddressPrefix')]"
         },
         "machineSettings": {
             "adminUsername": "[parameters('adminUsername')]",
@@ -219,14 +233,15 @@
         },
         "clusterSpec": "[variables(concat('tshirtSize', parameters('tshirtSize')))]",
         "osFamilySpec": "[variables(concat('osFamily', parameters('osFamily')))]",
+        "installCommand": "[concat('bash mongodb-', variables('osFamilySpec').osName, '-install.sh', ' -i ', variables('osFamilySpec').installerBaseUrl, ' -b ', variables('osFamilySpec').installerPackages, ' -r ', parameters('replicaSetName'), ' -k ', parameters('replicaSetKey'), ' -u ', parameters('adminUsername'), ' -p ', parameters('adminPassword'), ' -x ', variables('networkSettings').machineIpPrefix, ' -n ', variables('clusterSpec').totalMemberCount)]",
         "vmScripts": {
             "scriptsToDownload": [
                 "[concat(variables('scriptUrl'), 'mongodb-', variables('osFamilySpec').osName, '-install.sh')]",
-                "[concat(variables('scriptUrl'), 'mongodb-', variables('osFamilySpec').osName, '-setup.sh')]",
-                "[concat(variables('scriptUrl'), 'vm-disk-utils-0.1.sh')]"
+                "[concat(variables('sharedScriptUrl'), 'vm-disk-utils-0.1.sh')]"
             ],
-            "installCommand": "[concat('bash mongodb-', variables('osFamilySpec').osName, '-install.sh', ' -l ', variables('osFamilySpec').installerBaseUrl, ' -i ', variables('osFamilySpec').installerPackages, ' -r ', parameters('replicaSetName'), ' -k ', parameters('replicaSetKey'), ' -u ', parameters('adminUsername'), ' -p ', parameters('adminPassword'))]",
-            "setupCommand": "[concat('bash mongodb-', variables('osFamilySpec').osName, '-setup.sh', ' -a ', concat(variables('networkSettings').machineIpPrefix, ' -c ', variables('clusterSpec').numberOfMembers, ' -u ', parameters('adminUsername'), ' -p ', parameters('adminPassword')))]"
+            "regularNodeInstallCommand": "[variables('installCommand')]",
+            "lastNodeInstallCommand": "[concat(variables('installCommand'), ' -l')]",
+            "arbiterNodeInstallCommand": "[concat(variables('installCommand'), ' -a')]"
         },
         "_comment1": "/* The weird list of values below helps partition VM disks across multiple storage accounts to achieve a better throughput */",
         "_comment2": "/* Feel free to modify the default allocations if you are comfortable and understand what you are doing */",
@@ -370,7 +385,50 @@
                             "dataDiskSize": "[variables('clusterSpec').dataDiskSize]",
                             "machineIndex": "[copyindex()]",
                             "vmScripts": "[variables('vmScripts').scriptsToDownload]",
-                            "commandToExecute": "[variables('vmScripts').installCommand]"
+                            "commandToExecute": "[variables('vmScripts').regularNodeInstallCommand]"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "name": "lastmember-resources",
+            "apiVersion": "2015-01-01",
+            "dependsOn": [
+                "memberNodesLoop"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('clusterSpec').vmTemplate]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "commonSettings": {
+                        "value": "[variables('commonSettings')]"
+                    },
+                    "storageSettings": {
+                        "value": {
+                            "vhdStorageAccountName": "[concat(variables('storageSettings').vhdStorageAccountName, variables(concat('storageAccountFor', parameters('tshirtSize'), '_', variables('clusterSpec').numberOfMembers)))]",
+                            "vhdContainerName": "[variables('storageSettings').vhdContainerName]",
+                            "destinationVhdsContainer": "[concat('https://', variables('storageSettings').vhdStorageAccountName, variables(concat('storageAccountFor', parameters('tshirtSize'), '_', variables('clusterSpec').numberOfMembers)), variables('vmStorageAccountDomain'), '/', variables('storageSettings').vhdContainerName, '/')]"
+                        }
+                    },
+                    "networkSettings": {
+                        "value": "[variables('networkSettings')]"
+                    },
+                    "machineSettings": {
+                        "value": {
+                            "adminUsername": "[variables('machineSettings').adminUsername]",
+                            "adminPassword": "[variables('machineSettings').adminPassword]",
+                            "machineNamePrefix": "[variables('machineSettings').machineNamePrefix]",
+                            "osImageName": "[variables('machineSettings').osImageName]",
+                            "vmSize": "[variables('clusterSpec').vmSizeMember]",
+                            "dataDiskSize": "[variables('clusterSpec').dataDiskSize]",
+                            "machineIndex": "[variables('clusterSpec').numberOfMembers]",
+                            "vmScripts": "[variables('vmScripts').scriptsToDownload]",
+                            "commandToExecute": "[variables('vmScripts').lastNodeInstallCommand]"
                         }
                     }
                 }
@@ -381,7 +439,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2015-01-01",
             "dependsOn": [
-                "memberNodesLoop"
+                "[concat('Microsoft.Resources/deployments/', 'lastmember-resources')]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -411,7 +469,7 @@
                             "osImageName": "[variables('machineSettings').osImageName]",
                             "vmSize": "[variables('clusterSpec').vmSizeArbiter]",
                             "vmScripts": "[variables('vmScripts').scriptsToDownload]",
-                            "commandToExecute": "[concat(variables('vmScripts').installCommand, ' -a')]"
+                            "commandToExecute": "[concat(variables('vmScripts').arbiterNodeInstallCommand)]"
                         }
                     }
                 }
