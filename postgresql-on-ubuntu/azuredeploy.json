@@ -1,15 +1,15 @@
-﻿{
+{
   "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "location": {
+    "region": {
       "type": "string",
       "defaultValue": "West US",
       "metadata": {
         "Description": "Location of the resource group and all contained resources"
       }
     },
-    "newStorageAccountName": {
+    "storageAccountNamePrefix": {
       "type": "string",
       "metadata": {
         "Description": "Unique name of the new storage account that will be created to store virtual machine VHDs"
@@ -37,72 +37,28 @@
     "replicatorPassword": {
       "type": "string"
     },
-    "vmSize": {
+    "jumpbox": {
       "type": "string",
-      "defaultValue": "Standard_A1",
+      "defaultValue": "Disabled",
       "allowedValues": [
-        "Standard_A1",
-        "Standard_A2",
-        "Standard_A3",
-        "Standard_A4"
+        "Enabled",
+        "Disabled"
       ],
       "metadata": {
-        "Description": "Size of the virtual machine (must be able to support 2 data disks)"
+        "Description": "The flag allowing to enable or disable provisioning of the jumpbox VM that can be used to access the MongoDB environment"
       }
     },
-    "numberOfSlaveInstances": {
-      "type": "int",
-      "defaultValue": 1,
+    "tshirtSize": {
+      "type": "string",
+      "defaultValue": "XSmall",
       "allowedValues": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18
+        "Small",
+        "Medium",
+        "Large"
       ],
       "metadata": {
-        "Description": "Number of PostgreSQL slave instances to provision"
+        "Description": "T-shirt size of the MongoDB deployment"
       }
-    },
-    "dbMasterName": {
-      "type": "string",
-      "defaultValue": "dbmaster"
-    },
-    "dbSlaveNamePrefix": {
-      "type": "string",
-      "defaultValue": "dbslave"
-    },
-    "dbAvailabilitySetName": {
-      "type": "string",
-      "defaultValue": "dbavailabilityset",
-      "metadata": {
-        "Description": "Name of the availability set containing the PostgreSQL master and slave database servers"
-      }
-    },
-    "platformFaultDomainCount": {
-      "type": "string",
-      "defaultValue": "2"
-    },
-    "platformUpdateDomainCount": {
-      "type": "string",
-      "defaultValue": "5"
-    },
-    "dataDiskSizeGB": {
-      "type": "string",
-      "defaultValue": "1000"
     },
     "virtualNetworkName": {
       "type": "string",
@@ -110,66 +66,240 @@
       "metadata": {
         "Description": "Virtual network name"
       }
-    },
-    "addressPrefix": {
-      "type": "string",
-      "defaultValue": "10.1.0.0/16"
-    },
-    "subnetDmzName": {
-      "type": "string",
-      "defaultValue": "Subnet-DMZ"
-    },
-    "subnetDmzPrefix": {
-      "type": "string",
-      "defaultValue": "10.1.0.0/24"
-    },
-    "subnetDbName": {
-      "type": "string",
-      "defaultValue": "Subnet-DB"
-    },
-    "subnetDbPrefix": {
-      "type": "string",
-      "defaultValue": "10.1.1.0/24"
     }
   },
   "variables": {
-    "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',variables('vmSourceImageName'))]",
+    "templateBaseUrl": "https://raw.githubusercontent.com/trentmswanson/azurermtemplates/master/postgresql-on-ubuntu/",
+    "sharedTemplateUrl": "[concat(variables('templateBaseUrl'), 'shared-resources.json')]",
+        "tshirtSizeSmall": {
+            "vmSize": "Standard_A2",
+            "slaveCount": 1,
+            "diskSize": 1023,
+            "vmTemplate": "[concat(variables('templateBaseUrl'), 'database-2disk-resources.json')]"
+        },
+        "tshirtSizeMedium": {
+            "vmSize": "Standard_A2",
+            "slaveCount": 1,
+            "diskSize": 1023,
+            "vmTemplate": "[concat(variables('templateBaseUrl'), 'database-8disk-resources.json')]"
+        },
+        "tshirtSizeLarge": {
+            "vmSize": "Standard_A3",
+            "slaveCount": 2,
+            "diskSize": 1023,
+            "vmTemplate": "[concat(variables('templateBaseUrl'), 'database-16disk-resources.json')]"
+        },
+    "clusterSpec": "[variables(concat('tshirtSize', parameters('tshirtSize')))]",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
     "subnetDmzRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetDmzName'))]",
     "subnetDbRef": "[concat(variables('vnetID'),'/subnets/',parameters('subnetDbName'))]",
-    
+    "jumpboxTemplateYes": "jumpbox-resources.json",
+    "jumpboxTemplateNo": "jumpbox-disabled.json",
+    "jumpboxTemplateUrl": "[concat(variables('templateBaseUrl'), variables(concat('jumpboxTemplate',parameters('jumpbox'))))]",
+    "ubuntuVMImage": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
     "osSettings": {
       "scripts": [
-      "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/postgresql-multi-vm-ubuntu/install_postgresql.sh",
-      "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/shared_scripts/ubuntu/vm-disk-utils-0.1.sh"
+        "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/postgresql-multi-vm-ubuntu/install_postgresql.sh",
+        "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/shared_scripts/ubuntu/vm-disk-utils-0.1.sh"
       ],
-      "vmSourceImageName": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB"
+      "sourceImage": "[concat('/', subscription().subscriptionId, '/services/images/', variables('ubuntuVMImage') )]"
     },
-    "commandToExecute": "[concat('bash install_postgresql.sh ', reference('nicmaster').ipConfigurations[0].properties.privateIPAddress, ' ', parameters('subnetDbPrefix'), ' SLAVE ', reference(concat('nicslave', copyindex())).ipConfigurations[0].properties.privateIPAddress, ' ', parameters('numberOfSlaveInstances'), ' ', parameters('replicatorPassword'))]",
     "networkSettings": {
-      "vnetName": "trent",
+      "vnetName": "[parameters('virtualNetworkName')]",
       "addressPrefix": "10.0.0.0/16",
       "subnets": {
         "dmz": {
           "name": "dmz",
           "prefix": "10.0.0.0/24",
-          "vnet": "trent"
+          "vnet": "[parameters('virtualNetworkName')]"
         },
         "data": {
           "name": "data",
           "prefix": "10.0.1.0/24",
-          "vnet": "trent"
+          "vnet": "[parameters('virtualNetworkName')]"
         }
+      }
     },
     "availabilitySetSettings": {
-        "name": "dbAvailabilitySet",
-        "fdCount": 3,
-        "udCount": 20
-      }
-  }
+      "name": "[parameters('dbAvailabilitySetName')]",
+      "fdCount": "[parameters('platformFaultDomainCount')]",
+      "udCount": "[parameters('platformUpdateDomainCount')]"
+    }
   },
   "resources": [
-    
+    {
+      "name": "shared",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('sharedTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "storageAccountName": {
+            "value": "[concat(parameters('storageAccountNamePrefix'),'shared')]"
+          },
+          "region": {
+            "value": "[parameters('region')]"
+          },
+          "networkSettings": {
+            "value": "[variables('networkSettings')]"
+          },
+          "availabilitySetSettings": {
+            "value": "[variables('availabilitySetSettings')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "master-node",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments/', 'shared')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('clusterSpec').vmTemplate]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "region": {
+            "value": "[parameters('region')]"
+          },
+          "storageAccountNamePrefix": {
+            "value": "[parameters('storageAccountNamePrefix')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "replicatorPassword": {
+            "value": "[parameters('replicatorPassword')]"
+          },
+          "vmSize": {
+            "value": "[parameters('vmSize')]"
+          },
+          "osSettings": {
+            "value": "[variables('osSettings')]"
+          },
+          "vmCount": {
+            "value": 1
+          },
+          "namespace": {
+            "value": "master"
+          },
+          "diskSize": {
+            "value": "[parameters('dataDiskSizeGB')]"
+          },
+          "subnet": {
+            "value": "[variables('networkSettings').subnets.data]"
+          },
+          "availabilitySetName": {
+            "value": "[variables('availabilitySetSettings').name]"
+          },
+          "masterIpAddress": {
+            "value": "10.0.1.5"
+          }
+        }
+      }
+    },
+    {
+      "name": "slave-nodes",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments/', 'master-node')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('clusterSpec').vmTemplate]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "region": {
+            "value": "[parameters('region')]"
+          },
+          "storageAccountNamePrefix": {
+            "value": "[parameters('storageAccountNamePrefix')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "replicatorPassword": {
+            "value": "[parameters('replicatorPassword')]"
+          },
+          "vmSize": {
+            "value": "[parameters('vmSize')]"
+          },
+          "osSettings": {
+            "value": "[variables('osSettings')]"
+          },
+          "vmCount": {
+            "value": "[parameters('clusterSpec').slaveCount]"
+          },
+          "namespace": {
+            "value": "slave"
+          },
+          "diskSize": {
+            "value": "[parameters('dataDiskSizeGB')]"
+          },
+          "subnet": {
+            "value": "[variables('networkSettings').subnets.data]"
+          },
+          "availabilitySetName": {
+            "value": "[variables('availabilitySetSettings').name]"
+          },
+          "masterIpAddress": {
+            "value": "[reference('master-node').outputs.masterip.value]"
+          }
+        }
+      }
+    },
+    {
+      "name": "jumpbox",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments/', 'shared')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('jumpboxTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "storageAccountName": {
+            "value": "[concat(parameters('storageAccountPrefix'),'shared')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "region": {
+            "value": "[parameters('region')]"
+          },
+          "subnet": {
+            "value": "[variables('networkSettings').subnet.dmz]"
+          },
+          "osSettings": {
+            "value": "[variables('osSettings')]"
+          }
+        }
+      }
+    }
   ],
   "outputs": {}
 }
