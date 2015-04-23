@@ -1,0 +1,184 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01-preview/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "East US",
+            "allowedValues": [
+                "East US"
+            ]
+        },
+        "newStorageAccountName": {
+            "type": "string",
+            "defaultValue": "apprendaTest"
+        },
+        "storageAccountType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_GRS"
+            ]
+        },
+        "platformNode": {
+            "type": "string",
+            "defaultValue": "apprenda01"
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_A1",
+            "allowedValues": [
+                "Standard_A0",
+                "Standard_A1",
+                "Standard_A2",
+                "Standard_A3",
+                "Standard_A4"
+            ]
+        },
+        "vmName": {
+            "type": "string",
+            "defaultValue": "apprenda"
+        },
+        "adminUsername": {
+            "type": "string"
+        },
+        "adminPassword": {
+            "type": "securestring"
+        },
+        "subscriptionId": {
+            "type": "string"
+        },
+        "vmSourceImageName": {
+            "type": "string",
+            "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201412.01-en.us-127GB.vhd"
+        },
+        "vmExpressImageName": {
+            "type": "string",
+            "defaultValue": "ApprendaAzureCertifiedTemplateV1.0-os-2014-09-24_Copy.vhd"
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "defaultValue": "apprendaVNet"
+        }
+    },
+    "variables": {
+        "apprendaExpressImageName": "[concat('/',parameters('subscriptionId'), '/services/images/', parameters('vmExpressImageName'))]",
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+        "customScriptExtensionVersion": "1.2",
+        "publicIPAddressName2": "[concat(parameters('platformNode'), 'pubIP')]",
+        "publicIPAddressType1": "Dynamic",
+        "vmStorageAccountContainerName": "apprendavhds",
+        "addressPrefix": "10.0.0.0/16",
+        "subnet1Name": "Subnet-1",
+        "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]",
+        "subnet1Prefix": "10.0.0.0/24",
+        "pnNicName": "[concat(parameters('platformNode'),'Nic')]",
+        "dcNicName": "[concat(parameters('domainControllerNode'),'Nic')]",
+        "vmExtensionName": "CustomScriptExtension",
+        "customScriptExtensionVerstion": "1.2"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('newStorageAccountName')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "properties": {
+                "accountType": "[parameters('storageAccountType')]"
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIPAddressName2')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "[variables('publicIPAddressType1')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('platformNode')]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('virtualNetworkName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnet1Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnet1Prefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('dcNicName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName2'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName2'))]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnet1Ref')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('platformNode')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('dcNicName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computername": "[parameters('platformNode')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "sourceImage": {
+                        "id": "[variables('apprendaExpressImageName')]"
+                    },
+                    "destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('dcNicName'))]"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
