@@ -194,3 +194,5 @@ setup_datadisks
 service postgresql start
 
 configure_streaming_replication
+
+service postgresql start
