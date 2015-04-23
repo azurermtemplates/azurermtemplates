@@ -1,19 +1,78 @@
 #!/bin/bash
 
+# Full Scale 180 Inc.
+
+# You must be root to run this script
+if [ "${UID}" -ne 0 ];
+then
+    log "Script executed without root permissions"
+    echo "You must be root to run this program." >&2
+    exit 3
+fi
+
+#Format the data disk
+bash vm-disk-utils-0.1.sh -s
+
+# TEMP FIX - Re-evaluate and remove when possible
+# This is an interim fix for hostname resolution in current VM (If it does not exist add it)
+grep -q "${HOSTNAME}" /etc/hosts
+if [ $? == 0 ];
+then
+  echo "${HOSTNAME}found in /etc/hosts"
+else
+  echo "${HOSTNAME} not found in /etc/hosts"
+  # Append it to the hsots file if not there
+  echo "127.0.0.1 ${HOSTNAME}" >> /etc/hosts
+fi
+
 # Get today's date into YYYYMMDD format
 now=$(date +"%Y%m%d")
  
 # Get passed in parameters $1, $2, $3, $4, and others...
-MASTERIP=$1
-SUBNETADDRESS=$2
-NODETYPE=$3
-NODEIP=$4
-NUMBEROFSLAVES=$5
-REPLICATORPASSWORD=$6
+MASTERIP=""
+SUBNETADDRESS=""
+NODETYPE=""
+REPLICATORPASSWORD=""
+
+#Loop through options passed
+while getopts :m:s:t:p: optname; do
+    log "Option $optname set with value ${OPTARG}"
+  case $optname in
+    m)
+      MASTERIP=${OPTARG}
+      ;;
+  	s) #Data storage subnet space
+      SUBNETADDRESS=${OPTARG}
+      ;;
+    t) #Type of node (MASTER/SLAVE)
+      NODETYPE=${OPTARG}
+      ;;
+    p) #Replication Password
+      REPLICATORPASSWORD=${OPTARG}
+      ;;
+    h)  #show help
+      help
+      exit 2
+      ;;
+    \?) #unrecognized option - show help
+      echo -e \\n"Option -${BOLD}$OPTARG${NORM} not allowed."
+      help
+      exit 2
+      ;;
+  esac
+done
+
+# Node type is an index count and we set the first node up as our master
+if [ $NODETYPE == "0" ];
+then
+NODETYPE="MASTER"
+else
+NODETYPE="SLAVE"
+fi
 
 export PGPASSWORD=$REPLICATORPASSWORD
 
-logger "NOW=$now MASTERIP=$MASTERIP SUBNETADDRESS=$SUBNETADDRESS NODETYPE=$NODETYPE NODEIP=$NODEIP NUMBEROFSLAVES=$NUMBEROFSLAVES"
+logger "NOW=$now MASTERIP=$MASTERIP SUBNETADDRESS=$SUBNETADDRESS NODETYPE=$NODETYPE NODEIP=$NODEIP"
 
 install_postgresql_service() {
 	logger "Start installing PostgreSQL..."
@@ -29,67 +88,9 @@ install_postgresql_service() {
 	logger "Done installing PostgreSQL..."
 }
 
-stripe_datadisks() {
-	logger "Install mdadm"
+setup_datadisks() {
 
-	export DEBIAN_FRONTEND=noninteractive
-	apt-get -y install mdadm
-
-	RAIDDISK="/dev/md127"
-	RAIDPARTITION="/dev/md127p1"
-	MOUNTPOINT="/datadrive"
-
-	ls -l $RAIDPARTITION >/dev/null 2>&1
-	if [ ${?} -eq 0 ];
-	then
-		logger "$RAIDPARTITION is already created"
-		echo "$RAIDPARTITION is already created"
-	else
-		# Create RAID-0 array to stripe the partitions together
-		logger "Create RAID-0 $RAIDDISK"
-		echo "yes" | mdadm --create "$RAIDDISK" --name=data --level=0 --chunk=64 --raid-devices=2 /dev/sdc /dev/sdd
-
-	# Create partition on the RAID disk
-	logger "Create partition on RAID $RAIDDISK"
-echo "n
-p
-1
-
-
-w
-" | fdisk $RAIDDISK
-	fi
-
-	# Create filesystem and mount point
-	ls -l $MOUNTPOINT >/dev/null 2>&1
-	if [ ${?} -eq 0 ];
-	then
-		logger "$MOUNTPOINT already exists"
-		echo "$MOUNTPOINT already exists"
-	else
-		logger "Create ext4 file system on $RAIDPARTITION"
-		mkfs -t ext4 $RAIDPARTITION
-		mkdir $MOUNTPOINT
-	fi
-
-	# This redirection is specific to the bash shell
-	read UUID FS_TYPE < <(blkid -u filesystem ${RAIDPARTITION} | awk -F "[= ]" '{print $3" "$5}' | tr -d "\"")
-
-	grep "${UUID}" /etc/fstab >/dev/null 2>&1
-	if [ ${?} -eq 0 ];
-	then
-		logger "$UUID is already in /etc/fstab"
-        echo "$UUID is already in /etc/fstab"
-	else
-        LINE="UUID=$UUID $MOUNTPOINT ext4 defaults,nobootwait 0 0"
-        logger "Added $LINE to /etc/fstab"
-        echo "Added $LINE to /etc/fstab"
-        echo $LINE >> /etc/fstab
-	fi
-
-	# Mount based on what is defined in /etc/fstab
-	logger "Mounting disk $RAIDPARTITION on $MOUNTPOINT"
-	mount -a
+	MOUNTPOINT="/datadisks/disk1"
 
 	# Move database files to the striped disk
 	if [ -L /var/lib/postgresql/9.3 ];
@@ -106,7 +107,6 @@ w
 		# Create symbolic link so that configuration files continue to use the default folders
 		logger "Create symbolic link from /var/lib/postgresql/9.3 to $MOUNTPOINT/pgdata/9.3"
 		ln -s $MOUNTPOINT/pgdata/9.3 /var/lib/postgresql/9.3
-		service postgresql start
 	fi
 }
 
@@ -165,12 +165,6 @@ configure_streaming_replication() {
 		echo "Updated postgresql.conf"
 	fi
 
-	if [ "$NODETYPE" == "MASTER" ];
-	then
-		# Start service on MASTER
-		service postgresql start
-	fi
-
 	# Synchronize the slave
 	if [ "$NODETYPE" == "SLAVE" ];
 	then
@@ -189,9 +183,6 @@ configure_streaming_replication() {
 		sudo -u postgres echo "standby_mode = 'on'" > recovery.conf
 		sudo -u postgres echo "primary_conninfo = 'host=$MASTERIP port=5432 user=replicator password=$PGPASSWORD'" >> recovery.conf
 		sudo -u postgres echo "trigger_file = '/var/lib/postgresql/9.3/main/failover'" >> recovery.conf
-
-		# Start service on SLAVE
-		service postgresql start
 	fi
 	
 	logger "Done configuring PostgreSQL streaming replication"
@@ -199,5 +190,12 @@ configure_streaming_replication() {
 
 # MAIN ROUTINE
 install_postgresql_service
-stripe_datadisks
+
+setup_datadisks
+
+service postgresql start
+
 configure_streaming_replication
+
+service postgresql start
+
