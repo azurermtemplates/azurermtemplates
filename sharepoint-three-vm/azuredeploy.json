@@ -199,13 +199,6 @@
 			},
 			"defaultValue":"sp2013domain.com"
 		},
-		"domainNetbiosName":{
-			"type":"string",
-			"metadata": {
-				"Description": "The NetBIOS name of the AD Domain created "
-			},
-			"defaultValue":"sp2013domain"
-		},
 		"sqlServerServiceAccountUserName":{
 			"type":"string",
 			"metadata": {
@@ -309,6 +302,10 @@
 		},
 	},
 	"variables": {
+		"LBFE":"LBFE",
+		"LBBE":"LBBE",
+		"RDPNAT":"RDP",
+		"spWebNAT":"spWeb",
 		"adSubnetName": "adSubnet",
 		"sqlSubnetName": "sqlSubnet",
 		"spSubnetName": "spSubnet",
@@ -323,22 +320,27 @@
 		"sqlSourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('sqlImageName'))]",
 		"spSourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('spImageName'))]",
 		"adNicId" : "[resourceId('Microsoft.Network/networkInterfaces',variables('adNicName'))]",
-		"adIPConfigID": "[concat(variables('adNicId'),'/ipConfigurations/ipconfig1')]",
 		"sqlNicId" : "[resourceId('Microsoft.Network/networkInterfaces',variables('sqlNicName'))]",
-		"sqlIPConfigID": "[concat(variables('sqlNicId'),'/ipConfigurations/ipconfig1')]",
 		"spNicId" : "[resourceId('Microsoft.Network/networkInterfaces',variables('spNicName'))]",
 		"adLBName" : "adLoadBalancer",
 		"sqlLBName" : "sqlLoadBalancer",
 		"spLBName" : "spLoadBalancer",
 		"adIPConfigID": "[concat(variables('adNicId'),'/ipConfigurations/ipconfig1')]",
 		"adlbID":"[resourceId('Microsoft.Network/loadBalancers',variables('adLBName'))]",
-		"adlbFEConfigID":"[concat(variables('adlbID'),'/frontendIPConfigurations/LBFE')]",
+		"adlbFEConfigID":"[concat(variables('adlbID'),'/frontendIPConfigurations/',variables('LBFE'))]",
+		"adRDPNATRuleID":"[concat(variables('adlbID'),'/inboundNatRules/',variables('RDPNAT'))]",
+		"adBEAddressPoolID":"[concat(variables('adlbID'),'/backendAddressPools/',variables('LBBE'))]",
 		"sqlIPConfigID": "[concat(variables('sqlNicId'),'/ipConfigurations/ipconfig1')]",
 		"sqllbID":"[resourceId('Microsoft.Network/loadBalancers',variables('sqlLBName'))]",
-		"sqllbFEConfigID":"[concat(variables('sqllbID'),'/frontendIPConfigurations/LBFE')]",
+		"sqllbFEConfigID":"[concat(variables('sqllbID'),'/frontendIPConfigurations/',variables('LBFE'))]",
+		"sqlRDPNATRuleID":"[concat(variables('sqllbID'),'/inboundNatRules/',variables('RDPNAT'))]",
+		"sqlBEAddressPoolID":"[concat(variables('sqllbID'),'/backendAddressPools/',variables('LBBE'))]",
 		"spIPConfigID": "[concat(variables('spNicId'),'/ipConfigurations/ipconfig1')]",
 		"splbID":"[resourceId('Microsoft.Network/loadBalancers',variables('spLBName'))]",
-		"splbFEConfigID":"[concat(variables('splbID'),'/frontendIPConfigurations/LBFE')]",
+		"splbFEConfigID":"[concat(variables('splbID'),'/frontendIPConfigurations/',variables('LBFE'))]",
+		"spRDPNATRuleID":"[concat(variables('splbID'),'/inboundNatRules/',variables('RDPNAT'))]",
+		"spWebNATRuleID":"[concat(variables('splbID'),'/inboundNatRules/',variables('spWebNAT'))]",
+		"spBEAddressPoolID":"[concat(variables('splbID'),'/backendAddressPools/',variables('LBBE'))]",
 		"adDataDisk":"ADDataDisk",
 		"adDataDiskSize":1000,
 		"sqlDataDisk":"SQLDataDisk",
@@ -376,6 +378,7 @@
 			}
 		],
 		"vnetwithDNSTemplateUri":"[concat(parameters('AssetLocation'),'/vnet-with-dns-server.json')]",
+		"nicUpdate":"[concat(parameters('AssetLocation'),'/nicUpdate.json')]",
 		"adModulesURL":"[concat(parameters('AssetLocation'),'/CreateADPDC.ps1.zip')]",
 		"adConfigurationFunction":"CreateADPDC.ps1\\CreateADPDC",
 		"sqlModulesURL":"[concat(parameters('AssetLocation'),'/ConfigureSQLServer.ps1.zip')]",
@@ -462,243 +465,253 @@
 			}
 		},
 		{
-		 "name": "[variables('adNicName')]",
-		 "type": "Microsoft.Network/networkInterfaces",
-		 "location": "[parameters('deploymentLocation')]",
-		 "dependsOn": ["[parameters('virtualNetworkName')]"],
-		 "apiVersion": "2014-12-01-preview",
-		 "properties": {
-			 "ipConfigurations": [
-				 {
-					 "name": "ipconfig1",
-					 "properties": {
-						"privateIPAllocationMethod": "Static",
-						"privateIPAddress" :"[parameters('adNicIPAddress')]",
-						"subnet": {
-							"id": "[variables('adSubnetRef')]"
-						 }
-					 }
-				 }
-			 ]
-		 }
-		},
-		{
-		 "name": "[variables('sqlNicName')]",
-		 "type": "Microsoft.Network/networkInterfaces",
-		 "location": "[parameters('deploymentLocation')]",
-		 "apiVersion": "2014-12-01-preview",
-		 "dependsOn": ["[parameters('virtualNetworkName')]"],
-		 "properties": {
-			 "ipConfigurations": [
-				 {
-					 "name": "ipconfig1",
-					 "properties": {
-						"privateIPAllocationMethod": "Dynamic",
-						"subnet": {
-							"id": "[variables('sqlSubnetRef')]"
+			"apiVersion": "2014-12-01-preview",
+			"name": "[variables('adlbName')]",
+			"type": "Microsoft.Network/loadBalancers",
+			"location": "[parameters('deploymentLocation')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Network/publicIPAddresses',variables('adpublicIPAddressName'))]"
+			],
+			"properties": {
+				"frontendIPConfigurations": [
+					{
+						"name": "[variables('LBFE')]",
+						"properties": {
+							"publicIPAddress": {
+								"id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('adpublicIPAddressName'))]"
+							},
 						}
-					 }
-				 }
-			 ]
-		 }
-		},
-		{
-		 "name": "[variables('spNicName')]",
-		 "type": "Microsoft.Network/networkInterfaces",
-		 "location": "[parameters('deploymentLocation')]",
-		 "apiVersion": "2014-12-01-preview",
-		 "dependsOn": [	"[parameters('virtualNetworkName')]"
-		 ],
-		 "properties": {
-			 "ipConfigurations": [
-				 {
-					 "name": "ipconfig1",
-					 "properties": {
-						"privateIPAllocationMethod": "Dynamic",
-						"subnet": {
-							"id": "[variables('spSubnetRef')]"
+					}
+				],
+				"backendAddressPools": [
+					{
+						"name": "[variables('LBBE')]",
+					}
+				],
+				"inboundNatRules": [
+					{
+						"name": "[variables('RDPNAT')]",
+						"properties": {
+							"frontendIPConfiguration": {
+								"id": "[variables('adlbFEConfigID')]"
+							},
+							"protocol": "tcp",
+							"frontendPort": "[parameters('RDPPort')]",
+							"backendPort": 3389,
+							"enableFloatingIP": false
 						}
-					 }
-				 }
-			 ]
-		 }
+					}
+				]
+			}
 		},
 		{
-		  "apiVersion": "2014-12-01-preview",
-		  "name": "[variables('adlbName')]",
-		  "type": "Microsoft.Network/loadBalancers",
-		  "location": "[parameters('deploymentLocation')]",
-		  "dependsOn": [
-			  "[concat('Microsoft.Network/networkInterfaces/', variables('adNicName'))]",
-			  "[resourceId('Microsoft.Network/publicIPAddresses',variables('adpublicIPAddressName'))]"
-		  ],
-		  "properties": {
-			  "frontendIPConfigurations": [
-				  {
-					  "name": "LBFE",
-					  "properties": {
-						"publicIPAddress": {
-							"id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('adpublicIPAddressName'))]"
+			"apiVersion": "2014-12-01-preview",
+			"name": "[variables('sqllbName')]",
+			"type": "Microsoft.Network/loadBalancers",
+			"location": "[parameters('deploymentLocation')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Network/publicIPAddresses',variables('sqlpublicIPAddressName'))]"
+			],
+			"properties": {
+				"frontendIPConfigurations": [
+					{
+						"name": "[variables('LBFE')]",
+						"properties": {
+							"publicIPAddress": {
+								"id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('sqlpublicIPAddressName'))]"
+							},
+						}
+					}
+				],
+				"backendAddressPools": [
+					{
+						"name": "[variables('LBBE')]",
+					}
+				],
+				"inboundNatRules": [
+					{
+						"name": "[variables('RDPNAT')]",
+						"properties": {
+						"frontendIPConfiguration": {
+							"id": "[variables('sqllbFEConfigID')]"
 						},
-					  }
-				  }
-			  ],
-			  "backendAddressPools": [
-				  {
-					  "name": "LBBE",
-					  "properties": {
-						  "backendIPConfigurations": [
-							  {
-								"id" : "[variables('adIPConfigID')]"
-							  }
-						  ]
-					  }
-				  }
-			  ],
-			  "inboundNatRules": [
-				  {
-					  "name": "adRDP",
-					  "properties": {
-						  "frontendIPConfigurations": [
-							  {
-									"id": "[variables('adlbFEConfigID')]"
-							  }
-						  ],
-						  "backendIPConfiguration": {
-							  "id" : "[variables('adIPConfigID')]"
-						  },
-						  "protocol": "tcp",
-						  "frontendPort": "[parameters('RDPPort')]",
-						  "backendPort": 3389,
-						  "enableFloatingIP": false
-					  }
-				  }
-
-			  ]
-		  }
+						"protocol": "tcp",
+						"frontendPort": "[parameters('RDPPort')]",
+						"backendPort": 3389,
+						"enableFloatingIP": false
+						}
+					}
+				]
+			}
 		},
 		{
-		  "apiVersion": "2014-12-01-preview",
-		  "name": "[variables('sqllbName')]",
-		  "type": "Microsoft.Network/loadBalancers",
-		  "location": "[parameters('deploymentLocation')]",
-		  "dependsOn": [
-			  "[concat('Microsoft.Network/networkInterfaces/', variables('sqlNicName'))]",
-			  "[resourceId('Microsoft.Network/publicIPAddresses',variables('sqlpublicIPAddressName'))]"
-		  ],
-		  "properties": {
-			  "frontendIPConfigurations": [
-				  {
-					  "name": "LBFE",
-					  "properties": {
-						"publicIPAddress": {
-							"id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('sqlpublicIPAddressName'))]"
-						},
-					  }
-				  }
-			  ],
-			  "backendAddressPools": [
-				  {
-					  "name": "LBBE",
-					  "properties": {
-						  "backendIPConfigurations": [
-							  {
-								"id" : "[variables('sqlIPConfigID')]"
-							  }
-						  ]
-					  }
-				  }
-			  ],
-			  "inboundNatRules": [
-				  {
-					  "name": "sqlRDP",
-					  "properties": {
-						  "frontendIPConfigurations": [
-							  {
-									"id": "[variables('sqllbFEConfigID')]"
-							  }
-						  ],
-						  "backendIPConfiguration": {
-							  "id" : "[variables('sqlIPConfigID')]"
-						  },
-						  "protocol": "tcp",
-						  "frontendPort": "[parameters('RDPPort')]",
-						  "backendPort": 3389,
-						  "enableFloatingIP": false
-					  }
-				  }
-			  ]
-		  }
+			"apiVersion": "2014-12-01-preview",
+			"name": "[variables('spLBName')]",
+			"type": "Microsoft.Network/loadBalancers",
+			"location": "[parameters('deploymentLocation')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Network/publicIPAddresses',variables('sppublicIPAddressName'))]"
+			],
+			"properties": {
+				"frontendIPConfigurations": [
+					{
+						"name": "[variables('LBFE')]",
+						"properties": {
+							"publicIPAddress": {
+								"id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('sppublicIPAddressName'))]"
+							},
+						}
+					}
+				],
+				"backendAddressPools": [
+					{
+						"name": "[variables('LBBE')]",
+					}
+				],
+				"inboundNatRules": [
+					{
+						"name": "[variables('RDPNAT')]",
+						"properties": {
+							"frontendIPConfiguration": {
+								"id": "[variables('splbFEConfigID')]"
+							},
+							"protocol": "tcp",
+							"frontendPort": "[parameters('RDPPort')]",
+							"backendPort": 3389,
+							"enableFloatingIP": false
+						}
+					}
+				],
+				"loadBalancingRules": [
+                    {
+                        "name": "spWeb",
+                        "properties": {
+                        "frontendIPConfiguration": {
+                            "id": "[variables('splbFEConfigID')]"
+                        },
+                        "probe": {
+                            "id": "[concat(variables('splbID'),'/probes/spWebProbe')]"
+                        },
+                        "protocol": "tcp",
+                        "frontendPort": 80,
+                        "backendPort": 80,
+                        "enableFloatingIP": false
+                        }
+                    }
+                ],
+                "probes": [
+                    {
+                        "name": "spWebProbe",
+                        "properties": {
+                            "protocol": "tcp",
+                            "port": 80,
+                            "intervalInSeconds": "15",
+                            "numberOfProbes": "5"
+                        }
+                    }
+                ]
+			}
 		},
 		{
-		  "apiVersion": "2014-12-01-preview",
-		  "name": "[variables('spLBName')]",
-		  "type": "Microsoft.Network/loadBalancers",
-		  "location": "[parameters('deploymentLocation')]",
-		  "dependsOn": [
-			  "[concat('Microsoft.Network/networkInterfaces/', variables('spNicName'))]",
-			  "[resourceId('Microsoft.Network/publicIPAddresses',variables('sppublicIPAddressName'))]"
-		  ],
-		  "properties": {
-			  "frontendIPConfigurations": [
-				  {
-					  "name": "LBFE",
-					  "properties": {
-						"publicIPAddress": {
-							"id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('sppublicIPAddressName'))]"
-						},
-					  }
-				  }
-			  ],
-			  "backendAddressPools": [
-				  {
-					  "name": "LBBE",
-					  "properties": {
-						  "backendIPConfigurations": [
-							  {
-								"id" : "[variables('spIPConfigID')]"
-							  }
-						  ]
-					  }
-				  }
-			  ],
-			  "inboundNatRules": [
-				  {
-					  "name": "spRDP",
-					  "properties": {
-						  "frontendIPConfigurations": [
-							  {
-									"id": "[variables('splbFEConfigID')]"
-							  }
-						  ],
-						  "backendIPConfiguration": {
-							  "id" : "[variables('spIPConfigID')]"
-						  },
-						  "protocol": "tcp",
-						  "frontendPort": "[parameters('RDPPort')]",
-						  "backendPort": 3389,
-						  "enableFloatingIP": false
-					  }
-				  },
-				  {
-					  "name": "spWeb",
-					  "properties": {
-						  "frontendIPConfigurations": [
-							  {
-									"id": "[variables('splbFEConfigID')]"
-							  }
-						  ],
-						  "backendIPConfiguration": {
-							  "id" : "[variables('spIPConfigID')]"
-						  },
-						  "protocol": "tcp",
-						  "frontendPort": 80,
-						  "backendPort": 80,
-						  "enableFloatingIP": false
-					  }
-				  }
-			  ]
-		  }
+			"name": "[variables('adNicName')]",
+			"type": "Microsoft.Network/networkInterfaces",
+			"location": "[parameters('deploymentLocation')]",
+			"dependsOn": [
+				"[parameters('virtualNetworkName')]",
+				"[concat('Microsoft.Network/loadBalancers/',variables('adlbName'))]"
+			],
+			"apiVersion": "2014-12-01-preview",
+			"properties": {
+				"ipConfigurations": [
+					{
+						"name": "ipconfig1",
+						"properties": {
+							"privateIPAllocationMethod": "Static",
+							"privateIPAddress" :"[parameters('adNicIPAddress')]",
+							"subnet": {
+								"id": "[variables('adSubnetRef')]"
+							},
+							"loadBalancerBackendAddressPools": [
+								{
+									"id":"[variables('adBEAddressPoolID')]"
+								}
+							],
+							"loadBalancerInboundNatRules": [
+								{
+									"id": "[variables('adRDPNATRuleID')]"
+								}
+							]
+						}
+					}
+				]
+			}
+		},
+		{
+			"name": "[variables('sqlNicName')]",
+			"type": "Microsoft.Network/networkInterfaces",
+			"location": "[parameters('deploymentLocation')]",
+			"apiVersion": "2014-12-01-preview",
+			"dependsOn": [
+				"[parameters('virtualNetworkName')]",
+				"[concat('Microsoft.Network/loadBalancers/',variables('sqllbName'))]"
+			],
+			"properties": {
+				"ipConfigurations": [
+					{
+						"name": "ipconfig1",
+						"properties": {
+							"privateIPAllocationMethod": "Dynamic",
+							"subnet": {
+								"id": "[variables('sqlSubnetRef')]"
+							},
+							"loadBalancerBackendAddressPools": [
+								{
+									"id":"[variables('sqlBEAddressPoolID')]"
+								}
+							],
+							"loadBalancerInboundNatRules": [
+								{
+									"id": "[variables('sqlRDPNATRuleID')]"
+								}
+							]
+						}
+					}
+				]
+			}
+		},
+		{
+			"name": "[variables('spNicName')]",
+			"type": "Microsoft.Network/networkInterfaces",
+			"location": "[parameters('deploymentLocation')]",
+			"apiVersion": "2014-12-01-preview",
+			"dependsOn": [
+				"[parameters('virtualNetworkName')]",
+				"[concat('Microsoft.Network/loadBalancers/',variables('splbName'))]"
+			],
+			"properties": {
+				"ipConfigurations": [
+					{
+						"name": "ipconfig1",
+						"properties": {
+							"privateIPAllocationMethod": "Dynamic",
+							"subnet": {
+								"id": "[variables('spSubnetRef')]"
+							},
+							"loadBalancerBackendAddressPools": [
+								{
+									"id":"[variables('spBEAddressPoolID')]"
+								}
+							],
+							"loadBalancerInboundNatRules": [
+								{
+									"id": "[variables('spRDPNATRuleID')]",
+									"id": "[variables('spWebNATRuleID')]"
+								}
+							]
+						}
+					}
+				]
+			}
 		},
 		{
 			"apiVersion": "2014-12-01-preview",
@@ -769,7 +782,6 @@
 							"ConfigurationFunction": "[variables('adConfigurationFunction')]",
 							"Properties": {
 								"DomainName": "[parameters('domainName')]",
-								"DomainNetBiosName":"[parameters('domainNetbiosName')]",
 								"AdminCreds":{
 									"UserName": "[parameters('adminUserName')]",
 									"Password": "PrivateSettingsRef:AdminPassword"
@@ -874,7 +886,8 @@
 			"apiVersion": "2014-12-01-preview",
 			"location": "[parameters('deploymentLocation')]",
 			"dependsOn": [
-				 "[concat('Microsoft.Compute/virtualMachines/', parameters('sqlVMName'))]"
+				 "[concat('Microsoft.Compute/virtualMachines/', parameters('sqlVMName'))]",
+				"Microsoft.Resources/deployments/UpdateVNetDNS"
 			],
 			"properties": {
 				"publisher": "Microsoft.Powershell",
@@ -885,7 +898,7 @@
 					"ConfigurationFunction": "[variables('sqlConfigurationFunction')]",
 					"Properties": {
 						"DomainName": "[parameters('domainName')]",
-						"DomainNetBiosName":"[parameters('domainNetbiosName')]",
+						"DNSServer": "[parameters('adNicIPAddress')]",
 						"AdminCreds":{
 							"UserName": "[parameters('adminUserName')]",
 							"Password": "PrivateSettingsRef:AdminPassword"
@@ -969,8 +982,8 @@
 					"apiVersion": "2014-12-01-preview",
 					"location": "[parameters('deploymentLocation')]",
 					"dependsOn": [
-						 "[concat('Microsoft.Compute/virtualMachines/', parameters('spVMName'))]"
-					],
+						"[concat('Microsoft.Compute/virtualMachines/', parameters('spVMName'))]"
+						],
 					"properties": {
 						"publisher": "Microsoft.Powershell",
 						"type": "DSC",
@@ -980,7 +993,7 @@
 							"ConfigurationFunction": "[variables('spConfigurationFunction')]",
 							"Properties": {
 								"DomainName": "[parameters('domainName')]",
-								"DomainNetBiosName":"[parameters('domainNetbiosName')]",
+								"DNSServer": "[parameters('adNicIPAddress')]",
 								"AdminCreds":{
 									"UserName": "[parameters('adminUserName')]",
 									"Password": "PrivateSettingsRef:AdminPassword"
@@ -1000,7 +1013,7 @@
 								"DatabaseName":"[parameters('databaseName')]",
 								"AdministrationContentDatabaseName":"[parameters('administrationContentDatabaseName')]",
 								"DatabaseServer":"[concat(parameters('sqlVMName'),'.',parameters('domainName'))]",
-								"Configuration":"[concat('{\"roles\":[{\"type\":\"application\",\"properties\":{\"fqdn\":\"',reference(variables('sppublicIPAddressName')).dnsSettings.fqdn,'\",\"port\":',variables('spCentralAdminPort'),'}},{\"type\":\"web\",\"properties\":{\"webApp\":{\"name\":\"spARM\",\"applicationPool\":\"spARM AppPool\",\"applicationPoolAccount\":\"', parameters('sharePointFarmAccountUserName'),'\",\"url\":\"http://',reference(variables('sppublicIPAddressName')).dnsSettings.fqdn,'\",\"port\":80,\"hostHeader\":\"',reference(variables('sppublicIPAddressName')).dnsSettings.fqdn,'\",\"databaseName\":\"',variables('spContentDatabase'),'\"},\"site\":{\"name\":\"spARM\",\"template\":\"',parameters('spSiteTemplateName'),'\",\"url\":\"http://',reference(variables('sppublicIPAddressName')).dnsSettings.fqdn,'\",\"ownerAliasDomain\":\"',parameters('domainNetbiosName'),'\",\"ownerAliasUserName\":\"',parameters('sharePointFarmAccountUserName'),'\",\"secondaryOwnerAliasDomain\":\"',parameters('domainNetbiosName'),'\",\"secondaryOwnerAliasUserName\":\"',parameters('adminUserName'),'\"}}}],\"configureForHa\":\"False\",\"loadBalancedSetProbePort\":0}')]"
+								"Configuration":"[concat('{\"roles\":[{\"type\":\"application\",\"properties\":{\"fqdn\":\"',reference(variables('sppublicIPAddressName')).dnsSettings.fqdn,'\",\"port\":',variables('spCentralAdminPort'),'}},{\"type\":\"web\",\"properties\":{\"webApp\":{\"name\":\"spARM\",\"applicationPool\":\"spARM AppPool\",\"applicationPoolAccount\":\"', parameters('sharePointFarmAccountUserName'),'\",\"url\":\"http://',reference(variables('sppublicIPAddressName')).dnsSettings.fqdn,'\",\"port\":80,\"hostHeader\":\"',reference(variables('sppublicIPAddressName')).dnsSettings.fqdn,'\",\"databaseName\":\"',variables('spContentDatabase'),'\"},\"site\":{\"name\":\"spARM\",\"template\":\"',parameters('spSiteTemplateName'),'\",\"url\":\"http://',reference(variables('sppublicIPAddressName')).dnsSettings.fqdn,'\",\"ownerAliasDomain\":\"',parameters('domainName'),'\",\"ownerAliasUserName\":\"',parameters('sharePointFarmAccountUserName'),'\",\"secondaryOwnerAliasDomain\":\"',parameters('domainName'),'\",\"secondaryOwnerAliasUserName\":\"',parameters('adminUserName'),'\"}}}],\"configureForHa\":\"False\",\"loadBalancedSetProbePort\":0}')]"
 							}
 						},
 						"protectedSettings": {

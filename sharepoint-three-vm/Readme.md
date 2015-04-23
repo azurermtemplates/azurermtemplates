@@ -4,9 +4,7 @@ This template creates three new Azure VMs, each with a public IP address and loa
 
 There are a number of issues\workarounds in this template and the associated DSC Script:
 
-1. Version 1.7 of the DSC Extension has a problem whereby the script execution policy will not allow scripts to be executed , therefore the DSC script provided updates the execution policy before the DSC extension is run and then sets it back to default once the configuration has been applied.
-
-2. This template is entirely serial due to some issues between the platform agent and the DSC extension which cause problems when multiple VM and\or extension resources are deployed concurrently, this willbe fixed in the future
+1. This template is entirely serial due to some issues between the platform agent and the DSC extension which cause problems when multiple VM and\or extension resources are deployed concurrently, this will be fixed in the future
 
 Click the button below to deploy
 
@@ -26,7 +24,6 @@ Below are the parameters that the template expects
 | adSubnet | Address prefix for adSubnetName <br> <ul><li>10.0.0.0/24 **(default)**</li></ul> |
 | sqlSubnet | Address prefix for adSubnetName <br> <ul><li>10.0.1.0/24 **(default)**</li></ul> |
 | spSubnet | Address prefix for adSubnetName <br> <ul><li>10.0.2.0/24 **(default)**</li></ul> |
-| adNicName | The name of the NIC attached to the new VM |
 | adNicIPAddress | The IP address of the new AD VM  <br> <ul><li>**10.0.0.4 (default)**</li></ul> |
 | publicIPAddressName | Name of the public IP address to create |
 | adVMName | Name for the AD VM |
@@ -42,7 +39,6 @@ Below are the parameters that the template expects
 | spImageName | Name of image to use for the SP VM <br> <ul><li>c6e0f177abd8496e934234bd27f46c5d__SharePoint-2013-Trial-1-20-2015 **(default)**</li></ul>|
 | vmContainerName | The container name in the storage account where VM disks are stored|
 | domainName | The FQDN of the AD Domain created |
-| domainNetbiosName | The NetBIOS name of the AD Domain created |
 | sqlServerServiceAccountUserName | The SQL Server Service account name |
 | sqlServerServiceAccountPassword | The SQL Server Service account password |
 | sharePointSetupUserAccountUserName | The Sharepoint Setup account name|
