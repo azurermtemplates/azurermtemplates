@@ -8,6 +8,9 @@ then
     exit 3
 fi
 
+#Format the data disk
+bash vm-disk-utils-0.1.sh -s
+
 # TEMP FIX - Re-evaluate and remove when possible
 # This is an interim fix for hostname resolution in current VM (If it does not exist add it)
 grep -q "${HOSTNAME}" /etc/hosts
@@ -18,7 +21,6 @@ else
   echo "${HOSTNAME} not found in /etc/hosts"
   # Append it to the hsots file if not there
   echo "127.0.0.1 ${HOSTNAME}" >> /etc/hosts
-  log "hostname ${HOSTNAME} added to /etchosts"
 fi
 
 # Get today's date into YYYYMMDD format
@@ -80,8 +82,6 @@ setup_datadisks() {
 
 	MOUNTPOINT="/datadisks/disk1"
 
-	bash vm-disk-utils-0.1.sh -s
-
 	# Move database files to the striped disk
 	if [ -L /var/lib/postgresql/9.3 ];
 	then
@@ -97,7 +97,6 @@ setup_datadisks() {
 		# Create symbolic link so that configuration files continue to use the default folders
 		logger "Create symbolic link from /var/lib/postgresql/9.3 to $MOUNTPOINT/pgdata/9.3"
 		ln -s $MOUNTPOINT/pgdata/9.3 /var/lib/postgresql/9.3
-		service postgresql start
 	fi
 }
 
@@ -156,12 +155,6 @@ configure_streaming_replication() {
 		echo "Updated postgresql.conf"
 	fi
 
-	if [ "$NODETYPE" == "MASTER" ];
-	then
-		# Start service on MASTER
-		service postgresql start
-	fi
-
 	# Synchronize the slave
 	if [ "$NODETYPE" == "SLAVE" ];
 	then
@@ -180,9 +173,6 @@ configure_streaming_replication() {
 		sudo -u postgres echo "standby_mode = 'on'" > recovery.conf
 		sudo -u postgres echo "primary_conninfo = 'host=$MASTERIP port=5432 user=replicator password=$PGPASSWORD'" >> recovery.conf
 		sudo -u postgres echo "trigger_file = '/var/lib/postgresql/9.3/main/failover'" >> recovery.conf
-
-		# Start service on SLAVE
-		service postgresql start
 	fi
 	
 	logger "Done configuring PostgreSQL streaming replication"
@@ -190,5 +180,9 @@ configure_streaming_replication() {
 
 # MAIN ROUTINE
 install_postgresql_service
-stripe_datadisks
+
+setup_datadisks
+
+service postgresql start
+
 configure_streaming_replication
