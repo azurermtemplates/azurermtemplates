@@ -41,7 +41,7 @@
         "nicName" : "myVMNic",
         "dnsName" : "[variables('subnet1Name')]"
       },
-		"resources": [
+    "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[parameters('newStorageAccountName')]",
@@ -157,14 +157,14 @@
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
             ],
-
             "properties": {
-              "publisher": "PuppetLabs",
-              "type": "PuppetEnterpriseAgent",
-              "typeHandlerVersion": "3.2",
-              "settings": {
-                "PUPPET_MASTER_SERVER": "[parameters('puppet_master_server')]",
-              }
+               "publisher": "PuppetLabs",
+               "type": "PuppetEnterpriseAgent",
+               "typeHandlerVersion": "3.2",
+               "settings": {
+                 "PUPPET_MASTER_SERVER": "[parameters('puppet_master_server')]"
+               }
+         }
         }
     ]
 }
