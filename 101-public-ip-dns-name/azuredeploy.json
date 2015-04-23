@@ -19,7 +19,7 @@
         "location": {
             "type": "String",
             "defaultValue" : "West US",
-            "allowedValues": ["East US", "North Central US", "North Europe", "West Europe", "East Asia", "South East Asia"],
+            "allowedValues": ["West US", "East US", "North Central US", "North Europe", "West Europe", "East Asia", "Southeast Asia"],
             "metadata": {
                 "description": "Location of the Public IP."
             }
@@ -30,7 +30,7 @@
     },
     "resources": [
     {
-        "apiVersion": "2014-12-01-preview",
+        "apiVersion": "2015-05-01-preview",
         "type": "Microsoft.Network/publicIPAddresses",
         "name": "[parameters('publicIPAddressName')]",
         "location": "[parameters('location')]",
