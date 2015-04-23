@@ -1,9 +1,23 @@
 ﻿{
-    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentParameters.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "adminUsername": {
-            "value": "azureuser"
-        }
-    }
+  "storageAccountNamePrefix": {
+    "value": "fs180"
+  },
+  "adminUsername": {
+    "value": "trent"
+  },
+  "region": {
+  	"value": "West US"
+  },
+  "adminPassword": {
+    "value": ""
+  },
+  "domainName": {
+    "value": ""
+  },
+  "replicatorPassword": {
+    "value": ""
+  },
+  "jumpbox": {
+  	"value": "Enabled"
+  }
 }

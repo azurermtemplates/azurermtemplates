@@ -43,23 +43,12 @@ Template expects the following parameters
 
 | Name   | Description    |
 |:--- |:---|
-| newStorageAccountName  | Unique DNS name for the Storage Account where the Virtual Machines' disks will be placed |
-| location | Location where the resources will be deployed |
+| region | Location where the resources will be deployed |
+| storageAccountNamePrefix  | Unique DNS name for the Storage Account where the Virtual Machines' disks will be placed |
 | domainName | Domain name of the publicly accessible jumpbox VM {domainName}.{location}.cloudapp.com (e.g. mydomainname.westus.cloudapp.azure.com)|
 | adminUsername  | Username for the Virtual Machines  |
 | adminPassword  | Password for the Virtual Machine  |
-| numberOfSlaveInstances  | Number of PostgreSQL slave servers to deploy |
-| vmSize | Size of each of the virtual machines |
+| tshirtSize  | Size of deployment to provision |
 | replicatorPassword | Password to use for the pgsql replication user (replicator) |
-| dbMasterName | Name of the master PostgreSQL server (e.g. dbmaster) |
-| dbSlaveNamePrefix | Prefix for the name of the PostgreSQL slave-servers (e.g. dbslave will result in dbslave0, dbslave1, etc.) |
-| dbAvailabilitySetName | Name of the availability set into which master and slave servers will be deployed |
-| platformFaultDomainCount | Number of fault domains within the availability set |
-| platformUpdateDomainCount | Number of update domains within the availability set |
-| dataDiskSizeGB | Size of the data disks that will be attached to the PostgreSQL database servers and striped together |
+| jumpbox | Enable jumpbox |
 | virtualNetworkName | Virtual network name |
-| addressPrefix | Address prefix for the virtual network specified in CIDR format |
-| subnetDmzName | Name of Subnet-DMZ where the jumpbox server is deployed |
-| subnetDbName | Name of Subnet-DB where PostgreSQL servers are deployed |
-| subnetDmzPrefix | Prefix for the Subnet-DMZ specified in CIDR format |
-| subnetDbPrefix | Prefix for the Subnet-DB specified in CIDR format |

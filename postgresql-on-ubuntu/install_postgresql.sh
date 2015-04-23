@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Full Scale 180 Inc.
+
 # You must be root to run this script
 if [ "${UID}" -ne 0 ];
 then
@@ -196,3 +198,4 @@ service postgresql start
 configure_streaming_replication
 
 service postgresql start
+
