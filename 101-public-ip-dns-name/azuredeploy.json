@@ -19,7 +19,7 @@
         "location": {
             "type": "String",
             "defaultValue" : "West US",
-            "allowedValues": ["East US", "North Central US", "North Europe", "West Europe", "East Asia", "South East Asia"],
+            "allowedValues": ["West US", "East US", "North Central US", "North Europe", "West Europe", "East Asia", "Southeast Asia"],
             "metadata": {
                 "description": "Location of the Public IP."
             }
