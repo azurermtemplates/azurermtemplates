@@ -2,74 +2,47 @@
   "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "region": {
-      "type": "string"
+    "commonSettings": {
+      "type": "object"
     },
-    "storageAccountNamePrefix": {
-      "type": "string"
+    "osSettings": {
+      "type":"object"
     },
-    "adminUsername": {
-      "type": "string"
+    "storageSettings": {
+      "type": "object"
     },
     "adminPassword": {
       "type": "securestring"
     },
-    "replicatorPassword": {
-      "type": "securestring"
-    },
-    "vmSize": {
-      "type": "string"
-    },
-    "vmCount": {
-      "type": "int"
-    },
-    "namespace": {
-      "type": "string"
-    },
-    "diskSize": {
-      "type": "int",
-      "defaultValue": 1023
-    },
-    "osSettings": {
+    "machineSettings": {
       "type": "object"
     },
     "subnet": {
       "type": "object"
     },
-    "availabilitySetName": {
-      "type": "string"
-    },
-    "masterIpAddress": {
-      "type": "string"
-    },
-    "dbType": {
-      "type": "string"
+    "replicatorPassword": {
+      "type": "securestring"
     }
   },
   "variables": {
+    "region": "[parameters('commonSettings').region]",
+    "namespace":"[parameters('commonSettings').namespace]",
     "subnetRef": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('subnet').vnet), '/subnets/', parameters('subnet').name)]",
-    "storageAccountName": "[concat(parameters('storageAccountNamePrefix'), parameters('namespace'))]",
-    "vmName": "[concat(parameters('namespace'), 'vm')]",
-    "nicName": "[concat(parameters('namespace'), 'nic')]"
+    "storageAccountName": "[concat(parameters('storageSettings').name, variables('namespace'))]",
+    "vmName": "[concat(variables('namespace'), 'vm')]",
+    "nicName": "[concat(variables('namespace'), 'nic')]",
+    "adminUsername":"[parameters('commonSettings').adminUsername]",
+    "vmCount": "[parameters('machineSettings').vmCount]"
   },
   "resources": [
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('storageAccountName')]",
-      "apiVersion": "2014-12-01-preview",
-      "location": "[parameters('region')]",
-      "properties": {
-        "accountType": "Standard_LRS"
-      }
-    },
     {
       "apiVersion": "2014-12-01-preview",
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[concat(variables('nicName'), copyindex())]",
-      "location": "[parameters('region')]",
+      "location": "[variables('region')]",
       "copy": {
         "name": "nicCopyLoop",
-        "count": "[parameters('vmCount')]"
+        "count": "[variables('vmCount')]"
       },
       "properties": {
         "ipConfigurations": [
@@ -89,47 +62,46 @@
       "apiVersion": "2014-12-01-preview",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[concat(variables('vmName'), copyindex())]",
-      "location": "[parameters('region')]",
+      "location": "[variables('region')]",
       "dependsOn": [
-        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'), copyindex())]",
-        "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
+        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'), copyindex())]"
       ],
       "copy": {
         "name": "vmCopyLoop",
-        "count": "[parameters('vmCount')]"
+        "count": "[variables('vmCount')]"
       },
       "properties": {
         "availabilitySet": {
-          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySetName'))]"
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('machineSettings').availabilitySet)]"
         },
         "hardwareProfile": {
-          "vmSize": "[parameters('vmSize')]"
+          "vmSize": "[parameters('machineSettings').vmSize]"
         },
         "osProfile": {
           "computername": "[concat(variables('vmName'), copyindex())]",
-          "adminUsername": "[parameters('adminUsername')]",
+          "adminUsername": "[variables('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]"
         },
         "storageProfile": {
           "sourceImage": {
             "id": "[parameters('osSettings').sourceImage]"
           },
-          "destinationVhdsContainer": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/vhds/')]",
+          "destinationVhdsContainer": "[concat('http://', parameters('storageSettings').name, parameters('storageSettings').map[copyindex()] ,'.blob.core.windows.net/vhds/')]",
           "dataDisks": [
             {
               "name": "datadisk1",
-              "diskSizeGB": "[parameters('diskSize')]",
+              "diskSizeGB": "[parameters('machineSettings').diskSize]",
               "lun": 0,
               "vhd": {
-                "Uri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/vhds/',variables('vmName'), copyindex(),'-datadisk1.vhd')]"
+                "Uri": "[concat('http://', parameters('storageSettings').name, parameters('storageSettings').map[copyindex()],'.blob.core.windows.net/vhds/',variables('vmName'), copyindex(),'-datadisk1.vhd')]"
               }
             },
             {
               "name": "datadisk2",
-              "diskSizeGB": "[parameters('diskSize')]",
+              "diskSizeGB": "[parameters('machineSettings').diskSize]",
               "lun": 1,
               "vhd": {
-                "Uri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/vhds/',variables('vmName'), copyindex(),'-datadisk2.vhd')]"
+                "Uri": "[concat('http://', parameters('storageSettings').name, parameters('storageSettings').map[copyindex()],'.blob.core.windows.net/vhds/',variables('vmName'), copyindex(),'-datadisk2.vhd')]"
               }
             }
           ]
@@ -147,13 +119,13 @@
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "name": "[concat(variables('vmName'), copyindex(), '/install_postgresql')]",
       "apiVersion": "2014-12-01-preview",
-      "location": "[parameters('region')]",
+      "location": "[variables('region')]",
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'), copyindex())]"
       ],
       "copy": {
         "name": "scriptCopyLoop",
-        "count": "[parameters('vmCount')]"
+        "count": "[variables('vmCount')]"
       },
       "properties": {
         "publisher": "Microsoft.OSTCExtensions",
@@ -161,15 +133,10 @@
         "typeHandlerVersion": "1.2",
         "settings": {
           "fileUris": "[parameters('osSettings').scripts]",
-          "commandToExecute": "[concat('bash install_postgresql.sh -m ', parameters('masterIpAddress'), ' -s ', parameters('subnet').prefix, ' -t ', parameters('dbType'), ' -p ', parameters('replicatorPassword') )]"
+          "commandToExecute": "[concat('bash install_postgresql.sh -m ', reference(concat(variables('nicName'), 0)).ipConfigurations[0].properties.privateIPAddress, ' -s ', parameters('subnet').prefix, ' -t ', copyindex(), ' -p ', parameters('replicatorPassword') )]"
         }
       }
     }
   ],
-  "outputs": {
-    "masterip": {
-      "value": "[reference(concat(variables('nicName'),0)).ipConfigurations[0].properties.privateIPAddress]",
-      "type": "string"
-    }
-  }
+  "outputs": {}
 }
