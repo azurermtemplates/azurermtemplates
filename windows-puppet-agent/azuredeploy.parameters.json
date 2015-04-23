@@ -11,22 +11,7 @@
     "vmDnsName": {
         "value": "unique dns name"
     },
-    "chef_node_name": {
-        "value": "your node name"
-    },
-    "chef_server_url": {
-        "value": "Chef Server url"
-    },
-    "validation_client_name": {
-        "value": "chef validator name"
-    },
-    "runlist": {
-        "value": "recipe[getting-started]"
-    },
-    "autoUpdateClient": {
-        "value": "false"
-    },
-    "validation_key": {
-        "value": "validation key"
+    "puppet_master_server": {
+        "value": "Puppet Master Agent"
     }
 }
