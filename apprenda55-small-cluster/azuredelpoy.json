@@ -4,11 +4,19 @@
     "parameters": {
         "location": {
             "type": "string",
-            "defaultValue": "East US"
+            "defaultValue": "East US",
+            "metadata" :
+            {
+              "Description": "The location to where the Apprenda cluster will be deployed."
+            }
         },
         "newStorageAccountName": {
             "type": "string",
-            "defaultValue": "apprendaTest"
+            "defaultValue": "apprendaTest",
+            "metadata" :
+            {
+              "Description": "The name of the storage account to store the VMs."
+            }
         },
         "storageAccountType": {
             "type": "string",
@@ -16,23 +24,43 @@
             "allowedValues": [
                 "Standard_LRS",
                 "Standard_GRS"
-            ]
+            ],
+            "metadata" :
+            {
+              "Description": "The type of storage account. Default is Standard_LRS."
+            }
         },
         "platformNode": {
             "type": "string",
-            "defaultValue": "apprenda01"
+            "defaultValue": "apprenda01",
+            "metadata" :
+            {
+              "Description": "The name of the platform node. Default is apprenda01."
+            }
         },
         "windowsNode02": {
             "type": "string",
-            "defaultValue": "apprenda02"
+            "defaultValue": "apprenda02",
+            "metadata" :
+            {
+              "Description": "The name of the second windows node. Default is apprenda02."
+            }
         },
         "windowsNode03": {
             "type": "string",
-            "defaultValue": "apprenda03"
+            "defaultValue": "apprenda03",
+            "metadata" :
+            {
+              "Description": "The name of the third windows node. Default is apprenda03."
+            }
         },
         "domainControllerNode": {
             "type": "string",
-            "defaultValue": "apprendadc"
+            "defaultValue": "apprendadc",
+            "metadata" :
+            {
+              "Description": "The name of the domain controller node. Default is apprendadc."
+            }
         },
         "vmSize": {
             "type": "string",
@@ -43,32 +71,56 @@
                 "Standard_A2",
                 "Standard_A3",
                 "Standard_A4"
-            ]
-        },
-        "vmName": {
-            "type": "string",
-            "defaultValue": "apprenda"
+            ],
+            "metadata" :
+            {
+              "Description": "The size for all of the VMs in the cluster. Default is Standard_A1."
+            }
         },
         "adminUsername": {
-            "type": "string"
+            "type": "string",
+            "metadata" :
+            {
+              "Description": "The admin account name for all nodes in the cluster."
+            }
         },
         "adminPassword": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata" :
+            {
+              "Description": "The admin account password for all nodes in the cluster."
+            }
         },
         "subscriptionId": {
-            "type": "string"
+            "type": "string",
+            "metadata" :
+            {
+              "Description": "The user's subscription ID."
+            }
         },
         "vmSourceImageName": {
             "type": "string",
-            "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201412.01-en.us-127GB.vhd"
+            "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201412.01-en.us-127GB.vhd",
+            "metadata" :
+            {
+              "Description": "The Windows Image source VHD file. Override only if you wish to use your own."
+            }
         },
         "vmExpressImageName": {
             "type": "string",
-            "defaultValue": "ApprendaAzureCertifiedTemplateV1.0-os-2014-09-24_Copy.vhd"
+            "defaultValue": "ApprendaAzureCertifiedTemplateV1.0-os-2014-09-24_Copy.vhd",
+            "metadata" :
+            {
+              "Description": "The image file used for Deploying Apprenda. Override only if you require a custom setup."
+            }
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "apprendaVNet"
+            "defaultValue": "apprendaVNet",
+            "metadata" :
+            {
+              "Description": "The name of the virtual network for the cluster."
+            }
         }
     },
     "variables": {

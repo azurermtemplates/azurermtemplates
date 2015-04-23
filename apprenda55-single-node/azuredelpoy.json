@@ -65,29 +65,21 @@
             "type": "string",
             "metadata" :
             {
-              "Description": "Select a name for the administrative user."
+              "Description": "The administrator account name."
             }
         },
         "adminPassword": {
             "type": "securestring",
             "metadata" :
             {
-              "Description": "The location to where the Apprenda cluster will be deployed."
+              "Description": "The administrator account password."
             }
         },
         "subscriptionId": {
             "type": "string",
             "metadata" :
             {
-              "Description": "The location to where the Apprenda cluster will be deployed."
-            }
-        },
-        "vmSourceImageName": {
-            "type": "string",
-            "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201412.01-en.us-127GB.vhd",
-            "metadata" :
-            {
-              "Description": "The location to where the Apprenda cluster will be deployed."
+              "Description": "The azure subscription ID."
             }
         },
         "vmExpressImageName": {
@@ -95,7 +87,7 @@
             "defaultValue": "ApprendaAzureCertifiedTemplateV1.0-os-2014-09-24_Copy.vhd",
             "metadata" :
             {
-              "Description": "The location to where the Apprenda cluster will be deployed."
+              "Description": "The image file used for Deploying Apprenda. Override only if you require a custom setup."
             }
         },
         "virtualNetworkName": {
@@ -103,7 +95,7 @@
             "defaultValue": "apprendaVNet",
             "metadata" :
             {
-              "Description": "The location to where the Apprenda cluster will be deployed."
+              "Description": "The name of the virtual network to run Apprenda on."
             }
         }
     },
