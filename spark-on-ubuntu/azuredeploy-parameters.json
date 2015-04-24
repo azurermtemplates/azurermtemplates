@@ -32,6 +32,9 @@
     "sparkNodeIPAddressPrefix": {
         "value": "10.0.0.1"
     },
+    "sparkSlaveNodeIPAddressPrefix": {
+        "value": "10.0.0.3"
+    },
     "jumpbox": {
         "value": "enabled"
     },

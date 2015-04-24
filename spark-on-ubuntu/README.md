@@ -22,7 +22,8 @@ The example expects the following parameters:
 | subnetPrefix | The subnet mask used by the Virtual Network subnet |
 | sparkVersion | Spark version number to be installed |
 | sparkClusterName | Name of the Spark cluster |
-| sparkNodeIPAddressPrefix | The IP address prefix that will be used for constructing a static private IP address for each node in the cluster |
+| sparkNodeIPAddressPrefix | The IP address prefix that will be used for constructing a static private IP address for Master node in the cluster |
+| sparkSlaveNodeIPAddressPrefix | The IP address prefix that will be used for constructing a static private IP address for Slave node in the cluster |
 | jumpbox | The flag allowing to enable or disable provisioning of the jumpbox VM that can be used to access the Spark nodes |
 | tshirtSize | The t-shirt size of the Spark nodes Slaves or workers can be increased (small, medium, large) |
 

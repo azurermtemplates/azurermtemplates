@@ -22,6 +22,8 @@ help()
     echo "-k kafka version like 0.8.2.1"
     echo "-b broker id"
     echo "-h view this help content"
+    echo "-z zookeeper not kafka"
+    echo "-i zookeeper Private IP address prefix"
 }
 
 log()
@@ -131,11 +133,7 @@ expand_ip_range() {
     echo "${EXPAND_STATICIP_RANGE_RESULTS[@]}"
 }
 
-#TEST echo $(expand_ip_range "${ZOOKEEPER_IP_PREFIX}-${INSTANCE_COUNT}")
-#TEST echo $(join , $(expand_ip_range "${ZOOKEEPER_IP_PREFIX}-${INSTANCE_COUNT}"))
-
-
-# Install Zookeeper
+# Install Zookeeper - can expose zookeeper version
 install_zookeeper()
 {
 	mkdir -p /var/lib/zookeeper
@@ -164,6 +162,7 @@ install_kafka()
 	cd /usr/local
 	name=kafka
 	version=${KF_VERSION}
+	#this Kafka version is prefix same used for all versions
 	kafkaversion=2.10
 	description="Apache Kafka is a distributed publish-subscribe messaging system."
 	url="https://kafka.apache.org/"
