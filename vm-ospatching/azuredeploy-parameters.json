@@ -1,0 +1,47 @@
+﻿{
+    "newStorageAccountName" : {
+        "value":"uniquestorageaccountname"
+    },
+    "adminUsername": {
+        "value": ""
+    },
+    "adminPassword": {
+        "value": ""
+    },
+    "dnsNameForPublicIP": {
+        "value": "uniquednsnameforpublicip"
+    },
+    "vmSourceImageName" : {
+        "value" : "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB"
+    },
+    "location": {
+        "value": "West US"
+    },
+    "virtualNetworkName": {
+        "value": "myVNET"
+    },
+    "vmSize": {
+        "value": "Standard_A0"
+    },
+    "vmName" : {
+      "value" : "myVM"
+    },
+    "publicIPAddressName" : {
+      "value" : "myPublicIP"
+    },
+    "nicName" : {
+      "value" : "myNic"
+    }
+    "rebootAfterPatch":{
+      "value" : "Auto"
+    },
+    "dayOfWeek":{
+      "value" : "Sunday|Wednesday"
+    },
+    "startTime":{
+      "value" : "03:00"
+    },
+    "category":{
+      "value" : "ImportantAndRecommended"
+    }
+}
