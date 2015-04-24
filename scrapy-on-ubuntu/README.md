@@ -1,4 +1,4 @@
-# Install Mongo DB on a Ubuntu Virtual Machine using Custom Script Linux Extension
+# Install Scrapy on a Ubuntu Virtual Machine using Custom Script Linux Extension
 
 <a href="https://azuredeploy.net/" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
@@ -22,3 +22,5 @@ Below are the parameters that the template expects
 | vmName | Name of Virtual Machine |
 | publicIPAddressName | Name of Public IP Address Name |
 | nicName | Name of Network Interface |
+| spiderName | Name of the spider |
+| spiderUri | Name of the uri |

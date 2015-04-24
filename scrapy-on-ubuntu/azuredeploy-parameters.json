@@ -1,15 +1,15 @@
 ﻿{
     "newStorageAccountName" : {
-        "value":"xiabinscrapy"
+        "value":"azureuserscrapy"
     },
     "adminUsername": {
-        "value": "xiabin"
+        "value": "azureuser"
     },
     "adminPassword": {
         "value": "User@123"
     },
     "dnsNameForPublicIP": {
-        "value": "xiabinscrapy"
+        "value": "azureuserdns"
     },
     "vmSourceImageName" : {
         "value" : "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB"
@@ -18,19 +18,19 @@
         "value": "West US"
     },
     "virtualNetworkName": {
-        "value": "binxianetworkscrapy"
+        "value": "auzreusernetwork"
     },
     "vmSize": {
         "value": "Standard_A0"
     },
     "vmName" : {
-      "value" : "binxiavmscrapy"
+      "value" : "azureuservm"
     },
     "publicIPAddressName" : {
-      "value" : "binxiapublicip"
+      "value" : "azureuserpublicip"
     },
     "nicName" : {
-      "value" : "binxianic"
+      "value" : "azureusernic"
     },
     "spiderName" : {
       "value" : "myspider.py"
