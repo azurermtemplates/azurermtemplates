@@ -36,6 +36,6 @@
       "value" : "myspider.py"
     },
     "spiderUri" : {
-      "value" : "https://raw.githubusercontent.com/bingosummer/azurermtemplates/master/scrapy-on-ubuntu/myspider.py"
+      "value" : "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/scrapy-on-ubuntu/myspider.py"
     }
 }
