@@ -4,61 +4,93 @@
     "parameters" : {
         "newStorageAccountName": {
             "type": "string",
-            "defaultValue" : "uniqueStorageAccountName"
+            "defaultValue" : "uniqueStorageAccountName",
+            "metadata": {
+              "Description": "Unique DNS Name for the Storage Account where the Virtual Machine's disks will be placed."
+     }
+
         },
         "dnsNameForPublicIP" : {
             "type" : "string",
-            "defaultValue": "uniqueDnsNameForPublicIP"
+            "defaultValue": "uniqueDnsNameForPublicIP",
+            "metadata": {
+              "Description": "Unique DNS Name for the Public IP instance"
         },
         "adminUserName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+              "Description": "Username for the Virtual Machine."
         },
         "adminPassword": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata": {
+              "Description": "Password for the Virtual Machine."
         },
         "vmSourceImageName": {
             "type": "string",
-            "defaultValue": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB"
+            "defaultValue": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
+            "metadata": {
+              "Description": "Source Image Name for the VM."
         },
         "location": {
             "type": "String",
-            "defaultValue" : "West US"
+            "defaultValue" : "West US",
+            "metadata": {
+              "Description": "location where the resources will be deployed."
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "Standard_A0"
+            "defaultValue": "Standard_A0",
+            "metadata": {
+              "Description": "Size of the Virtual Machine."
         },
         "publicIPAddressName": {
             "type": "string",
-            "defaultValue" : "myPublicIP"
+            "defaultValue" : "myPublicIP",
+            "metadata": {
+              "Description": "Unique DNS Name for the Storage Account where the Virtual Machine's disks will be placed."
         },
         "vmName": {
             "type": "string",
-            "defaultValue" : "myVM"
+            "defaultValue" : "myVM",
+            "metadata": {
+              "Description": "Name of Virtual Machine."
         },
         "virtualNetworkName":{
             "type" : "string",
-            "defaultValue" : "myVNET"
+            "defaultValue" : "myVNET",
+            "metadata": {
+              "Description": "Name of Virtual Network."
         },
         "nicName":{
             "type" : "string",
-            "defaultValue":"myNIC"
+            "defaultValue":"myNIC",
+            "metadata": {
+              "Description": "Name of Network Interface."
         },
         "rebootAfterPatch":{
             "type" : "string",
-            "defaultValue" : "Auto"
+            "defaultValue" : "Auto",
+            "metadata": {
+              "Description": "The reboot behavior after patching."
         },
         "dayOfWeek":{
             "type" : "string",
-            "defaultValue" : "Sunday|Wednesday"
+            "defaultValue" : "Sunday|Wednesday",
+            "metadata": {
+              "Description": "The patching date (of the week)You can specify multiple days in a week."
         },
         "startTime":{
             "type" : "string",
-            "defaultValue" : "03:00"
+            "defaultValue" : "03:00",
+            "metadata": {
+              "Description": "Start time of patching."
         },
         "category":{
             "type" : "string",
-            "defaultValue" : "ImportantAndRecommended"
+            "defaultValue" : "ImportantAndRecommended",
+            "metadata": {
+              "Description": "Type of patches to install."
         }
     },
     "variables": {
