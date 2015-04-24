@@ -224,7 +224,7 @@
                         "https://raw.githubusercontent.com/bingosummer/azurermtemplates/master/scrapy-on-ubuntu/scrapy-install-ubuntu.sh",
                         "https://raw.githubusercontent.com/bingosummer/azurermtemplates/master/scrapy-on-ubuntu/myspider.py"
                     ],
-                    "commandToExecute": "sh scrapy-install-ubuntu.sh parameters('spiderName')"
+                    "commandToExecute": "[concat('sh scrapy-install-ubuntu.sh', parameters('spiderName'))]"
                 }
             }
         }
