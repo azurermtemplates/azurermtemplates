@@ -4,7 +4,7 @@
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
-This template deploys Mongo DB on a Ubuntu Virtual Machine. This template also deploys a Storage Account, Virtual Network, Public IP addresses and a Network Interface.
+This template deploys Scrapy on a Ubuntu Virtual Machine. This template also deploys a Storage Account, Virtual Network, Public IP addresses and a Network Interface.
 
 Below are the parameters that the template expects
 

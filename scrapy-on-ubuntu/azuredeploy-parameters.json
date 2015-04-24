@@ -31,5 +31,8 @@
     },
     "nicName" : {
       "value" : "binxianic"
+    },
+    "spiderName" : {
+      "value" : "myspider.py"
     }
 }

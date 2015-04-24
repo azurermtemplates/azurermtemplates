@@ -4,46 +4,87 @@
     "parameters" : {
         "newStorageAccountName": {
             "type": "string",
-            "defaultValue" : "uniquestorageaccountName"
+            "defaultValue" : "uniquestorageaccountName",
+            "metadata": {
+              "Description": "Unique DNS Name for the Storage Account where the Virtual Machine's disks will be placed"
+            }
         },
         "dnsNameForPublicIP" : {
             "type" : "string",
-            "defaultValue": "uniquednsnameforpublicip"
+            "defaultValue": "uniquednsnameforpublicip",
+            "metadata": {
+              "Description": "This is the dns name of the public IP"
+            }
         },
         "adminUserName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+              "Description": "Username for the Virtual Machines"
+            }
         },
         "adminPassword": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata": {
+              "Description": "Password for the Virtual Machine"
+            }
         },
         "vmSourceImageName": {
             "type": "string",
-            "defaultValue": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB"
+            "defaultValue": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
+            "metadata": {
+              "Description": "Source Image Name for the VM"
+            }
         },
         "location": {
             "type": "String",
-            "defaultValue" : "West US"
+            "defaultValue" : "West US",
+            "metadata": {
+              "Description": "location where the resources will be deployed"
+            }
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "Standard_A0"
+            "defaultValue": "Standard_A0",
+            "metadata": {
+              "Description": "Size of Virtual Machin"
+            }
         },
         "publicIPAddressName": {
             "type": "string",
-            "defaultValue" : "myPublicIP"
+            "defaultValue" : "myPublicIP",
+            "metadata": {
+              "Description": "Name of Public IP Address Name"
+            }
         },
         "vmName": {
             "type": "string",
-            "defaultValue" : "myLinuxVM"
+            "defaultValue" : "myLinuxVM",
+            "metadata": {
+              "Description": "Name of Virtual Machine"
+            }
         },
         "virtualNetworkName":{
             "type" : "string",
-            "defaultValue" : "myVNET"
+            "defaultValue" : "myVNET",
+            "metadata": {
+              "Description": "Name of Virtual Network"
+            }
         },
         "nicName":{
             "type" : "string",
-            "defaultValue":"myNIC"
+            "defaultValue":"myNIC",
+            "metadata": {
+              "Description": "Name of Network Interface"
+            }
+        },
+        "spiderName":{
+            "type" : "string",
+            "defaultValue":"myspider.py",
+            "metadata": {
+              "Description": "Name of the spider"
+            }
         }
+
     },
     "variables": {
         "addressPrefix":"10.0.0.0/16",
@@ -180,9 +221,10 @@
                 "typeHandlerVersion": "1.2",
                 "settings": {
                     "fileUris": [
-                        "https://raw.githubusercontent.com/bingosummer/azurermtemplates/master/scrapy-on-ubuntu/scrapy-install-ubuntu.sh"
+                        "https://raw.githubusercontent.com/bingosummer/azurermtemplates/master/scrapy-on-ubuntu/scrapy-install-ubuntu.sh",
+                        "https://raw.githubusercontent.com/bingosummer/azurermtemplates/master/scrapy-on-ubuntu/myspider.py"
                     ],
-                    "commandToExecute": "sh scrapy-install-ubuntu.sh"
+                    "commandToExecute": "sh scrapy-install-ubuntu.sh parameters('spiderName')"
                 }
             }
         }
