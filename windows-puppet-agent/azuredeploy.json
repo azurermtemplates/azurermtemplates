@@ -3,20 +3,36 @@
     "contentVersion": "1.0.0.0",
     "parameters" : {
         "newStorageAccountName": {
-            "type": "string"
+            "type": "String",
+            "metadata" : {
+              "Description" : "This is the name of the storage account"
+            }
+
         },
         "vmDnsName": {
-                "type": "string",
-                "defaultValue": "uniqueDNS"
+                "type": "String",
+                "defaultValue": "uniqueDNS",
+                "metadata" : {
+                  "Description" : "This is the DNS Name"
+                }
         },
         "adminUserName": {
-            "type": "string"
+            "type": "String",
+            "metadata" : {
+              "Description" : "Admin Name for the VM"
+            }
         },
         "adminPassword": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata" : {
+              "Description" : "Admin Password"
+            }
         },
         "puppet_master_server": {
-            "type": "string"
+            "type": "String",
+            "metadata" : {
+              "Description" : "Puppet Master URL"
+            }
         }
     },
     "variables": {
