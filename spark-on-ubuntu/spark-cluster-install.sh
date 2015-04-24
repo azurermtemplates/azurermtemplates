@@ -89,6 +89,7 @@ done
 
 install_pre()
 {
+# First install pre-requisites
 	sudo  apt-get -y update
 	 
 	echo "Installing Java"
@@ -97,46 +98,39 @@ install_pre()
 	echo debconf shared/accepted-oracle-license-v1-1 select true | sudo debconf-set-selections
 	echo debconf shared/accepted-oracle-license-v1-1 seen true | sudo debconf-set-selections
 	apt-get -y install oracle-java7-installer
-
 	sudo ntpdate pool.ntp.org
-	 
 	sudo apt-get -y install ntp
-	 
 	sudo apt-get -y install python-software-properties 
-
 	sudo apt-get -y update 
-	
 	sudo apt-get -y install git
-
 }
 
 # Install spark
 install_spark()
 {
-
 	##Second download and install Apache Spark
-
 	cd ~
-	 
 	mkdir /usr/local/azurespark
-	 
 	cd /usr/local/azurespark/
-	 
+
+########## to build manually for versions where prebuilt binary is not available
 #	wget http://mirror.tcpdiag.net/apache/spark/spark-1.2.1/spark-1.2.1.tgz
 #	gunzip -c spark-1.2.1.tgz | tar -xvf -
 #	mv spark-1.2.1 ../
 #	cd ../spark-1.2.1/	
-	# this will take quite a while
+# this will take quite a while
 #	sudo sbt/sbt assembly 2>&1 1>buildlog.txt
-	
-	wget http://mirror.tcpdiag.net/apache/spark/spark-1.2.1/spark-1.2.1-bin-hadoop1.tgz  
+##########
+
+	version=${SPK_VERSION}
+	wget http://mirror.tcpdiag.net/apache/spark/spark-${version}/spark-${version}-bin-hadoop1.tgz  
 	echo "Unpacking Spark"
 	tar xvzf spark-*.tgz > /tmp/spark-ec2_spark.log
 	rm spark-*.tgz
-	mv spark-1.2.1-bin-hadoop1 ../
+	mv spark-${version}-bin-hadoop1 ../
 	cd ..
 	cd /usr/local/
-	sudo ln -s spark-1.2.1-bin-hadoop1 spark
+	sudo ln -s spark-${version}-bin-hadoop1 spark
 
 #	Third create a spark user with proper privileges and ssh keys.
 
@@ -148,29 +142,24 @@ install_spark()
 	 
 #	Add to sudoers file:
 	 
-	echo "spark ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/90-cloud-init-users
-	 
+	echo "spark ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/90-cloud-init-users	 
 	sudo chown -R spark:spark /usr/local/spark/
 	
-# setting passwordless ssh for root also remove later
+#	Setting passwordless ssh for root 
+
         rm -f ~/.ssh/id_rsa 
 	ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa && cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
-#	ssh-keygen -t rsa -P ""
-#	cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-	
-#exit
 #	Fourth setup some Apache Spark working directories with proper user permissions
 
 	sudo mkdir -p /srv/spark/{logs,work,tmp,pids}
-	 
 	sudo chown -R spark:spark /srv/spark
-	 
 	sudo chmod 4755 /srv/spark/tmp
 
 #	Fifth let’s do a quick test
 #	cd /usr/local/spark	 
 #	bin/run-example SparkPi 10
+
 #	Now lets adjust some Spark configuration files
 
 	cd /usr/local/spark/conf/
@@ -180,7 +169,7 @@ install_spark()
 #	========================================================
 #	echo 'SPARK-ENV.SH (ADD BELOW)' >> spark-env.sh
 
-# Make sure to put your change SPARK_PUBLIC_DNS="PUBLIC IP" to your Public IP
+# Can change the memory settings
 	 
 	echo 'export SPARK_WORKER_MEMORY="1g"' >> spark-env.sh
 	echo 'export SPARK_DRIVER_MEMORY="1g"' >> spark-env.sh
