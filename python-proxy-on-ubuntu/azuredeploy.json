@@ -11,68 +11,68 @@
         },
         "dnsNameForPublicIP": {
             "type": "string",
-            "defaultValue": "uniquednsnameforpublicip"
+            "defaultValue": "uniquednsnameforpublicip",
             "metadata": { 
                 "Description": "Unique dns name for public ip" 
             } 
         },
         "adminUserName": {
-            "type": "string"
+            "type": "string",
             "metadata": { 
-                "Description": "Username for the Virtual Machines" 
+                "Description": "Username for the Virtual Machines" ,
             } 
         },
         "adminPassword": {
-            "type": "securestring"
+            "type": "securestring",
             "metadata": { 
-                "Description": "Password for the Virtual Machines" 
+                "Description": "Password for the Virtual Machines" ,
             } 
         },
         "vmSourceImageName": {
             "type": "string",
-            "defaultValue": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB"
+            "defaultValue": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
             "metadata": { 
                 "Description": "Source Image Name for the VM. Example: b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-12_04_5-LTS-amd64-server-20140927-en-us-30GB" 
             } 
         },
         "location": {
-            "type": "String",
-            "defaultValue": "West US"
+            "type": "string",
+            "defaultValue": "West US",
             "metadata": { 
-                "Description": "Location where the resources will be deployed" 
+                "Description": "Location where the resources will be deployed"
             } 
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "Standard_A0"
+            "defaultValue": "Standard_A0",
             "metadata": { 
-                "Description": "Size of the Virtual Machine" 
+                "Description": "Size of the Virtual Machine"
             } 
         },
         "publicIPAddressName": {
             "type": "string",
-            "defaultValue": "myPublicIP"
+            "defaultValue": "myPublicIP",
             "metadata": { 
                 "Description": "Name of Public IP Address Name" 
             } 
         },
         "vmName": {
             "type": "string",
-            "defaultValue": "myLinuxVM"
+            "defaultValue": "myLinuxVM",
             "metadata": { 
                 "Description": "Name of Virtual Machine" 
             } 
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "myVNET"
+            "defaultValue": "myVNET",
             "metadata": { 
                 "Description": "Name of Virtual Network" 
             } 
         },
         "nicName": {
             "type": "string",
-            "defaultValue": "myNIC"
+            "defaultValue": "myNIC",
             "metadata": { 
                 "Description": "Name of Network Interface" 
             } 
@@ -181,7 +181,7 @@
                 },
                 "osProfile": {
                     "computername": "[parameters('vmName')]",
-                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminUsername": "[parameters('adminUserName')]",
                     "adminPassword": "[parameters('adminPassword')]"
                 },
                 "storageProfile": {
