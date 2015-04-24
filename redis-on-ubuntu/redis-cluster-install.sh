@@ -4,30 +4,121 @@
 VERSION="3.0.0"
 CLUSTER_NAME="redis-cluster"
 IS_LAST_NODE=0
+IS_CLUSTER_AWARE=0
 INSTANCE_COUNT=1
-SLAVE_COUNT=0
-IP_PREFIX="10.0.0."
+MASTER_NODE_COUNT=0
+SLAVE_NODE_COUNT=0
+NODE_INDEX=0
+IP_PREFIX="10.0.0.0"
+LOGGING_KEY="[account-key]"
+REDIS_PORT=6379
+CURRENT_DIRECTORY=$(pwd)
 
 ########################################################
 # This script will install Redis from sources
 ########################################################
 help()
 {
-	echo "This script installs a Redis cluster on the Ubuntu virtual machine image"
+	echo "This script installs Redis Cache on the Ubuntu virtual machine image"
 	echo "Available parameters:"
-	echo "-n Cluster_Name"
-	echo "-v Redis_Version_Number"
+	echo "-n Cluster name"
+	echo "-v Redis package version"
+	echo "-c Number of instances"
+	echo "-s Number of master nodes"	
+	echo "-s Number of slave nodes"
+	echo "-i Sequential node index (starting from 0)"
+	echo "-p Private IP address prefix"
+	echo "-l (Indicator of the last node)"
+	echo "-h Help"
 }
 
+#############################################################################
 log()
 {
-	# If you want to enable this logging add a un-comment the line below and add your account key 
-    #curl -X POST -H "content-type:text/plain" --data-binary "$(date) | ${HOSTNAME} | $1" https://logs-01.loggly.com/inputs/[account-key]/tag/redis-extension,${HOSTNAME}
+	# If you want to enable this logging, uncomment the line below and specify your logging key 
+	#curl -X POST -H "content-type:text/plain" --data-binary "$(date) | ${HOSTNAME} | $1" https://logs-01.loggly.com/inputs/${LOGGING_KEY}/tag/redis-extension,${HOSTNAME}
 	echo "$1"
 }
 
-tuneMemory()
+log "Begin execution of Redis installation script extension on ${HOSTNAME}"
+
+if [ "${UID}" -ne 0 ];
+then
+    log "Script executed without root permissions"
+    echo "You must be root to run this program." >&2
+    exit 3
+fi
+
+# Parse script parameters
+while getopts :n:v:c:m:s:i:p:lh optname; do
+  log "Option $optname set with value ${OPTARG}"
+  
+  case $optname in
+    n)  # Cluster name
+		CLUSTER_NAME=${OPTARG}
+		;;
+    v)  # Version to be installed
+		VERSION=${OPTARG}
+		if [[ $VERSION == 3.* ]]; then IS_CLUSTER_AWARE=1; fi
+		;;
+	c) # Number of instances
+		INSTANCE_COUNT=${OPTARG}
+		;;
+	m) # Number of master nodes
+		MASTER_NODE_COUNT=${OPTARG}
+		;;			
+	s) # Number of slave nodes
+		SLAVE_NODE_COUNT=${OPTARG}
+		;;		
+	i) # Sequential node index
+		NODE_INDEX=${OPTARG}
+		;;				
+	p) # Private IP address prefix
+		IP_PREFIX=${OPTARG}
+		;;			
+    l)  # Indicator of the last node
+		IS_LAST_NODE=1
+		;;		
+    h)  # Helpful hints
+		help
+		exit 2
+		;;
+    \?) #unrecognized option - show help
+		echo -e \\n"Option -${BOLD}$OPTARG${NORM} not allowed."
+		help
+		exit 2
+		;;
+  esac
+done
+
+#############################################################################
+tune_system()
 {
+	log "Tuning the system configuration"
+	
+	# Ensure the source list is up-to-date
+	apt-get -y update
+
+	# Add local machine name to the hosts file to facilitate IP address resolution
+	if grep -q "${HOSTNAME}" /etc/hosts
+	then
+	  echo "${HOSTNAME} was found in /etc/hosts"
+	else
+	  echo "${HOSTNAME} was not found in and will be added to /etc/hosts"
+	  # Append it to the hsots file if not there
+	  echo "127.0.0.1 $(hostname)" >> /etc/hosts
+	  log "Hostname ${HOSTNAME} added to /etc/hosts"
+	fi	
+}
+
+#############################################################################
+tune_memory()
+{
+	log "Tuning the memory configuration"
+	
+	# Get the supporting utilities
+	apt-get -y install hugepages
+
 	# Resolve a "Background save may fail under low memory condition." warning
 	sysctl vm.overcommit_memory=1
 
@@ -35,8 +126,11 @@ tuneMemory()
 	sudo hugeadm --thp-never
 }
 
-tuneNetwork()
+#############################################################################
+tune_network()
 {
+	log "Tuning the network configuration"
+	
 >/etc/sysctl.conf cat << EOF 
 
 	# Disable syncookies (syncookies are not RFC compliant and can use too muche resources)
@@ -55,9 +149,6 @@ tuneNetwork()
 
 	# Log packets with impossible addresses to kernel log
 	net.ipv4.conf.all.log_martians = 1
-
-	# Minimum interval between garbage collection passes This interval is in effect under high memory pressure on the pool
-	net.ipv4.inet_peer_gc_mintime = 5
 
 	# Disable Explicit Congestion Notification in TCP
 	net.ipv4.tcp_ecn = 0
@@ -114,119 +205,179 @@ EOF
 	/sbin/sysctl -p /etc/sysctl.conf
 }
 
-log "Begin execution of Redis installation script extension on ${HOSTNAME}"
+#############################################################################
+install_redis()
+{
+	log "Installing Redis v${VERSION}"
 
-if [ "${UID}" -ne 0 ];
-then
-    log "Script executed without root permissions"
-    echo "You must be root to run this program." >&2
-    exit 3
+	# Installing build essentials (if missing) and other required tools
+	apt-get -y install build-essential
+
+	wget http://download.redis.io/releases/redis-$VERSION.tar.gz
+	tar xzf redis-$VERSION.tar.gz
+	cd redis-$VERSION
+	make
+	make install prefix=/usr/local/bin/
+
+	log "Redis package v${VERSION} was downloaded and built successfully"
+}
+
+#############################################################################
+configure_redis()
+{
+	# Configure the general settings
+	sed -i "s/^port.*$/port ${REDIS_PORT}/g" redis.conf
+	sed -i "s/^daemonize no$/daemonize yes/g" redis.conf
+	sed -i 's/^logfile ""/logfile \/var\/log\/redis.log/g' redis.conf
+	sed -i "s/^loglevel verbose$/loglevel notice/g" redis.conf
+	sed -i "s/^dir \.\//dir \/var\/redis\//g" redis.conf 
+	sed -i "s/\${REDISPORT}.conf/redis.conf/g" utils/redis_init_script 
+	sed -i "s/_\${REDISPORT}.pid/.pid/g" utils/redis_init_script 
+	
+	# Configure the sentinel bits
+	echo "daemonize yes" >> sentinel.conf
+	echo "logfile /var/log/redis-sentinel.log" >> sentinel.conf
+	echo "loglevel notice" >> sentinel.conf
+	echo "pidfile /var/run/redis-sentinel.pid" >> sentinel.conf
+
+	# Create all essentials directories and copy files to the correct locations
+	mkdir /etc/redis
+	mkdir /var/redis
+	
+	cp redis.conf /etc/redis/redis.conf
+	cp sentinel.conf /etc/redis/sentinel.conf
+	cp utils/redis_init_script /etc/init.d/redis-server
+	cp ${CURRENT_DIRECTORY}/redis-sentinel-startup.sh /etc/init.d/redis-sentinel
+	
+	# Copy the cluster configuration utility (if exists)
+	if [ -f src/redis-trib.rb ]; then
+		cp src/redis-trib.rb /usr/local/bin/
+	fi
+
+	# Clean up temporary files
+	cd ..
+	rm redis-$VERSION -R
+	rm redis-$VERSION.tar.gz
+
+	log "Redis configuration was applied successfully"
+	
+	# Create service user and configure for permissions
+	useradd -r -s /bin/false redis
+	chown redis:redis /var/run/redis.pid
+	chmod 755 /etc/init.d/redis-server
+	chmod 755 /etc/init.d/redis-sentinel
+
+	# Start the script automatically at boot time
+	update-rc.d redis-server defaults
+	
+	log "Redis service was created successfully"	
+}
+
+#############################################################################
+configure_redis_cluster()
+{
+	# Enable the AOF persistence
+	sed -i "s/^appendonly no$/appendonly yes/g" /etc/redis/redis.conf
+
+	# Tune the RDB persistence
+	sed -i "s/^save.*$/# save/g" /etc/redis/redis.conf
+	echo "save 3600 1" >> /etc/redis/redis.conf
+
+	# Add cluster configuration (expected to be commented out in the default configuration file)
+	echo "cluster-enabled yes" >> /etc/redis/redis.conf
+	echo "cluster-node-timeout 5000" >> /etc/redis/redis.conf
+	echo "cluster-config-file ${CLUSTER_NAME}.conf" >> /etc/redis/redis.conf
+}
+
+#############################################################################
+initialize_redis_cluster()
+{
+	# Cluster setup must run on the last node (a nasty workaround until ARM can recognize multiple custom script extensions)
+	if [ "$IS_LAST_NODE" -eq 1 ]; then
+		let REPLICA_COUNT=$SLAVE_NODE_COUNT/$MASTER_NODE_COUNT
+		sudo bash redis-cluster-setup.sh -c $INSTANCE_COUNT -s $REPLICA_COUNT -p $IP_PREFIX
+	fi
+}
+
+#############################################################################
+configure_redis_replication()
+{
+	log "Configuring master-slave replication"
+	
+	if [ "$NODE_INDEX" -lt "$MASTER_NODE_COUNT" ]; then
+		log "Redis node ${HOSTNAME} is considered a MASTER, no further configuration changes are required"
+	else
+		log "Redis node ${HOSTNAME} is considered a SLAVE, additional configuration changes will be made"
+		
+		let MASTER_NODE_INDEX=$NODE_INDEX%$MASTER_NODE_COUNT
+		MASTER_NODE_IP="${IP_PREFIX}${MASTER_NODE_INDEX}"
+		
+		echo "slaveof ${MASTER_NODE_IP} ${REDIS_PORT}" >> /etc/redis/redis.conf
+		log "Redis node ${HOSTNAME} is configured as a SLAVE of ${MASTER_NODE_IP}:${REDIS_PORT}"
+	fi
+}
+
+#############################################################################
+configure_sentinel()
+{
+	let MASTER_NODE_INDEX=$NODE_INDEX%$MASTER_NODE_COUNT
+	MASTER_NODE_IP="${IP_PREFIX}${MASTER_NODE_INDEX}"
+
+	# Patch the sentinel configuration file with a new master
+	sed -i "s/^sentinel monitor.*$/sentinel monitor mymaster ${MASTER_NODE_IP} ${REDIS_PORT} ${MASTER_NODE_COUNT}/g" /etc/redis/sentinel.conf
+
+	# Make a writable log file
+	touch /var/log/redis-sentinel.log
+	chown redis:redis /var/log/redis-sentinel.log
+	chmod u+w /var/log/redis-sentinel.log
+	
+	# Change owner for /etc/redis/ to allow sentinel change the configuration files
+	chown -R redis.redis /etc/redis/
+
+	# Start the script automatically at boot time
+	update-rc.d redis-sentinel defaults
+}
+
+#############################################################################
+start_redis()
+{
+	# Start the Redis daemon
+	/etc/init.d/redis-server start
+	log "Redis daemon was started successfully"
+}
+
+start_sentinel()
+{
+	# Start the Redis sentinel daemon
+	/etc/init.d/redis-sentinel start
+	log "Redis sentinel daemon was started successfully"
+}
+
+# Step1
+tune_system
+tune_memory
+tune_network
+
+# Step 2
+install_redis
+
+# Step 3
+configure_redis
+
+# Step 4
+if [ "$IS_CLUSTER_AWARE" -eq 1 ]; then
+	configure_redis_cluster
+else
+	configure_redis_replication
+	configure_sentinel
 fi
 
-# Parse script parameters
-while getopts :n:v:c:s:p:lh optname; do
-  log "Option $optname set with value ${OPTARG}"
-  
-  case $optname in
-    n)  # Cluster name
-		CLUSTER_NAME=${OPTARG}
-		;;
-    v)  # Version to be installed
-		VERSION=${OPTARG}
-		;;
-	c) # Number of instances
-		INSTANCE_COUNT=${OPTARG}
-		;;
-	s) # Number of slave nodes
-		SLAVE_COUNT=${OPTARG}
-		;;		
-	p) # Private IP address prefix
-		IP_PREFIX=${OPTARG}
-		;;			
-    l)  # Indicator of the last node
-		IS_LAST_NODE=1
-		;;		
-    h)  # Helpful hints
-		help
-		exit 2
-		;;
-    \?) #unrecognized option - show help
-		echo -e \\n"Option -${BOLD}$OPTARG${NORM} not allowed."
-		help
-		exit 2
-		;;
-  esac
-done
+# Step 5
+start_redis
 
-log "Installing Redis v${VERSION}... "
-
-# Installing build essentials (if missing) and other required tools
-apt-get -y update
-apt-get -y install build-essential
-apt-get -y install hugepages
-
-wget http://download.redis.io/releases/redis-$VERSION.tar.gz
-tar xzf redis-$VERSION.tar.gz
-cd redis-$VERSION
-make
-make install prefix=/usr/local/bin/
-
-log "Redis package v${VERSION} was downloaded and built locally"
-
-# Configure the general settings
-sed -i "s/^daemonize no$/daemonize yes/g" redis.conf
-sed -i 's/^logfile ""/logfile \/var\/log\/redis.log/g' redis.conf
-sed -i "s/^loglevel verbose$/loglevel notice/g" redis.conf
-sed -i "s/^dir \.\//dir \/var\/redis\//g" redis.conf 
-sed -i "s/\${REDISPORT}.conf/redis.conf/g" utils/redis_init_script 
-sed -i "s/_\${REDISPORT}.pid/.pid/g" utils/redis_init_script 
-
-# Enable the AOF persistence
-sed -i "s/^appendonly no$/appendonly yes/g" redis.conf
-
-# Tune the RDB persistence
-sed -i "s/^save.*$/# save/g" redis.conf
-echo "save 3600 1" >> redis.conf
-
-# Add cluster configuration (expected to be commented out in the default configuration file)
-echo "cluster-enabled yes" >> redis.conf
-echo "cluster-node-timeout 5000" >> redis.conf
-echo "cluster-config-file ${CLUSTER_NAME}.conf" >> redis.conf
-
-# Create all essentials directories and copy files to the correct locations
-mkdir /etc/redis
-mkdir /var/redis
-cp redis.conf /etc/redis/redis.conf
-cp utils/redis_init_script /etc/init.d/redis-server
-cp src/redis-trib.rb /usr/local/bin/
-
-# Clean up after the build
-cd ..
-rm redis-$VERSION -R
-rm redis-$VERSION.tar.gz
-
-log "Redis cluster configuration was applied successfully"
-
-# Create service user and configure for permissions
-useradd -r -s /bin/false redis
-chown redis:redis /var/run/redis.pid
-chmod 755 /etc/init.d/redis-server
-
-# Initialize and perform auto-start
-update-rc.d redis-server defaults
-log "Redis service was created successfully"
-
-# Apply memory-specific optimizations
-tuneMemory
-
-# Tune network settings for better performance
-tuneNetwork
-
-# Start the Redis service
-/etc/init.d/redis-server start
-log "Redis service was started successfully"
-
-# Cluster setup must run on the last node (a nasty workaround until ARM can recognize multiple CSEs)
-if [ "$IS_LAST_NODE" -eq 1 ]; then
-	sudo bash redis-cluster-setup.sh -c $INSTANCE_COUNT -s $SLAVE_COUNT -p $IP_PREFIX
+# Step 6
+if [ "$IS_CLUSTER_AWARE" -eq 1 ]; then
+	initialize_redis_cluster
+else	
+	start_sentinel
 fi
