@@ -3,37 +3,67 @@
     "contentVersion": "1.0.0.0",
     "parameters" : {
         "newStorageAccountName": {
-            "type": "string"
+            "type": "string",
+            "metadata" : {
+              "Description": "Storage Account Name"
+            }
         },
         "vmDnsName": {
                 "type": "string",
-                "defaultValue": "uniqueDNS"
+                "defaultValue": "uniqueDNS",
+                "metadata" : {
+                  "Description": "DNS Name"
+                }
         },
         "adminUserName": {
-            "type": "string"
+            "type": "string",
+            "metadata" : {
+              "Description": "Admin User Name"
+            }
         },
         "adminPassword": {
-            "type": "securestring"
+            "type": "securestring",
+            "metadata" : {
+              "Description": "Admin Password"
+            }
         },
         "chef_node_name": {
-            "type": "string"
+            "type": "string",
+            "metadata" : {
+              "Description": "Chef Node Name"
+            }
         },
         "chef_server_url": {
-            "type": "string"
+            "type": "string",
+            "metadata" : {
+              "Description": "Chef Server URL"
+            }
         },
         "validation_client_name": {
-            "type": "string"
+            "type": "string",
+            "metadata" : {
+              "Description": "Client Validator Name for Chef"
+            }
         },
         "runlist": {
             "type": "string",
-            "defaultValue": "recipe[getting-started]"
+            "defaultValue": "recipe[getting-started]",
+            "metadata" : {
+              "Description": "Optional Run List to Execute"
+            }
         },
         "autoUpdateClient": {
             "type": "string",
-            "defaultValue": "false"
+            "defaultValue": "false",
+            "metadata" : {
+              "Description": "Optional Flag for auto update"
+            }
         },
         "validation_key": {
-            "type":  "string"
+            "type":  "string",
+            "metadata" : {
+              "Description": "JSON Escaped Validation Key"
+            }
         }
 
     },
