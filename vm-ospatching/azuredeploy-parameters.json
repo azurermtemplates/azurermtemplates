@@ -31,8 +31,8 @@
     },
     "nicName" : {
       "value" : "myNic"
-    }
-    "rebootAfterPatch":{
+    },
+    "rebootAfterPatch" : {
       "value" : "Auto"
     },
     "dayOfWeek":{
