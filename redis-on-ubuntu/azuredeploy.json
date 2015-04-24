@@ -104,23 +104,26 @@
         "_comment0": "/* T-shirt sizes may vary for different reasons, and some customers may want to modify these - so feel free to go ahead and define your favorite t-shirts */",
         "tshirtSizeSmall": {
             "vmSizeMember": "Standard_A1",
-            "numberOfMembers": 2,
-            "totalMemberCount": 3,
+            "numberOfMasters": 3,
             "numberOfSlaves": 0,
+            "totalMemberCount": 3,
+            "totalMemberCountExcludingLast": 2,
             "vmTemplate": "[concat(variables('templateBaseUrl'), 'node-resources.json')]"
         },
         "tshirtSizeMedium": {
             "vmSizeMember": "Standard_A2",
-            "numberOfMembers": 5,
+            "numberOfMasters": 3,
+            "numberOfSlaves": 3,
             "totalMemberCount": 6,
-            "numberOfSlaves": 1,
+            "totalMemberCountExcludingLast": 5,
             "vmTemplate": "[concat(variables('templateBaseUrl'), 'node-resources.json')]"
         },
         "tshirtSizeLarge": {
             "vmSizeMember": "Standard_A5",
-            "numberOfMembers": 8,
+            "numberOfMasters": 3,
+            "numberOfSlaves": 6,
             "totalMemberCount": 9,
-            "numberOfSlaves": 2,
+            "totalMemberCountExcludingLast": 8,
             "arbiter": "Enabled",
             "vmTemplate": "[concat(variables('templateBaseUrl'), 'node-resources.json')]"
         },
@@ -158,11 +161,12 @@
             "osImageName": "[variables('sourceImageName')]"
         },
         "clusterSpec": "[variables(concat('tshirtSize', parameters('tshirtSize')))]",
-        "installCommand": "[concat('redis-cluster-install.sh -n ', parameters('redisClusterName'), ' -v ', parameters('redisVersion'), ' -c ', variables('clusterSpec').totalMemberCount, ' -s ', variables('clusterSpec').numberOfSlaves, ' -p ', variables('networkSettings').machineIpPrefix)]",
+        "installCommand": "[concat('redis-cluster-install.sh -n ', parameters('redisClusterName'), ' -v ', parameters('redisVersion'), ' -c ', variables('clusterSpec').totalMemberCount, ' -m ', variables('clusterSpec').numberOfMasters, ' -s ', variables('clusterSpec').numberOfSlaves, ' -p ', variables('networkSettings').machineIpPrefix)]",
         "vmScripts": {
             "scriptsToDownload": [
                 "[concat(variables('scriptUrl'), 'redis-cluster-install.sh')]",
-                "[concat(variables('scriptUrl'), 'redis-cluster-setup.sh')]"
+                "[concat(variables('scriptUrl'), 'redis-cluster-setup.sh')]",
+                "[concat(variables('scriptUrl'), 'redis-sentinel-startup.sh')]"
             ],
             "installCommand": "[concat('bash ', variables('installCommand'))]",
             "setupCommand": "[concat('bash ', variables('installCommand'), ' -l')]"
@@ -233,7 +237,7 @@
             ],
             "copy": {
                 "name": "memberNodesLoop",
-                "count": "[variables('clusterSpec').numberOfMembers]"
+                "count": "[variables('clusterSpec').totalMemberCountExcludingLast]"
             },
             "properties": {
                 "mode": "Incremental",
@@ -259,7 +263,7 @@
                             "vmSize": "[variables('clusterSpec').vmSizeMember]",
                             "machineIndex": "[copyindex()]",
                             "vmScripts": "[variables('vmScripts').scriptsToDownload]",
-                            "commandToExecute": "[variables('vmScripts').installCommand]"
+                            "commandToExecute": "[concat(variables('vmScripts').installCommand, ' -i ', copyindex())]"
                         }
                     },
                     "adminPassword": {
@@ -297,9 +301,9 @@
                             "machineNamePrefix": "[variables('machineSettings').machineNamePrefix]",
                             "osImageName": "[variables('machineSettings').osImageName]",
                             "vmSize": "[variables('clusterSpec').vmSizeMember]",
-                            "machineIndex": "[variables('clusterSpec').numberOfMembers]",
+                            "machineIndex": "[variables('clusterSpec').totalMemberCountExcludingLast]",
                             "vmScripts": "[variables('vmScripts').scriptsToDownload]",
-                            "commandToExecute": "[variables('vmScripts').setupCommand]"
+                            "commandToExecute": "[concat(variables('vmScripts').setupCommand, ' -i ', variables('clusterSpec').totalMemberCountExcludingLast)]"
                         }
                     },
                     "adminPassword": {

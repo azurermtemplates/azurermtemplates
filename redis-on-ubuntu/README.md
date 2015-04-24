@@ -44,8 +44,6 @@ In addition, some critical memory- and network-specific optimizations are applie
 NOTE: To access the individual Redis nodes, you need to enable and use the publicly accessible jumpbox VM and ssh from it into the Redis instances.
 
 ##Known Issues and Limitations
-- The deployment script is not yet idempotent and cannot handle updates (it currently works great for initial cluster provisioning only)
-- Health monitoring of the Redis instances is not currently enabled as this is not a mandatory requirement for the clustered setup
 - SSH key is not yet implemented and the template currently takes a password for the admin user
-- Redis version 3.0.0 or above is a requirement for the cluster (although the older versions can still be deployed without a clustered configuration)
+- Redis version 3.0.0 or above is a requirement for the cluster (although this template also supports Redis 2.x which will be deployed using a traditional master-slave replication)
 - A static IP address (starting with the prefix defined in the _nodeAddressPrefix_ parameter) will be assigned to each Redis node in order to work around the current limitation of not being able to dynamically compose a list of IP addresses from within the template (by default, the first node will be assigned the private IP of 10.0.0.10, the second node - 10.0.0.11, and so on)
