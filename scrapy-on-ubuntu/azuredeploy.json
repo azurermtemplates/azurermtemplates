@@ -83,6 +83,13 @@
             "metadata": {
               "Description": "Name of the spider"
             }
+        },
+        "spiderUri":{
+            "type" : "string",
+            "defaultValue": "https://raw.githubusercontent.com/bingosummer/azurermtemplates/master/scrapy-on-ubuntu/myspider.py",
+            "metadata": {
+              "Description": "Uri of the spider source"
+            }
         }
 
     },
@@ -222,9 +229,9 @@
                 "settings": {
                     "fileUris": [
                         "https://raw.githubusercontent.com/bingosummer/azurermtemplates/master/scrapy-on-ubuntu/scrapy-install-ubuntu.sh",
-                        "https://raw.githubusercontent.com/bingosummer/azurermtemplates/master/scrapy-on-ubuntu/myspider.py"
+                        "[parameters('spiderUri')]"
                     ],
-                    "commandToExecute": "[concat('sh scrapy-install-ubuntu.sh', parameters('spiderName'))]"
+                    "commandToExecute": "[concat('sh scrapy-install-ubuntu.sh ', parameters('spiderName'))]"
                 }
             }
         }

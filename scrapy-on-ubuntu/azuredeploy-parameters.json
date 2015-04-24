@@ -34,5 +34,8 @@
     },
     "spiderName" : {
       "value" : "myspider.py"
+    },
+    "spiderUri" : {
+      "value" : "https://raw.githubusercontent.com/bingosummer/azurermtemplates/master/scrapy-on-ubuntu/myspider.py"
     }
 }
