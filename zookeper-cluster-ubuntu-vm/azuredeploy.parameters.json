@@ -6,7 +6,7 @@
             "value": ""
         },
         "location": {
-            "value": "West US"
+            "value": ""
         },
         "publicIPAddressType": {
             "value": "Dynamic"
@@ -36,7 +36,7 @@
             "value": "zookeeper"
         },
         "customScriptFilePath": {
-            "value": ""
+            "value": "https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/zookeper-cluster-ubuntu-vm/zookeeper.sh"
         },
         "customScriptCommandToExecute": {
             "value": "sh zookeeper.sh "
