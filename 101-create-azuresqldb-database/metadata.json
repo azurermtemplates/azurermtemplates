@@ -1,0 +1,7 @@
+{
+  "itemDisplayName": "Create Azure SQL Database",
+  "description": "This template creates an Azure SQL Server, Database and Server Firewall",
+  "summary": "This template creates an Azure SQL Server, Database and Server Firewall",
+  "githubUsername": "TigerMint",
+  "dateUpdated": "2015-04-24"
+}
