@@ -6,7 +6,11 @@
             "type": "string",
             "defaultValue": "West US",
             "allowedValues": [
-                "West US"
+                "East US",
+                "West US",
+                "West Europe",
+                "Southeast Asia",
+                "East Asia"
             ]
         },
         "newStorageAccountName": {
@@ -47,7 +51,7 @@
         },
         "vmSourceImageName" :{
             "type" : "string",
-            "defaultValue" : "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201412.01-en.us-127GB.vhd"
+            "defaultValue" : "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201503.01-en.us-127GB.vhd"
         },
         "virtualNetworkName" :{
             "type" : "string",
@@ -59,8 +63,8 @@
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "scriptUrl" : "https://iaasscripts.blob.core.windows.net/scripts/InstallApplication.ps1",
 	      "scriptName" : "InstallApplication.ps1",
+        "customScriptExtensionVersion" : "1.4",
 	      "scriptArg" : "[parameters('applicationToInstall')]",
-        "customScriptExtensionVersion" : "1.2",
         "publicIPAddressName" : "[concat(parameters('uniqueDNSNameBase'),'pubIP')]",
         "publicIPAddressType" : "Dynamic",
         "vmStorageAccountContainerName" : "vhds",

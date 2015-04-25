@@ -1,9 +1,9 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/VNET.json",
     "contentVersion": "1.0.0.0",
-    "parameters": 
+    "parameters":
     {
-        "location": 
+        "location":
         {
             "type": "String",
             "defaultValue": "West US",
@@ -11,22 +11,22 @@
                 "Description": "This is the region where the resources will be created"
                  }
         },
-        "virtualNetworkName": 
-        { 
+        "virtualNetworkName":
+        {
             "type": "string",
             "defaultValue": "First_ARM_VNet",
             "metadata": {
                 "Description": "This is your Virtual Network"
                  }
-        }, 
-        "addressPrefix": 
-        { 
+        },
+        "addressPrefix":
+        {
             "type": "string",
             "defaultValue": "10.0.0.0/16",
             "metadata": {
                 "Description": "The CIDR address space for your Virtual Network in Azure"
                  }
-        }, 
+        },
         "FESubnetName": {
             "type": "string",
             "defaultValue": "FESubnet",
@@ -34,13 +34,13 @@
                 "Description": "This will be the name of your Front End Subnet. The DMZ Subnet."
                  }
         },
-        "FESubnetPrefix": { 
+        "FESubnetPrefix": {
             "type": "string",
             "defaultValue": "10.0.0.0/24",
             "metadata": {
                 "Description": "This is CIDR prefix for the FrontEnd Subnet"
                  }
-        }, 
+        },
         "AppSubnetName": {
             "type": "string",
             "defaultValue": "AppSubnet",
@@ -48,13 +48,13 @@
                 "Description": "This will be the name of your Application Subnet"
                  }
         },
-        "AppSubnetPrefix": { 
+        "AppSubnetPrefix": {
             "type": "string",
             "defaultValue": "10.0.1.0/24" ,
             "metadata": {
                 "Description": "This is CIDR prefix for the Application Subnet"
                  }
-        }, 
+        },
         "DBSubnetName": {
             "type": "string",
             "defaultValue": "DBSubnet",
@@ -62,14 +62,14 @@
                 "Description": "This is the name of the Database Subnet"
                  }
         },
-        "DBSubnetPrefix": { 
+        "DBSubnetPrefix": {
             "type": "string",
             "defaultValue": "10.0.2.0/24",
             "metadata": {
                 "Description": "This is CIDR prefix for the Database Subnet"
                  }
-        }, 
-        "FENSGName": { 
+        },
+        "FENSGName": {
             "type": "string",
             "defaultValue": "FE_NSG",
             "metadata": {
@@ -91,21 +91,21 @@
                  }
         }
    },
-     
-    "resources": 
+
+    "resources":
     [
         {
-        "apiVersion": "2014-12-01-preview",
+        "apiVersion": "2015-05-01-preview",
         "type": "Microsoft.Network/networkSecurityGroups",
         "name": "[parameters('FENSGName')]",
         "location": "[parameters('location')]",
 
-        "properties": 
+        "properties":
         {
             "securityRules": [
             {
                 "name": "rdp_rule",
-                "properties": 
+                "properties":
                 {
                     "description": "Allow RDP",
                     "protocol": "Tcp",
@@ -134,9 +134,9 @@
             }
             ]
         }
-    }, 
+    },
     {
-        "apiVersion": "2014-12-01-preview",
+        "apiVersion": "2015-05-01-preview",
         "type": "Microsoft.Network/networkSecurityGroups",
         "name": "[parameters('AppNSGName')]",
         "location": "[parameters('location')]",
@@ -187,7 +187,7 @@
         }
     },
     {
-        "apiVersion": "2014-12-01-preview",
+        "apiVersion": "2015-05-01-preview",
         "type": "Microsoft.Network/networkSecurityGroups",
         "name": "[parameters('DBNSGName')]",
         "location": "[parameters('location')]",
@@ -252,7 +252,7 @@
         }
     },
     {
-        "apiVersion": "2014-12-01-preview",
+        "apiVersion": "2015-05-01-preview",
         "type": "Microsoft.Network/virtualNetworks",
         "name": "[parameters('virtualNetworkName')]",
         "location": "[parameters('location')]",
@@ -267,7 +267,7 @@
                     "[parameters('addressPrefix')]"
                 ]
             },
-            "subnets": 
+            "subnets":
             [{
                 "name": "[parameters('FESubnetName')]",
                 "properties": {
@@ -282,7 +282,7 @@
                 "properties": {
                     "addressPrefix": "[parameters('AppSubnetPrefix')]",
                  "networkSecurityGroup" : {
-                      "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('AppNSGName'))]"   
+                      "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('AppNSGName'))]"
                 }
                 }
             },
