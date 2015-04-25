@@ -4,31 +4,52 @@
     "parameters": {
         "location": {
             "type": "string",
-            "defaultValue": "East US"
+            "defaultValue": "East US",
+            "metadata": {
+                "Description": "Location to deploy to"
+            }
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "myVNET"
+            "defaultValue": "myVNET",
+            "metadata": {
+                "Description": "VNET name"
+            }
         },
         "addressPrefix": {
             "type": "string",
-            "defaultValue": "10.0.0.0/16"
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+                "Description": "address prefix"
+            }
         },
         "subnetName": {
             "type": "string",
-            "defaultValue": "Subnet-1"
+            "defaultValue": "Subnet-1",
+            "metadata": {
+                "Description": "Subnet Name"
+            }
         },
         "subnetPrefix": {
             "type": "string",
-            "defaultValue": "10.0.0.0/24"
+            "defaultValue": "10.0.0.0/24",
+            "metadata": {
+                "Description": "Subnet prefix"
+            }
         },
         "loadBalancerName": {
             "type": "string",
-            "defaultValue": "myLoadBalancer"
+            "defaultValue": "myLoadBalancer",
+            "metadata": {
+                "Description": "Loadbalancer Name"
+            }
         },
         "nicName": {
             "type": "string",
-            "defaultValue": "myNic"
+            "defaultValue": "myNic",
+            "metadata": {
+                "Description": "NIC name"
+            }
         }
     },
     "variables": {
