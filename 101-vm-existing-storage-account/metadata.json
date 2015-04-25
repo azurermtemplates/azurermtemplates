@@ -1,0 +1,7 @@
+{
+  "itemDisplayName": "Deploy a VM to a Storage Account in any Resource Group",
+  "description": "This template allows you to create a Virtual Machine with an existing Storage Account from any Resource Group.",
+  "summary": "Create a VM with an existing Storage Account",
+  "githubUsername": "karthmut",
+  "dateUpdated": "2015-04-10"
+}

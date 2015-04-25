@@ -1,0 +1,186 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters" : {
+        "StorageAccountName": {
+            "type": "string",
+            "metadata": { 
+                "Description": "The name of an existing storage account from any resource group"
+            } 
+        },
+        "dnsNameForPublicIP" : {
+            "type" : "string",
+            "metadata": { 
+                "Description": "A unique DNS name"
+            }
+        },
+        "adminUserName": {
+            "type": "string",
+            "metadata": { 
+                "Description": "VM admin username"
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": { 
+                "Description": "VM admin password"
+            }
+        },
+        "vmSourceImageName": {
+            "type": "string",
+            "defaultValue": "b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB",
+            "metadata": { 
+                "Description": "Name of the image to be used to create the V"
+            }
+        },
+        "location": {
+            "type": "String",
+            "defaultValue" : "West US",
+            "metadata": { 
+                "Description": "Location of the resources being created"
+            }
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_A0",
+            "metadata": { 
+                "Description": "The size of the VM being created"
+            }
+        },
+        "publicIPAddressName": {
+            "type": "string",
+            "metadata": { 
+                "Description": "The name of the public IP"
+            }
+        },
+        "vmName": {
+            "type": "string",
+            "metadata": { 
+                "Description": "The name of the VM"
+            }
+        },
+        "virtualNetworkName":{
+            "type" : "string",
+            "metadata": { 
+                "Description": "The name of the virtual network being created"
+            }
+        },
+        "nicName":{
+            "type" : "string",
+            "metadata": { 
+                "Description": "The Network Interface Name"
+            }
+        }
+    },
+    "variables": {
+        "addressPrefix":"10.0.0.0/16",
+        "subnet1Name": "Subnet-1",
+        "subnet2Name": "Subnet-2",
+        "subnet1Prefix" : "10.0.0.0/24",
+        "subnet2Prefix" : "10.0.1.0/24",
+        "vmStorageAccountContainerName": "vhds",
+        "publicIPAddressType" : "Dynamic",
+        "sourceImageName" : "[concat('/', subscription().subscriptionId, '/services/images/',parameters('vmSourceImageName'))]",
+        "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+        "subnet1Ref" : "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]"
+    },
+    "resources": [
+    {
+        "apiVersion": "2014-12-01-preview",
+        "type": "Microsoft.Network/publicIPAddresses",
+        "name": "[parameters('publicIPAddressName')]",
+        "location": "[parameters('location')]",
+        "properties": {
+            "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+            "dnsSettings": {
+                "domainNameLabel": "[parameters('dnsNameForPublicIP')]"
+            }
+        }
+    },
+    {
+      "apiVersion": "2014-12-01-preview",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('virtualNetworkName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('addressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('subnet1Name')]",
+            "properties" : {
+                "addressPrefix": "[variables('subnet1Prefix')]"
+            }
+          },
+          {
+            "name": "[variables('subnet2Name')]",
+            "properties" : {
+                "addressPrefix": "[variables('subnet2Prefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+        "apiVersion": "2014-12-01-preview",
+        "type": "Microsoft.Network/networkInterfaces",
+        "name": "[parameters('nicName')]",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+            "[concat('Microsoft.Network/publicIPAddresses/', parameters('publicIPAddressName'))]",
+            "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+        ],
+        "properties": {
+            "ipConfigurations": [
+            {
+                "name": "ipconfig1",
+                "properties": {
+                    "privateIPAllocationMethod": "Dynamic",
+                    "publicIPAddress": {
+                        "id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName'))]"
+                    },
+                    "subnet": {
+                        "id": "[variables('subnet1Ref')]"
+                    }
+                }
+            }
+            ]
+        }
+    },
+    {
+        "apiVersion": "2014-12-01-preview",
+        "type": "Microsoft.Compute/virtualMachines",
+        "name": "[parameters('vmName')]",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+            "[concat('Microsoft.Network/networkInterfaces/', parameters('nicName'))]"
+        ],
+        "properties": {
+            "hardwareProfile": {
+                "vmSize": "[parameters('vmSize')]"
+            },
+            "osProfile": {
+                "computername": "[parameters('vmName')]",
+                "adminUsername": "[parameters('adminUsername')]",
+                "adminPassword": "[parameters('adminPassword')]"
+            },
+            "storageProfile": {
+                "sourceImage": {
+                    "id": "[variables('sourceImageName')]"
+                },
+                "destinationVhdsContainer" : "[concat('http://',parameters('StorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
+            },
+            "networkProfile": {
+                "networkInterfaces" : [
+                {
+                    "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('nicName'))]"
+                }
+                ]
+            }
+        }
+    }
+    ]
+}
