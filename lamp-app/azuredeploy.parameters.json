@@ -9,13 +9,13 @@
             "value": "West US"
         },
         "adminUsername": {
-            "value": "user"
+            "value": ""
         },
         "adminPassword": {
-            "value": "userPassword"
+            "value": ""
         },
         "mySqlPassword": {
-            "value": "mySqlPassword"
+            "value": ""
         },
         "vmDnsName": {
             "value": "uniqueDomain"
