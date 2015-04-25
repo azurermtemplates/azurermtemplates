@@ -1,5 +1,5 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2015-05-01-preview/deploymentTemplate.json",
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01-preview/deploymentTemplate.json",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
@@ -40,7 +40,7 @@
         "backEndIPConfigID": "[concat(variables('nicId'),'/ipConfigurations/ipconfig1')]"
     },
     "resources": [{
-        "apiVersion": "2014-12-01-preview",
+        "apiVersion": "2015-05-01-preview",
         "type": "Microsoft.Network/virtualNetworks",
         "name": "[parameters('virtualNetworkName')]",
         "location": "[parameters('location')]",
@@ -58,7 +58,7 @@
             }]
         }
     }, {
-        "apiVersion": "2014-12-01-preview",
+        "apiVersion": "2015-05-01-preview",
         "type": "Microsoft.Network/networkInterfaces",
         "name": "[parameters('nicName')]",
         "location": "[parameters('location')]",
@@ -80,7 +80,7 @@
             }]
         }
     }, {
-        "apiVersion": "2014-12-01-preview",
+        "apiVersion": "2015-05-01-preview",
         "name": "[parameters('loadBalancerName')]",
         "type": "Microsoft.Network/loadBalancers",
         "location": "[parameters('location')]",
