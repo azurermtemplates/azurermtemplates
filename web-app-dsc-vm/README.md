@@ -4,8 +4,7 @@
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
-This template allows you to deploy a Web application a VM. It also configures the Web Applicatino to set the SQL Azure database server.
-Please make sure you have your DSC powershell script published to an Azure storage using Publish-AzureVMDscConfiguration -ConfigurationPath '..\ConfigureWebServer.ps1' -Force
-In addition, please upload your WebApplication.zip webdeploy package to a shared location. 
-Will update the script to automate the entire process
+This template allows you to deploy a Web application a VM. It also configures the Web Application to set the SQL Azure database server.
 
+Pre-requisite for running the PowerShell script:
+1. Set a current storage account for your Azure subscription. The DSC module will be created and uploaded to your current storage account 2. Upload your Web Deploy Package somewhere. In the example I have uploaded it to GitHub
