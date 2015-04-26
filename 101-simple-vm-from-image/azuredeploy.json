@@ -3,12 +3,10 @@
     "contentVersion": "1.0.0.0",
     "parameters" : {
         "newStorageAccountName": {
-            "type": "string",
-            "defaultValue" : "uniqueStorageAccountName"
+            "type": "string"
         },
         "dnsNameForPublicIP" : {
-            "type" : "string",
-            "defaultValue": "uniqueDnsNameForPublicIP"
+            "type" : "string"
         },
         "adminUserName": {
             "type": "string"
@@ -46,8 +44,7 @@
             "defaultValue": "Standard_A0"
         },
         "publicIPAddressName": {
-            "type": "string",
-            "defaultValue" : "myPublicIP"
+            "type": "string"
         },
         "vmName": {
             "type": "string",
