@@ -7,7 +7,7 @@
 
 This advanced template creates a Multi VM Couchbase Cluster,it also configures Ansible so you can easily manage all the VMS. 
 
-This template  deploys  N number of Storage Accounts, a Virtual Network, an Availability Sets (up to 3 Fault Domains and up to 20 Update Domains), one private NIC per VM, one public IP ,a Load Balancer.You can specify SSH keys to access your Ansible Controller remotely from your latop. Minimun recommded VM Size is Standard_D2 and by default 4 data disks will be attaached to the VM.
+This template  creates a new Storage Account, a Virtual Network, an Availability Sets (up to 3 Fault Domains and up to 20 Update Domains), one private NIC per VM, one public IP ,a Load Balancer.You can specify SSH keys to access your Ansible Controller remotely from your latop. Minimun recommded VM Size is Standard_D2 and by default 4 data disks will be attaached to the VM.
 You will need an additional certificate / public key for the Ansible configuration and before executing the template you have to upload them to a Private azure storage account.  
 
 The template uses two Custom Scripts  :

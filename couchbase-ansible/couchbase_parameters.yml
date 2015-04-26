@@ -39,6 +39,13 @@ couchbase_server_log_path: "/opt/couchbase/couchbase/var/lib/couchbase/logs"
 couchbase_server_data_path: "{{ mount_point }}/couchbase/data"
 couchbase_server_index_path: "{{ mount_point }}/couchbase/index"
 
+# Default bucket
+couchbase_server_bucket_name: default
+couchbase_server_bucket_type: couchbase
+couchbase_server_bucket_ram: 256
+couchbase_server_bucket_port: 11211
+couchbase_server_bucket_replica: 1
+
 
 # NOT NEEDED : only needed if couchbase_server_tune_disks
 couchbase_server_mount_options: "noatime,barrier=0,errors=remount-ro"
