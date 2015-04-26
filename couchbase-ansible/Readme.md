@@ -35,7 +35,7 @@ Below are the parameters that the template expects
 |:--- |:---|
 | location  | Region where you want to create all the resources |
 | storageAccountName  | Name of the storage account , the template will also append the name of the resource group |
-| storageAccountType  | Standard_LRS or Premium_LRS |
+| storageAccountType  | Standard_LRS or Premium_LRS  (* For future versions) |
 | vmNumberOfDataDisks | Number of Data Disk (* For future versions, today a fixed number of 4 disks will be created) |
 | vmSizeDataDisks  | Size of Data disks : By default 4 data disks will be created |
 | vmFileSystem | ext4 or xfs (* For future versions) |
