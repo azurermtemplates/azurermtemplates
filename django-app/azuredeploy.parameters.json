@@ -3,19 +3,19 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "newStorageAccountName": {
-            "value": "madhanstorage123"
+            "value": "uniquestorageaccountname"
         },
         "location": {
             "value": "West US"
         },
         "adminUsername": {
-            "value": "azureuser"
+            "value": "username"
         },
         "adminPassword": {
-            "value": "Azure12*"
+            "value": "strongpassword"
         },
         "vmDnsName": {
-            "value": "madhandjangoapplication1"
+            "value": "uniquednsname"
         }
     }
 }
