@@ -120,27 +120,49 @@
                 "Description": "Storage account type"
             }
         },
-        "vmStorageAccountContainerName": {
+        "headNodeImagePublisher": {
             "type": "string",
-            "defaultValue": "vhds",
+            "defaultValue": "MicrosoftWindowsServerHPCPack",
             "metadata": {
-                "Description": "Name of storage container to store VM vhd"
+                 "Description": "Head Node Image Publisher"
             }
         },
-        "headNodeSourceImage": {
+        "headNodeImageOffer": {
             "type": "string",
-            "defaultValue": "96316178b0644ae08bc4e037635ce104__HPC-Pack-2012R2-Update1-4.3.4660.0-WS2012R2-ENU",
+            "defaultValue": "WindowsServerHPCPack",
             "metadata": {
-                "Description": "HPC Cluster image name, default is HPC Pack 2012 R2 Update 1 (4.3.4660)"
+                "Description": "Head Node Image Offer"
             }
         },
-        "computeNodeSourceImage": {
+        "headNodeImageSKU": {
             "type": "string",
-            "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201503.01-en.us-127GB.vhd",
+            "defaultValue": "2012R2",
             "metadata": {
-                "Description": "HPC Compute Node base image"
+                "Description": "Head Node Image SKU"
             }
         },
+        "computeNodeImagePublisher": {
+            "type": "string",
+            "defaultValue": "MicrosoftWindowsServer",
+            "metadata": {
+                 "Description": "Compute Node Image Publisher"
+            }
+        },
+        "computeNodeImageOffer": {
+            "type": "string",
+            "defaultValue": "WindowsServer",
+            "metadata": {
+                "Description": "Compute Node Image Offer"
+            }
+        },
+        "computeNodeImageSKU": {
+            "type": "string",
+            "defaultValue": "2012-R2-Datacenter",
+            "metadata": {
+                "Description": "Compute Node Image SKU"
+            }
+        },
+
         "adminUsername": {
             "type": "string",
             "defaultValue": "azureuser",
@@ -159,8 +181,6 @@
 
     "variables": {
         "storageAccountName": "[concat(parameters('namePrefix'), 'sa')]",
-        "HNsourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('headNodeSourceImage'))]",
-        "CNsourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('computeNodeSourceImage'))]",
         "virtualNetworkName": "[concat(parameters('namePrefix'), 'VNet')]",
         "addressPrefix": "10.0.0.0/16",
         "subnet1Name": "Subnet-1",
@@ -187,7 +207,7 @@
         {
             "type": "Microsoft.Storage/storageAccounts",
             "name": "[variables('storageAccountName')]",
-            "apiVersion": "2014-12-01-preview",
+            "apiVersion": "2015-05-01-preview",
             "location": "[parameters('location')]",
             "properties": {
                 "accountType": "[parameters('storageAccountType')]"
@@ -195,7 +215,7 @@
         },
 
         {
-            "apiVersion": "2014-12-01-preview",
+            "apiVersion": "2015-05-01-preview",
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[variables('virtualNetworkName')]",
             "location": "[parameters('location')]",
@@ -220,7 +240,7 @@
         },
 
         {
-            "apiVersion": "2014-12-01-preview",
+            "apiVersion": "2015-05-01-preview",
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "[variables('publicIPAddressNameHN')]",
             "location": "[parameters('location')]",
@@ -233,7 +253,7 @@
         },
 
         {
-            "apiVersion": "2014-12-01-preview",
+            "apiVersion": "2015-05-01-preview",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[variables('nicNameHN')]",
             "location": "[parameters('location')]",
@@ -259,7 +279,7 @@
             }
         },
         {
-            "apiVersion": "2014-12-01-preview",
+            "apiVersion": "2015-05-01-preview",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[variables('vmNameHN')]",
             "location": "[parameters('location')]",
@@ -274,17 +294,25 @@
                 "osProfile": {
                     "computername": "[variables('vmNameHN')]",
                     "adminUsername": "[parameters('adminUsername')]",
-                    "adminPassword": "[parameters('adminPassword')]",
-                    "windowsProfile": {
-                        "provisionVMAgent": "true"
-                    }
+                    "adminPassword": "[parameters('adminPassword')]"
                 },
                 "storageProfile": {
-                    "sourceImage": {
-                        "id": "[variables('HNsourceImageName')]"
-                    },
-                    "destinationVhdsContainer": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/')]"
+                  "imageReference": {
+                      "publisher": "[parameters('headNodeImagePublisher')]",
+                      "offer": "[parameters('headNodeImageOffer')]",
+                      "sku" : "[parameters('headNodeImageSKU')]",
+                      "version":"latest"
+                  },
+                  "osDisk" : {
+                      "name": "osdisk",
+                      "vhd": {
+                         "uri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/headnode/','osdisk.vhd')]"
+                      },
+                      "caching": "ReadWrite",
+                      "createOption": "FromImage"
+                  }
                 },
+
                 "networkProfile": {
                     "networkInterfaces": [
                         {
@@ -297,7 +325,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "name": "[concat(variables('vmNameHN'),'/', variables('vmExtensionName'))]",
-            "apiVersion": "2014-12-01-preview",
+            "apiVersion": "2015-05-01-preview",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', variables('vmNameHN'))]"
@@ -317,7 +345,7 @@
             }
         },
         {
-            "apiVersion": "2014-12-01-preview",
+            "apiVersion": "2015-05-01-preview",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[concat(variables('nicName'), copyIndex())]",
             "location": "[parameters('location')]",
@@ -343,7 +371,7 @@
             }
         },
         {
-            "apiVersion": "2014-12-01-preview",
+            "apiVersion": "2015-05-01-preview",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[concat(parameters('computeNamePrefix'), copyIndex())]",
             "location": "[parameters('location')]",
@@ -362,16 +390,23 @@
                 "osProfile": {
                     "computername": "[concat(parameters('computeNamePrefix'), copyIndex())]",
                     "adminUsername": "[parameters('adminUsername')]",
-                    "adminPassword": "[parameters('adminPassword')]",
-                    "windowsProfile": {
-                        "provisionVMAgent": "true"
-                    }
+                    "adminPassword": "[parameters('adminPassword')]"
                 },
                 "storageProfile": {
-                    "sourceImage": {
-                        "id": "[variables('CNsourceImageName')]"
-                    },
-                    "destinationVhdsContainer": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/')]"
+                  "imageReference": {
+                      "publisher": "[parameters('computeNodeImagePublisher')]",
+                      "offer": "[parameters('computeNodeImageOffer')]",
+                      "sku" : "[parameters('computeNodeImageSKU')]",
+                      "version":"latest"
+                  },
+                  "osDisk" : {
+                      "name": "osdisk",
+                      "vhd": {
+                         "uri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/vhds',copyIndex(),'/','osdisk.vhd')]"
+                      },
+                      "caching": "ReadWrite",
+                      "createOption": "FromImage"
+                  }
                 },
                 "networkProfile": {
                     "networkInterfaces": [
@@ -385,7 +420,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "name": "[concat(concat(parameters('computeNamePrefix'), copyIndex()),'/', variables('vmExtensionName'))]",
-            "apiVersion": "2014-12-01-preview",
+            "apiVersion": "2015-05-01-preview",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Compute/virtualMachines/', parameters('computeNamePrefix'), copyIndex())]"
