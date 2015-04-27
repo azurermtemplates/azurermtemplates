@@ -4,31 +4,52 @@
     "parameters": {
         "dnsNameForPublicIP": {
             "type": "string",
-            "defaultValue": "uniqueDNSNameForPublicIP"
+            "defaultValue": "uniqueDNSNameForPublicIP",
+            "metadata" : {
+              "Description" : "Unique DNS name for Public IP"
+            }
         },
         "location": {
             "type": "string",
-            "defaultValue": "West US"
+            "allowedValues": ["East US", "West US", "West Europe", "East Asia", "South East Asia"],
+            "metadata" : {
+              "Description" : "Location of deployment"
+            }
         },
         "virtualNetworkName" :{
             "type" : "string",
-            "defaultValue" : "myVNET"
+            "defaultValue" : "myVNET",
+            "metadata" : {
+              "Description" : "VNET name"
+            }
         },
         "publicIPAddressName" : {
             "type" : "string",
-            "defaultValue" : "myPublicIP"
+            "defaultValue" : "myPublicIP",
+            "metadata" : {
+              "Description" : "public IP name"
+            }
         },
         "addressPrefix": {
             "type": "string",
-            "defaultValue": "10.0.0.0/16"
+            "defaultValue": "10.0.0.0/16",
+            "metadata" : {
+              "Description" : "Address Prefix"
+            }
         },
         "subnetName": {
             "type": "string",
-            "defaultValue": "Subnet-1"
+            "defaultValue": "Subnet-1",
+            "metadata" : {
+              "Description" : "Subnet-1 Name"
+            }
         },
         "subnetPrefix": {
             "type": "string",
-            "defaultValue": "10.0.0.0/24"
+            "defaultValue": "10.0.0.0/24",
+            "metadata" : {
+              "Description" : "Subnet prefix"
+            }
         },
         "publicIPAddressType": {
             "type": "string",
@@ -36,11 +57,17 @@
             "allowedValues": [
                 "Dynamic",
                 "Static"
-            ]
+            ],
+            "metadata" : {
+              "Description" : "Type of public IP address"
+            }
         },
         "nicName":{
             "type" : "string",
-            "defaultValue" : "myNic"
+            "defaultValue" : "myNic",
+            "metadata" : {
+              "Description" : "Name of NIC"
+            }
         }
         },
     "variables" : {

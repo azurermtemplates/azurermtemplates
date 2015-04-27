@@ -3,7 +3,7 @@
         "value" : "West US"
     },
     "dnsNameforLBIP": {
-        "value": "cloudguylbtest1"
+        "value": ""
     },
     "publicIPAddressName": {
         "value": "cloudguyIP"
