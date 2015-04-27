@@ -4,31 +4,53 @@
     "parameters": {
         "dnsNameforLBIP": {
             "type": "string",
-            "defaultValue": "uniqueDNSName"
+            "defaultValue": "uniqueDNSName",
+            "metadata" : {
+                "description" : "Unique DNS name"
+            }
         },
         "location": {
             "type": "string",
-            "defaultValue": "East US"
+            "allowedValues": ["East US", "West US", "West Europe", "East Asia", "South East Asia"],
+            "metadata" : {
+                "description" : "Location to deploy"
+            }
+
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "myVNET"
+            "defaultValue": "myVNET",
+            "metadata" : {
+                "description" : "VNET Name"
+            }
         },
         "publicIPAddressName": {
             "type": "string",
-            "defaultValue": "myPublicIP"
+            "defaultValue": "myPublicIP",
+            "metadata" : {
+                "description" : "Public IP Name"
+            }
         },
         "addressPrefix": {
             "type": "string",
-            "defaultValue": "10.0.0.0/16"
+            "defaultValue": "10.0.0.0/16",
+            "metadata" : {
+                "description" : "Address Prefix"
+            }
         },
         "subnetName": {
             "type": "string",
-            "defaultValue": "Subnet-1"
+            "defaultValue": "Subnet-1",
+            "metadata" : {
+                "description" : "Subnet Name"
+            }
         },
         "subnetPrefix": {
             "type": "string",
-            "defaultValue": "10.0.0.0/24"
+            "defaultValue": "10.0.0.0/24",
+            "metadata" : {
+                "description" : "Subnet Prefix"
+            }
         },
         "publicIPAddressType": {
             "type": "string",
@@ -36,15 +58,24 @@
             "allowedValues": [
                 "Dynamic",
                 "Static"
-            ]
+            ],
+            "metadata" : {
+                "description" : "Public IP type"
+            }
         },
         "loadBalancerName": {
             "type": "string",
-            "defaultValue": "myLoadBalancer"
+            "defaultValue": "myLoadBalancer",
+            "metadata" : {
+                "description" : "Loadbalancer Name"
+            }
         },
         "nicName": {
             "type": "string",
-            "defaultValue": "myNic"
+            "defaultValue": "myNic",
+            "metadata" : {
+                "description" : "NIC name"
+            }
         }
     },
     "variables": {

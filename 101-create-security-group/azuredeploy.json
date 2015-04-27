@@ -4,35 +4,59 @@
     "parameters": {
         "location": {
             "type": "String",
-            "defaultValue": "West US"
+            "allowedValues": ["East US", "West US", "West Europe", "East Asia", "South East Asia"],
+            "metadata" : {
+                "description" : "Location to deploy"
+            }
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "myVNET"
+            "defaultValue": "myVNET",
+            "metadata" : {
+                "description" : "Name of VNET"
+            }
         },
         "addressPrefix": {
             "type": "string",
-            "defaultValue": "10.0.0.0/16"
+            "defaultValue": "10.0.0.0/16",
+            "metadata" : {
+                "description" : "Address prefix"
+            }
         },
         "subnet1Name": {
             "type": "string",
-            "defaultValue": "Subnet-1"
+            "defaultValue": "Subnet-1",
+            "metadata" : {
+                "description" : "Name of Subnet-1"
+            }
         },
         "subnet2Name": {
             "type": "string",
-            "defaultValue": "Subnet-2"
+            "defaultValue": "Subnet-2",
+            "metadata" : {
+                "description" : "Name of Subnet-2"
+            }
         },
         "subnet1Prefix": {
             "type": "string",
-            "defaultValue": "10.0.0.0/24"
+            "defaultValue": "10.0.0.0/24",
+            "metadata" : {
+                "description" : "Subnet-1 Prefix"
+            }
         },
         "subnet2Prefix": {
             "type": "string",
-            "defaultValue": "10.0.1.0/24"
+            "defaultValue": "10.0.1.0/24",
+            "metadata" : {
+                "description" : "Subnet-2 Prefix"
+            }
         },
         "networkSecurityGroupName": {
             "type": "string",
-            "defaultValue": "myVNET"
+            "defaultValue": "myVNET",
+            "metadata" : {
+                "description" : "Name of network security group"
+            }
         },
     },
     "resources": [{
