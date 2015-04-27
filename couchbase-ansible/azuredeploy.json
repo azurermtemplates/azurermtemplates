@@ -104,7 +104,8 @@
 				"Standard_D11",
 				"Standard_D12",
 				"Standard_D13",
-				"Standard_D14"
+				"Standard_D14",
+				"Standard_DS2",
 			],
 			"metadata": {
 				"Description": "VM Size"
@@ -127,8 +128,7 @@
 			"type": "string",
 			"defaultValue": "5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-65-20150325",
 			"allowedValues": [
-				"5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-65-20150325",
-				"5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-66-20150128",
+				"5112500ae3b842c8b9c604889f8753c3__OpenLogic-CentOS-65-20150325",				
 				"b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-12_04_5_LTS-amd64-server-20150309-en-us-30GB",
 				"b39f27a8b8c64d52b05eac6a62ebad85__Ubuntu-14_04_2_LTS-amd64-server-20150309-en-us-30GB"
 				],
@@ -151,7 +151,7 @@
 			}
 		},
 		"adminPassword": {
-			"type": "string",
+			"type": "securestring",
 			"metadata": {
 				"Description": "Admin password"
 			}
@@ -239,7 +239,7 @@
 			}
 		},
 		"couchbaseAdminPassword":{
-			"type": "string",			
+			"type": "securestring",			
 			"metadata": {
 				"Description": "Specify the Couchbase Admin Password"
 			}
@@ -404,7 +404,7 @@
 		"lbBEConfigRef": "[concat(variables('loadBalancerRef'),'/backendAddressPools/' ,variables('lbBEConfig'))]",
 				
 
-		"storageAccountName": "[concat(resourceGroup().name,parameters('storageAccountName'))]",
+		"storageAccountName": "[concat(resourceGroup().name,parameters('storageAccountName'),'0')]",
 		"storageRef": "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]"
 	},
 
@@ -522,13 +522,9 @@
 
 		{
 			"type": "Microsoft.Storage/storageAccounts",
-			"name": "[concat(variables('storageAccountName'),copyIndex())]",
+			"name": "[variables('storageAccountName')]",
 			"apiVersion": "2014-12-01-preview",
-			"location": "[parameters('location')]",
-			"copy": {
-				"name": "StorageAccountsLoop",
-				"count": "[parameters('numberOfVms')]"
-			},
+			"location": "[parameters('location')]",			
 			"properties": {
 				"accountType": "[parameters('storageAccountType')]"
 			}
@@ -584,7 +580,7 @@
 				"count": "[parameters('numberOfVms')]"
 			},
 			"dependsOn": [
-				"[concat(variables('storageRef'),copyIndex())]",
+				"[variables('storageRef')]",
 				"[concat(variables('NICRef'),copyIndex())]",
 				"[concat('Microsoft.Compute/availabilitySets/', parameters('availabilitySetName'))]",
 			],
@@ -615,14 +611,14 @@
 					"sourceImage": {
 						"id": "[variables('vmSourceImageRef')]"
 					},
-					"destinationVhdsContainer": "[concat('http://',variables('storageAccountName'),copyIndex(),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/')]",
+					"destinationVhdsContainer": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/')]",
 					"dataDisks": [
 						{
 							"name": "[concat(parameters('vmName'),copyIndex(), 'Data_1')]",
 							"diskSizeGB": "[parameters('vmSizeDataDisks')]",
 							"lun": 0,
 							"vhd": {
-								"Uri": "[concat('http://',variables('storageAccountName'),copyIndex(),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/Data_1.vhd')]"
+								"Uri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/',parameters('vmName'),copyIndex(),'-Data_1.vhd')]"
 							}
 						},
 						{
@@ -630,7 +626,7 @@
 							"diskSizeGB": "[parameters('vmSizeDataDisks')]",
 							"lun": 1,
 							"vhd": {
-								"Uri": "[concat('http://',variables('storageAccountName'),copyIndex(),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/Data_2.vhd')]"
+								"Uri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/',parameters('vmName'),copyIndex(),'-Data_2.vhd')]"
 							}
 						},
 						{
@@ -638,7 +634,7 @@
 							"diskSizeGB": "[parameters('vmSizeDataDisks')]",
 							"lun": 2,
 							"vhd": {
-								"Uri": "[concat('http://',variables('storageAccountName'),copyIndex(),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/Data_3.vhd')]"
+								"Uri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/',parameters('vmName'),copyIndex(),'-Data_3.vhd')]"
 							}
 						},
 						{
@@ -646,7 +642,7 @@
 							"diskSizeGB": "[parameters('vmSizeDataDisks')]",
 							"lun": 3,
 							"vhd": {
-								"Uri": "[concat('http://',variables('storageAccountName'),copyIndex(),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/Data_4.vhd')]"
+								"Uri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/',parameters('vmName'),copyIndex(),'-Data_4.vhd')]"
 							}
 						}
 					]
@@ -734,7 +730,7 @@
 				"ServerEnvironment" :"[parameters('serversPurpose')]"
 				},
 			"dependsOn": [
-				"[concat(variables('storageRef'),'0')]",
+				"[variables('storageRef')]",
 				"[resourceId('Microsoft.Network/networkInterfaces','NICAnsibleController')]",
 				"[concat('Microsoft.Compute/availabilitySets/', parameters('availabilitySetName'))]",
 				"VMsLoop"
@@ -766,7 +762,7 @@
 					"sourceImage": {
 						"id": "[variables('vmSourceImageRef')]"
 					},
-					"destinationVhdsContainer": "[concat('http://',variables('storageAccountName'),'0.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/')]",
+					"destinationVhdsContainer": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/')]",
 					"dataDisks": [
 					]
 				},

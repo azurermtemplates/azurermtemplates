@@ -24,9 +24,7 @@ server {
                 proxy_pass_header Authorization;
                 proxy_pass_header       Accept;
                 proxy_pass_header       Server;
-                try_files /index.html /index.html;
-
-
+              
         }
 
 }

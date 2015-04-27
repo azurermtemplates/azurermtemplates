@@ -297,20 +297,30 @@ function install_couchbase()
 
 function configure_nginx()
 {
-  # Create nginx folder
-  mkdir /etc/nginx/ssl
+  # Create nginx folders
+  mkdir -p /etc/nginx/ssl
+  mkdir -p /etc/nginx/sites-enabled/
 
   # Generate Self-signed certificate for the web console
   openssl req -x509 -nodes -days 1095 -newkey rsa:2048 -keyout /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.crt -subj "/C=US/ST=WA/L=Redmond/O=IT/CN=${CB_WEB_FQDN}" 
 
+  # CentOS - Configure SELinux & Update /etc/nginx/nginx.conf
+  if [[ "${DIST}" == "CentOS" ]];  then
+    yum -y install policycoreutils-python
+    semanage port -a -t http_port_t -p tcp 16195
+    setsebool -P allow_ypbind 1
+
+    
+    cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.back
+    sed -i '/http {/a   \    include /etc/nginx/sites-enabled/*;' /etc/nginx/nginx.conf 
+  fi 
+
   # Generate the nginx Config file 
   cat nginx | sed "s/{PORT}/${CB_WEB_PORT}/" | sed "s/{FQDN}/${CB_WEB_FQDN}/" | sed "s/{CB_SRV1}/${NODE_LIST_IPS[0]}/" >> /etc/nginx/sites-enabled/couchbaseconsole
 
-  # Make sure that nginx Starts automatically
-  update-rc.d nginx defaults
 
   # Start nginx service
-  service nginx start
+  service nginx start 
 
 
   
@@ -331,13 +341,15 @@ InitializeVMs()
         log "INFO:Installing Ansible for CentOS"
         install_packages_centos
     else
-       log "ERROR:Unsupported OS ${DIST}"
+       log "ERROR:Unsupported OS ${ DIST}"
        exit 2
     fi
     
     configure_ansible    
     configure_storage    
     install_couchbase    
+    # nginx will be a reverse proxy for the Couchbase admin console
+    # It will use a self-signed certificate to expose the Web Admin console over https
     configure_nginx
 
 
