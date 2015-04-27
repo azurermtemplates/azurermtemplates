@@ -3,22 +3,22 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "newStorageAccountName": {
-            "value": "cawadscstrg007"
+            "value": "cawadscstrg005"
         },
         "resourceLocation": {
             "value": "West US"
         },
         "dnsName": {
-            "value": "cawaiisdns07"
+            "value": "cawaiisdns05"
         },
         "publicIPAddressName": {
-            "value": "cawaiisIP07"
+            "value": "cawaiisIP05"
         },
         "publicIPAddressType": {
             "value": "Dynamic"
         },
         "vmName": {
-            "value": "cawaiisvm07"
+            "value": "cawaiisvm05"
         },
         "vmSize": {
             "value": "Standard_A2"
@@ -30,13 +30,13 @@
             "value": "test.123"
         },
         "virtualNetworkName": {
-            "value": "cawaiisvnet07"
+            "value": "cawaiisvnet05"
         },
         "subscriptionId": {
             "value": "9de7ded6-0ad3-43e6-87b8-17d93e3ff695"
         },
         "nicName": {
-            "value": "cawaiisNic07"
+            "value": "cawaiisNic05"
         },
         "vmExtensionName": {
             "value": "dscExtension"
@@ -48,7 +48,7 @@
             "value": "ConfigureWebServer.ps1\\Main"
         },
         "serverName": {
-            "value": "cawadbserver07"
+            "value": "cawadbserver05"
         },
         "serverLocation": {
             "value": "westus"
