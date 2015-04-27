@@ -1,5 +1,5 @@
 {
-    "$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
+    "$schema": "http://schema.management.azure.com/schemas/2015-05-01-preview/deploymentTemplate.json",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "keyVaultName": {
@@ -10,8 +10,7 @@
         },
         "location": {
             "type": "string",
-            "defaultValue": "East US",
-            "allowedValues": ["East US", "North Central US", "North Europe", "West Europe", "East Asia", "South East Asia"],
+            "allowedValues": ["East US", "West US", "West Europe", "East Asia", "South East Asia"],
             "metadata": {
                 "description": "Location of the Vault"
             }

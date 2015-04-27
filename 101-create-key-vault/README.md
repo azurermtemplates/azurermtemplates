@@ -4,4 +4,4 @@
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
-This template creates a Key Vault
+This template creates a Key Vault. 

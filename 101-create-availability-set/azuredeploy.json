@@ -3,11 +3,17 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "availabilitySetName": {
-      "type": "String"
+      "type": "String",
+      "metadata": {
+                "Description": "Name of Availability Set"
+       }
     },
     "location": {
       "type": "String",
-      "defaultValue" : "West US"
+      "allowedValues": ["East US", "West US", "West Europe", "East Asia", "South East Asia"],
+      "metadata": {
+                "Description": "Location to deploy to"
+      }
     }
   },
   "resources": [
