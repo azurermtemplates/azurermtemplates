@@ -1,6 +1,6 @@
 {
     "dnsNameForPublicIP": {
-        "value": "uniquednsname"
+        "value": ""
     },
     "publicIPAddressName" : {
       "value" : "myPublicIP"

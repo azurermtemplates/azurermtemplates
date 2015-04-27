@@ -9,9 +9,6 @@
         "builtInRoleType": {
             "value": "Owner"
         },
-        "subscriptionId": {
-            "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-        },
         "virtualMachineName": {
             "value": "<name of vm>"
         }       
