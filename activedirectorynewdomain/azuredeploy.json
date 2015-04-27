@@ -129,20 +129,27 @@
 			},
 			"defaultValue": "Standard_A1"
 		},
-		"adImageName": {
-			"type": "string",
-			"metadata": {
-				"Description": "The name of the VM Image to create the AD VM from"
-			},
-			"defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201503.01-en.us-127GB.vhd"
-		},
-		"vmContainerName": {
-			"type":"string",
-			"metadata": {
-				"Description": "The container name in the storage account where VM disks are stored"
-			},
-			"defaultValue": "vhds"
-		},
+		"imagePublisher": {
+        "type": "string",
+        "defaultValue": "MicrosoftWindowsServer",
+        "metadata": {
+             "Description": "Image Publisher"
+        }
+    },
+    "imageOffer": {
+        "type": "string",
+        "defaultValue": "WindowsServer",
+        "metadata": {
+            "Description": "Image Offer"
+        }
+    },
+    "imageSKU": {
+        "type": "string",
+        "defaultValue": "2012-R2-Datacenter",
+        "metadata": {
+            "Description": "Image SKU"
+        }
+    },
 		"adAvailabilitySetName": {
 			"type":"string",
 			"metadata": {
@@ -186,7 +193,6 @@
 		"adRDPNAT":"adRDP",
 		"VnetID": "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworkName'))]",
 		"adSubnetRef": "[concat(variables('VnetID'),'/subnets/',parameters('adSubnetName'))]",
-		"adSourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('adImageName'))]",
 		"adNicId" : "[resourceId('Microsoft.Network/networkInterfaces',parameters('adNicName'))]",
 		"adIPConfigID": "[concat(variables('adNicId'),'/ipConfigurations/ipconfig1')]",
 		"adLBName" : "adLoadBalancer",
@@ -205,14 +211,14 @@
 		{
 			"type": "Microsoft.Storage/storageAccounts",
 			"name": "[parameters('newStorageAccountName')]",
-			"apiVersion": "2014-12-01-preview",
+			"apiVersion": "2015-05-01-preview",
 			"location": "[parameters('deploymentLocation')]",
 			"properties": {
 				"accountType": "[parameters('storageAccountType')]"
 			}
 		},
 		{
-			"apiVersion": "2014-12-01-preview",
+			"apiVersion": "2015-05-01-preview",
 			"type": "Microsoft.Network/publicIPAddresses",
 			"name": "[parameters('publicIPAddressName')]",
 			"location": "[parameters('deploymentLocation')]",
@@ -226,7 +232,7 @@
 		{
 			"type": "Microsoft.Compute/availabilitySets",
 			"name": "[parameters('adAvailabilitySetName')]",
-			"apiVersion": "2014-12-01-preview",
+			"apiVersion": "2015-05-01-preview",
 			"location": "[parameters('deploymentLocation')]"
 		},
 		{
@@ -249,7 +255,7 @@
 			}
 		},
 		{
-			"apiVersion": "2014-12-01-preview",
+			"apiVersion": "2015-05-01-preview",
 			"name": "[variables('adlbName')]",
 			"type": "Microsoft.Network/loadBalancers",
 			"location": "[parameters('deploymentLocation')]",
@@ -297,7 +303,7 @@
 				"Microsoft.Resources/deployments/VNet",
 				"[concat('Microsoft.Network/loadBalancers/',variables('adlbName'))]"
 			],
-			"apiVersion": "2014-12-01-preview",
+			"apiVersion": "2015-05-01-preview",
 			"properties": {
 				"ipConfigurations": [
 					{
@@ -324,7 +330,7 @@
 			}
 		},
 		{
-			"apiVersion": "2014-12-01-preview",
+			"apiVersion": "2015-05-01-preview",
 			"type": "Microsoft.Compute/virtualMachines",
 			"name": "[parameters('adVMName')]",
 			"location": "[parameters('deploymentLocation')]",
@@ -345,23 +351,32 @@
 					"computername": "[parameters('adVMName')]",
 					"adminUsername": "[parameters('adminUsername')]",
 					"adminPassword": "[parameters('adminPassword')]",
-					"windowsProfile": {
-						"provisionVMAgent": "true"
-					}
 				},
 				"storageProfile": {
-					"sourceImage": {
-						"id": "[variables('adSourceImageName')]"
-					},
-					"destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',parameters('vmContainerName'),'/')]",
+					"imageReference": {
+              "publisher": "[parameters('imagePublisher')]",
+              "offer": "[parameters('imageOffer')]",
+              "sku" : "[parameters('imageSKU')]",
+              "version":"latest"
+          },
+					"osDisk" : {
+              "name": "osdisk",
+              "vhd": {
+                 "uri": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/','osdisk.vhd')]"
+              },
+              "caching": "ReadWrite",
+              "createOption": "FromImage"
+          },
+
 					"dataDisks": [
 						{
 							"vhd": {
-								"uri":"[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',parameters('vmContainerName'),'/', variables('adDataDisk'),'-1.vhd')]"
-								},
+								"uri":"[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/', variables('adDataDisk'),'-1.vhd')]"
+							},
 							"name":"[concat(parameters('adVMName'),'-data-disk1')]",
 							"caching" : "None",
-							"diskSizeGB": "[variables('adDataDiskSize')]",
+							"createOption": "empty",
+          		"diskSizeGB": "[variables('adDataDiskSize')]",
 							"lun": 0
 						}
 					]
@@ -378,7 +393,7 @@
 				{
 					"type": "Microsoft.Compute/virtualMachines/extensions",
 					"name": "[concat(parameters('adVMName'),'/CreateADForest')]",
-					"apiVersion": "2014-12-01-preview",
+					"apiVersion": "2015-05-01-preview",
 					"location": "[parameters('deploymentLocation')]",
 					"dependsOn":[
 						"[resourceId('Microsoft.Compute/virtualMachines', parameters('adVMName'))]"
