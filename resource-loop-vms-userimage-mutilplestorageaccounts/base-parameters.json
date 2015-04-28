@@ -1,12 +1,12 @@
 ﻿{
     "userImageStorageAccountName": {
-        "value" : "cloudey0"
+        "value" : "kaystore2d"
     },
     "userImageStorageContainerName" : {
-        "value" : "vhds"
+        "value" : "system/Microsoft.Compute/Images/myvm0"
     },
     "userImageVhdName" : {
-        "value" : "sample.vhd"
+        "value" : "myvm0image-osDisk.41832b7f-cc6e-464e-ab37-0d63add6b5ba.vhd"
     },
     "osType" : {
         "value" : "linux"
@@ -22,9 +22,6 @@
     },
     "numberOfInstances": {
         "value": 2
-    },
-    "subscriptionId": {
-        "value": "79d35904-6ebb-471a-93c0-4e81261b8077"
     },
     "region": {
         "value": "West US"

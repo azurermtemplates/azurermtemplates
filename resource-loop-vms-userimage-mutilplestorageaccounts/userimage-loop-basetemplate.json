@@ -34,9 +34,6 @@
             "type": "int",
             "defaultValue": 2
         },
-        "subscriptionId": {
-            "type": "string"
-        },
         "region": {
             "type": "string"
         },
@@ -62,7 +59,7 @@
     },
     "resources": [
         {
-            "apiVersion": "2014-12-01-preview",
+            "apiVersion": "2015-05-01-preview",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[concat(parameters('nicNamePrefix'), copyindex())]",
             "location": "[parameters('region')]",
@@ -85,7 +82,7 @@
             }
         },
         {
-            "apiVersion": "2014-12-01-preview",
+            "apiVersion": "2015-05-01-preview",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[concat(parameters('vmNamePrefix'), copyindex())]",
             "location": "[parameters('region')]",
@@ -115,7 +112,8 @@
                         },
                         "vhd": {
                             "uri": "[concat(variables('osDiskVhdContainer'),parameters('vmNamePrefix'),copyindex(),'osDisk.vhd')]"
-                        }
+                        },
+                        "createOption": "fromImage"
                     }
                 },
                 "networkProfile": {

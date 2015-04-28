@@ -4,51 +4,87 @@
     "parameters": {
         "userImageStorageAccountNamePrefix": {
             "type": "string",
-            "defaultValue": "userImageStorageAccountName"
+            "defaultValue": "userImageStorageAccountName",
+            "metadata": {
+              "description": "User image storage account name prefix"
+            }
         },
         "userImageStorageContainerName": {
             "type": "string",
-            "defaultValue": "userImageStorageContainerName"
+            "defaultValue": "userImageStorageContainerName",
+            "metadata": {
+              "description": "User image storage container name"
+            }
         },
         "userImageVhdName": {
             "type": "string",
-            "defaultValue": "userImageVhdName"
+            "defaultValue": "userImageVhdName",
+            "metadata": {
+              "description": "User image VHD name"
+            }
         },
         "userImageOsType": {
             "type": "string",
             "allowedValues": [
                 "windows",
                 "linux"
-            ]
+            ],
+            "metadata": {
+              "description": "Type of OS on the user image"
+            }
         },
         "adminUsername": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+              "description": "Admin username"
+            }
         },
         "adminPassword": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+              "description": "Admin password"
+            }
         },
         "region": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+              "description": "Location of resources"
+            }
         },
         "virtualNetworkName": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+              "description": "Name of VNET"
+            }
         },
         "vmNamePrefix": {
             "type": "string",
-            "defaultValue": "myVM"
+            "defaultValue": "myVM",
+            "metadata": {
+              "description": "Prefix for VM names"
+            }
         },
 
         "nicNamePrefix": {
             "type": "string",
-            "defaultValue": "myNic"
+            "defaultValue": "myNic",
+            "metadata": {
+              "description": "Prefix for NIC names"
+            }
         },
         "scaleNumberPerStorageAccount": {
             "type": "int",
-            "defaultValue": 2
+            "defaultValue": 2,
+            "metadata": {
+              "description": "Number of instances per storage account"
+            }
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "Standard_A2"
+            "defaultValue": "Standard_A2",
+            "metadata": {
+              "description": "Size of the VM"
+            }
         }
     },
     "variables": {
@@ -69,7 +105,7 @@
     },
     "resources": [
         {
-            "apiVersion": "2014-12-01-preview",
+            "apiVersion": "2015-05-01-preview",
             "type": "Microsoft.Network/virtualNetworks",
             "name": "[parameters('virtualNetworkName')]",
             "location": "[parameters('region')]",
@@ -133,9 +169,6 @@
                     },
                     "numberOfInstances": {
                         "value": "[parameters('scaleNumberPerStorageAccount')]"
-                    },
-                    "subscriptionId": {
-                        "value": "[subscription().subscriptionId]"
                     },
                     "region": {
                         "value": "[parameters('region')]"

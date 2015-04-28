@@ -1,27 +1,27 @@
 ﻿{
     "userImageStorageAccountNamePrefix": {
-        "value" : "userImageStorageAccountNamePrefix"
+        "value" : "kaystore2dd"
     },
     "userImageStorageContainerName" : {
-        "value" : "userImageStorageContainerName"
+        "value" : "userimagekay"
     },
     "userImageVhdName" : {
-        "value" : "userImageVhdName"
+        "value" : "kayuserimage"
     },
     "userImageOsType" : {
-        "value" : "userImageOsType"
+        "value" : "linux"
     },
     "vmNamePrefix" : {
-        "value" : "myVM"
+        "value" : "uservm"
     },
     "nicNamePrefix" : {
         "value" : "myNic"
     },
     "adminUsername": {
-        "value": ""
+        "value": "kay"
     },
     "adminPassword": {
-        "value": ""
+        "value": "Azure12345"
     },
     "scaleNumberPerStorageAccount": {
         "value": 2
