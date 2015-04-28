@@ -17,10 +17,6 @@
         "storageAccountType": {
             "type": "string",
             "defaultValue": "Standard_LRS",
-            "allowedValues": [
-                "Standard_LRS",
-                "Standard_GRS"
-            ],
             "metadata": {
                 "Description": "Type of the Storage Account"
             }
@@ -41,13 +37,6 @@
                 "Description": "Public IP Address Type"
             }
         },
-        "vmStorageAccountContainerName": {
-            "type": "string",
-            "defaultValue": "vhds",
-            "metadata": {
-                "Description": "Storage container for disks"
-            }
-        },
         "vmName": {
             "type": "string",
             "metadata": {
@@ -57,24 +46,32 @@
         "vmSize": {
             "type": "string",
             "defaultValue": "Standard_A0",
-            "allowedValues": [
-                "Standard_A0",
-                "Standard_A1",
-                "Standard_A2",
-                "Standard_A3",
-                "Standard_A4"
-            ],
             "metadata": {
                 "Description": "Size of the VM"
             }
         },
-        "vmSourceImageName": {
+        "imagePublisher": {
             "type": "string",
-            "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201412.01-en.us-127GB.vhd",
+            "defaultValue": "MicrosoftWindowsServer",
             "metadata": {
-                "Description": "VM Image to use"
+                "Description": "Image Publisher"
             }
         },
+        "imageOffer": {
+            "type": "string",
+            "defaultValue": "WindowsServer",
+            "metadata": {
+                "Description": "Image Offer"
+            }
+        },
+        "imageSKU": {
+            "type": "string",
+            "defaultValue": "2012-R2-Datacenter",
+            "metadata": {
+                "Description": "Image SKU"
+            }
+        },
+
         "adminUsername": {
             "type": "string",
             "metadata": {
@@ -128,20 +125,19 @@
         }
     },
     "variables": {
-        "sourceImageName": "[concat('/', subscription().subscriptionId,'/services/images/',parameters('vmSourceImageName'))]",
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',parameters('subnet1Name'))]"
     },
     "resources": [{
         "type": "Microsoft.Storage/storageAccounts",
         "name": "[parameters('newStorageAccountName')]",
-        "apiVersion": "2014-12-01-preview",
+        "apiVersion": "2015-05-01-preview",
         "location": "[parameters('location')]",
         "properties": {
             "accountType": "[parameters('storageAccountType')]"
         }
     }, {
-        "apiVersion": "2014-12-01-preview",
+        "apiVersion": "2015-05-01-preview",
         "type": "Microsoft.Network/publicIPAddresses",
         "name": "[parameters('publicIPAddressName')]",
         "location": "[parameters('location')]",
@@ -149,7 +145,7 @@
             "publicIPAllocationMethod": "[parameters('publicIPAddressType')]"
         }
     }, {
-        "apiVersion": "2014-12-01-preview",
+        "apiVersion": "2015-05-01-preview",
         "type": "Microsoft.Network/virtualNetworks",
         "name": "[parameters('virtualNetworkName')]",
         "location": "[parameters('location')]",
@@ -167,7 +163,7 @@
             }]
         }
     }, {
-        "apiVersion": "2014-12-01-preview",
+        "apiVersion": "2015-05-01-preview",
         "type": "Microsoft.Network/networkInterfaces",
         "name": "[parameters('nicName')]",
         "location": "[parameters('location')]",
@@ -190,7 +186,7 @@
             }]
         }
     }, {
-        "apiVersion": "2014-12-01-preview",
+        "apiVersion": "2015-05-01-preview",
         "type": "Microsoft.Compute/virtualMachines",
         "name": "[parameters('vmName')]",
         "location": "[parameters('location')]",
@@ -208,10 +204,20 @@
                 "adminPassword": "[parameters('adminPassword')]"
             },
             "storageProfile": {
-                "sourceImage": {
-                    "id": "[variables('sourceImageName')]"
-                },
-                "destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',parameters('vmStorageAccountContainerName'),'/')]"
+              "imageReference": {
+                  "publisher": "[parameters('imagePublisher')]",
+                  "offer": "[parameters('imageOffer')]",
+                  "sku": "[parameters('imageSKU')]",
+                  "version": "latest"
+              },
+              "osDisk": {
+                  "name": "osdisk",
+                  "vhd": {
+                      "uri": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/','osdisk.vhd')]"
+                  },
+                  "caching": "ReadWrite",
+                  "createOption": "FromImage"
+              }
             },
             "networkProfile": {
                 "networkInterfaces": [{
@@ -222,7 +228,7 @@
     }, {
         "type": "Microsoft.Compute/virtualMachines/extensions",
         "name": "[concat(parameters('vmName'),'/', parameters('vmExtensionName'))]",
-        "apiVersion": "2014-12-01-preview",
+        "apiVersion": "2015-05-01-preview",
         "location": "[parameters('location')]",
         "dependsOn": [
             "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
