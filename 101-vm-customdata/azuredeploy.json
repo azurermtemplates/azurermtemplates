@@ -4,49 +4,99 @@
     "parameters" : {
         "newStorageAccountName": {
             "type": "string",
-            "defaultValue" : "uniqueStorageAccountName"
+            "defaultValue" : "uniqueStorageAccountName",
+            "metadata": { 
+               "Description": "Unique DNS Name for the Storage Account where the Virtual Machine's disks will be placed." 
+           } 
         },
         "dnsNameForPublicIP" : {
             "type" : "string",
-            "defaultValue": "uniqueDnsNameForPublicIP"
+            "defaultValue": "uniqueDnsNameForPublicIP",
+            "metadata": { 
+               "Description": "Unique DNS Name for the Storage Account where the Virtual Machine's disks will be placed." 
+           } 
         },
         "adminUsername": {
-            "type": "string"
+            "type": "string",
+            "metadata": { 
+                "Description": "User name for the Virtual Machine." 
+           } 
         },
         "customData" : {
             "type" : "string",
-            "defaultValue" : "ZWNobyBjdXN0b21EYXRh"
+            "defaultValue" : "ZWNobyBjdXN0b21EYXRh",
+            "metadata": { 
+                 "Description": "Base64 encoded string passed to the Virtual Machine." 
+             } 
         },
         "adminPassword": {
-            "type": "securestring"
+            "type": "securestring",
+             "metadata": { 
+                 "Description": "Password for the Virtual Machine." 
+             } 
         },
-        "vmSourceImageName": {
-            "type": "string",
-            "defaultValue": "b4590d9e3ed742e4a1d46e5424aa335e__SUSE-Linux-Enterprise-Server-11-SP3-v206"
-        },
+        "imagePublisher": { 
+             "type": "string", 
+             "defaultValue": "Canonical", 
+             "metadata": { 
+                  "Description": "Image Publisher" 
+             } 
+         }, 
+         "imageOffer": { 
+             "type": "string", 
+             "defaultValue": "UbuntuServer", 
+             "metadata": { 
+                 "Description": "Image Offer" 
+             } 
+         }, 
+         "imageSKU": { 
+             "type": "string", 
+             "defaultValue": "14.04.2-LTS", 
+             "metadata": { 
+                 "Description": "Image SKU" 
+             } 
+         }, 
         "location": {
             "type": "String",
-            "defaultValue" : "West US"
+            "allowedValues": ["East US", "West US", "West Europe", "East Asia", "South East Asia"],
+            "metadata": { 
+                 "Description": "Deployment location" 
+             } 
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "Standard_A0"
+            "defaultValue": "Standard_A0",
+            "metadata": { 
+                 "Description": "VM size" 
+             } 
         },
         "publicIPAddressName": {
             "type": "string",
-            "defaultValue" : "myPublicIP"
+            "defaultValue" : "myPublicIP",
+            "metadata": { 
+                 "Description": "name of Public IP" 
+             } 
         },
         "vmName": {
             "type": "string",
-            "defaultValue" : "myVM"
+            "defaultValue" : "myVM",
+            "metadata": { 
+                 "Description": "VM Name" 
+             } 
         },
         "virtualNetworkName":{
             "type" : "string",
-            "defaultValue" : "myVNET"
+            "defaultValue" : "myVNET",
+            "metadata": { 
+                 "Description": "VNET name" 
+             } 
         },
         "nicName":{
             "type" : "string",
-            "defaultValue":"myNIC"
+            "defaultValue":"myNIC",
+            "metadata": { 
+                 "Description": "NIC name" 
+             } 
         }
     },
     "variables": {
@@ -58,7 +108,6 @@
         "vmStorageAccountContainerName": "vhds",
         "publicIPAddressType" : "Dynamic",
         "storageAccountType": "Standard_LRS",
-        "sourceImageName" : "[concat('/',subscription().subscriptionId,'/services/images/',parameters('vmSourceImageName'))]",
         "vnetID":"[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "subnet1Ref" : "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]"
     },
@@ -160,10 +209,20 @@
                 }
             },
             "storageProfile": {
-                "sourceImage": {
-                    "id": "[variables('sourceImageName')]"
-                },
-                "destinationVhdsContainer" : "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
+                "imageReference": { 
+                     "publisher": "[parameters('imagePublisher')]", 
+                     "offer": "[parameters('imageOffer')]", 
+                     "sku" : "[parameters('imageSKU')]", 
+                     "version":"latest" 
+                 }, 
+                 "osDisk" : { 
+                     "name": "osdisk", 
+                     "vhd": { 
+                        "uri": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/','osdisk.vhd')]" 
+                     }, 
+                     "caching": "ReadWrite", 
+                     "createOption": "FromImage" 
+                 } 
             },
             "networkProfile": {
                 "networkInterfaces" : [
