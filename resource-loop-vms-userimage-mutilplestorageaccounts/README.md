@@ -26,7 +26,6 @@ Below are the parameters that the template expects
 | vmNamePrefix  | VM Name Prefix for the Virtual Machine Instances |
 | nicNamePrefix  | NIC Name Prefix for the Network Interfaces |
 | scaleNumberPerStorageAccount  | Number of Virtual Machine Instances per Storage Account. Recommended number is 40 |
-| subscriptionId  | Subscription ID where the template will be deployed |
 | numberOfInstances  | Number of Virtual Machine instances to create  |
 | region | Region where the resources will be deployed |
 | virtualNetworkName | Name of Virtual Network |
