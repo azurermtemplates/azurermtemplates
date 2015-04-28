@@ -4,19 +4,13 @@
     "parameters": {
         "location": {
             "type": "string",
-            "defaultValue": "East US",
-            "metadata" :
-            {
-              "Description": "The location to where the Apprenda cluster will be deployed."
-            }
+            "defaultValue": "West US",
+            "allowedValues": [
+                "West US"
+            ]
         },
         "newStorageAccountName": {
-            "type": "string",
-            "defaultValue": "apprendaTest",
-            "metadata" :
-            {
-              "Description": "The name of the storage account for your VMs"
-            }
+            "type": "string"
         },
         "storageAccountType": {
             "type": "string",
@@ -24,19 +18,7 @@
             "allowedValues": [
                 "Standard_LRS",
                 "Standard_GRS"
-            ],
-            "metadata" :
-            {
-              "Description": "The type of storage account. Default is Standard_LRS"
-            }
-        },
-        "platformNode": {
-            "type": "string",
-            "defaultValue": "apprenda01",
-            "metadata" :
-            {
-              "Description": "The name of the platform node. Default is apprenda01."
-            }
+            ]
         },
         "vmSize": {
             "type": "string",
@@ -47,73 +29,39 @@
                 "Standard_A2",
                 "Standard_A3",
                 "Standard_A4"
-            ],
-            "metadata" :
-            {
-              "Description": "The sizing of each VM."
-            }
+            ]
         },
         "vmName": {
             "type": "string",
-            "defaultValue": "apprenda",
-            "metadata" :
-            {
-              "Description": "The name of the virtual machine."
-            }
+            "defaultValue": "apprenda"
         },
         "adminUsername": {
-            "type": "string",
-            "metadata" :
-            {
-              "Description": "The administrator account name."
-            }
+            "type": "string"
         },
         "adminPassword": {
-            "type": "securestring",
-            "metadata" :
-            {
-              "Description": "The administrator account password."
-            }
+            "type": "securestring"
         },
         "subscriptionId": {
-            "type": "string",
-            "metadata" :
-            {
-              "Description": "The azure subscription ID."
-            }
-        },
-        "vmExpressImageName": {
-            "type": "string",
-            "defaultValue": "ApprendaAzureCertifiedTemplateV1.0-os-2014-09-24_Copy.vhd",
-            "metadata" :
-            {
-              "Description": "The image file used for Deploying Apprenda. Override only if you require a custom setup."
-            }
+            "type": "string"
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "apprendaVNet",
-            "metadata" :
-            {
-              "Description": "The name of the virtual network to run Apprenda on."
-            }
+            "defaultValue": "apprendaVNet"
         }
     },
     "variables": {
-        "apprendaExpressImageName": "[concat('/',parameters('subscriptionId'), '/services/images/', parameters('vmExpressImageName'))]",
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "customScriptExtensionVersion": "1.2",
-        "publicIPAddressName2": "[concat(parameters('platformNode'), 'pubIP')]",
-        "publicIPAddressType1": "Dynamic",
-        "vmStorageAccountContainerName": "apprendavhds",
+        "publicIPAddressName": "[concat(parameters('vmName'), 'pubIP')]",
+        "publicIPAddressType": "Dynamic",
         "addressPrefix": "10.0.0.0/16",
         "subnet1Name": "Subnet-1",
         "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]",
         "subnet1Prefix": "10.0.0.0/24",
-        "pnNicName": "[concat(parameters('platformNode'),'Nic')]",
-        "dcNicName": "[concat(parameters('domainControllerNode'),'Nic')]",
-        "vmExtensionName": "CustomScriptExtension",
-        "customScriptExtensionVerstion": "1.2"
+        "pnNicName": "[concat(parameters('vmName'),'Nic')]",
+        "vmImageName": "a3383098-fc64-47ee-bedd-0ec179412e5b__Image__apprendaDeploymentTemplateExpress",
+        "sourceImageName": "[concat('/',parameters('subscriptionId') ,'/services/images/', variables('vmImageName'))]",
+        "vmStorageAccountContainerName": "apprendaexpressvm"
     },
     "resources": [
         {
@@ -128,12 +76,12 @@
         {
             "apiVersion": "2014-12-01-preview",
             "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[variables('publicIPAddressName2')]",
+            "name": "[variables('publicIPAddressName')]",
             "location": "[parameters('location')]",
             "properties": {
-                "publicIPAllocationMethod": "[variables('publicIPAddressType1')]",
+                "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
                 "dnsSettings": {
-                    "domainNameLabel": "[parameters('platformNode')]"
+                    "domainNameLabel": "[parameters('vmName')]"
                 }
             }
         },
@@ -161,10 +109,10 @@
         {
             "apiVersion": "2014-12-01-preview",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[variables('dcNicName')]",
+            "name": "[variables('pnNicName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName2'))]",
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
                 "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
             ],
             "properties": {
@@ -174,7 +122,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName2'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
                             },
                             "subnet": {
                                 "id": "[variables('subnet1Ref')]"
@@ -184,38 +132,46 @@
                 ]
             }
         },
+
         {
             "apiVersion": "2014-12-01-preview",
             "type": "Microsoft.Compute/virtualMachines",
-            "name": "[parameters('platformNode')]",
+            "name": "[parameters('vmName')]",
             "location": "[parameters('location')]",
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
-                "[concat('Microsoft.Network/networkInterfaces/', variables('dcNicName'))]"
+                "[concat('Microsoft.Network/networkInterfaces/', variables('pnNicName'))]"
             ],
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('vmSize')]"
                 },
                 "osProfile": {
-                    "computername": "[parameters('platformNode')]",
+                    "computername": "[parameters('vmName')]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]"
                 },
                 "storageProfile": {
-                    "sourceImage": {
-                        "id": "[variables('apprendaExpressImageName')]"
+                    "imageReference": {
+                        "id": "[variables('sourceImageName')]"
                     },
-                    "destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
+                    "osDisk": {
+                        "name": "apprendaosdisk",
+                        "vhd": {
+                            "uri": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/vhds/', 'apprendaosdisk.vhd')]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption" :  "FromImage"
+                    }
                 },
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('dcNicName'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('pnNicName'))]"
                         }
                     ]
                 }
             }
         }
     ]
-}
+        }

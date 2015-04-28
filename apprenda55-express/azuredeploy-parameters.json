@@ -1,0 +1,35 @@
+{
+    "newStorageAccountName" : {
+        "value":"uniquestorageaccountname"
+    },
+    "adminUsername": {
+        "value": ""
+    },
+    "adminPassword": {
+        "value": ""
+    },
+    "dnsNameForPublicIP": {
+        "value": "uniquednsnameforpublicip"
+    },
+    "vmSourceImageName" : {
+        "value" : "a3383098-fc64-47ee-bedd-0ec179412e5b__Image__apprendaDeploymentTemplateExpress"
+    },
+    "location": {
+        "value": "West US"
+    },
+    "virtualNetworkName": {
+        "value": "myVNET"
+    },
+    "vmSize": {
+        "value": "Standard_A0"
+    },
+    "vmName" : {
+      "value" : "myVM"
+    },
+    "publicIPAddressName" : {
+      "value" : "myPublicIP"
+    },
+    "nicName" : {
+      "value" : "myNic"
+    }
+}

@@ -133,7 +133,6 @@
         "publicIPAddressDC": "[concat(parameters('domainControllerNode'),'pubIP')]",
         "publicIPAddressType": "Dynamic",
         "publicIPAddressPlatform": "[concat(parameters('platformNode'), 'pubIP')]",
-        "platformNodeScriptUrl": "https://apprendavhds.blob.core.windows.net/vhds/ConfigureApprendaCluster.ps1",
         "platformNodeScriptName": "ConfigureApprenda.ps1",
         "platformEmail": "parameters('platformEmail')",
         "appNodes":"{parameters('windowsNode02'), parameters('windowsNode03'), parameters('linuxNode04'), parameters('linuxNode05')}",
@@ -149,7 +148,6 @@
         "customScriptExtensionVerstion": "1.2",
         "apprenda02Nic": "apprenda02Nic",
         "apprenda03Nic": "apprenda03Nic",
-        "anscriptUrl": "https://apprendavhds.blob.core.windows.net/vhds/AddNodesToDC.ps1",
         "anscriptName": "AddNodesToDC.ps1",
         "anscriptArgs": "parameters('domainName'), parameters('domainConttrollerNode'), parameters('adminUsername'), parameters('adminPassword')"
     },
