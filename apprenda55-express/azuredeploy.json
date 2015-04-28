@@ -2,51 +2,67 @@
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01-preview/deploymentTemplate.json",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "newStorageAccountName": {
+            "type": "string",
+            "metadata": {
+              "Description": "This is the name of the storage account the user will place their VMs."
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "metadata": {
+              "Description": "This is the username of the administrative account."
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+              "Description": "This is the password of the administrative account."
+            }
+        },
         "location": {
             "type": "string",
-            "defaultValue": "West US",
-            "allowedValues": [
-                "West US"
-            ]
-        },
-        "newStorageAccountName": {
-            "type": "string"
+            "metadata": {
+              "Description": "This is the name of the Availability Set"
+            }
         },
         "storageAccountType": {
             "type": "string",
-            "defaultValue": "Standard_LRS",
-            "allowedValues": [
-                "Standard_LRS",
-                "Standard_GRS"
-            ]
+            "allowedValues": [ "Standard_LRS", "Standard_GRS"],
+            "metadata": {
+              "Description": "This is the storage account type."
+            }
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "Standard_A1",
-            "allowedValues": [
-                "Standard_A0",
-                "Standard_A1",
-                "Standard_A2",
-                "Standard_A3",
-                "Standard_A4"
-            ]
+            "allowedValues": ["Standard_A0", "Standard_A1", "Standard_A2", "Standard_A3", "Standard_A4"],
+            "metadata": {
+              "Description": "The size of the virtual machine."
+            }
         },
         "vmName": {
             "type": "string",
-            "defaultValue": "apprenda"
-        },
-        "adminUsername": {
-            "type": "string"
-        },
-        "adminPassword": {
-            "type": "securestring"
+            "metadata": {
+              "Description": "This is the name of the virtual machine."
+            }
         },
         "subscriptionId": {
-            "type": "string"
+            "type": "string",
+            "metadata": {
+              "Description": "This is the user's subscription ID."
+            }
+        },
+        "publicIPAddressName": {
+            "type": "string",
+            "metadata": {
+              "Description": "This is the name of the public IP address provisioned."
+            }
         },
         "virtualNetworkName": {
             "type": "string",
-            "defaultValue": "apprendaVNet"
+            "metadata": {
+              "Description": "This is the name of the virtual network."
+            }
         }
     },
     "variables": {
@@ -58,7 +74,7 @@
         "subnet1Name": "Subnet-1",
         "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]",
         "subnet1Prefix": "10.0.0.0/24",
-        "pnNicName": "[concat(parameters('vmName'),'Nic')]",
+        "nicName": "[concat(parameters('vmName'),'Nic')]",
         "vmImageName": "a3383098-fc64-47ee-bedd-0ec179412e5b__Image__apprendaDeploymentTemplateExpress",
         "sourceImageName": "[concat('/',parameters('subscriptionId') ,'/services/images/', variables('vmImageName'))]",
         "vmStorageAccountContainerName": "apprendaexpressvm"

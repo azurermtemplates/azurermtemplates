@@ -1,35 +1,32 @@
 {
     "newStorageAccountName" : {
-        "value":"uniquestorageaccountname"
+        "value":"apprenda55test"
     },
     "adminUsername": {
-        "value": ""
+        "value": "apprendaarm"
     },
     "adminPassword": {
-        "value": ""
-    },
-    "dnsNameForPublicIP": {
-        "value": "uniquednsnameforpublicip"
-    },
-    "vmSourceImageName" : {
-        "value" : "a3383098-fc64-47ee-bedd-0ec179412e5b__Image__apprendaDeploymentTemplateExpress"
+        "value": "@ppm5205"
     },
     "location": {
         "value": "West US"
     },
     "virtualNetworkName": {
-        "value": "myVNET"
+        "value": "apprendavnet"
+    },
+    "storageAccountType":{
+        "value": "Standard_LRS"
     },
     "vmSize": {
         "value": "Standard_A0"
     },
     "vmName" : {
-      "value" : "myVM"
+        "value" : "apprendaexpress55test"
     },
     "publicIPAddressName" : {
-      "value" : "myPublicIP"
+      "value" : "apprendaPublicIP"
     },
     "nicName" : {
-      "value" : "myNic"
+      "value" : "apprendaNic"
     }
 }
