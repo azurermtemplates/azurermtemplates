@@ -6,8 +6,7 @@
 			"type": "string",
 			 "metadata": {
 				"Description": "The name of the new storage account created to store the VMs disks"
-			},
-			"defaultValue":"New Storage Account Name"
+			}
 		},
 		"storageAccountType": {
 			"type": "string",
@@ -283,22 +282,19 @@
 			"type":"string",
 			"metadata": {
 				"Description": "The DNS Prefix for the AD Public IP Address"
-			},
-			"defaultValue":"New AD DNS Prefix"
+			}
 		},
 		"sqlDNSPrefix": {
 			"type":"string",
 			"metadata": {
 				"Description": "The DNS Prefix for the SQL Public IP Address"
-			},
-			"defaultValue":"New SQL DNS Prefix"
+			}
 		},
 		"spDNSPrefix":{
 			"type":"string",
 			"metadata": {
 				"Description": "The DNS Prefix for the SharePoint Public IP Address"
-			},
-			"defaultValue":"New SP DNS Prefix"
+			}
 		},
 	},
 	"variables": {

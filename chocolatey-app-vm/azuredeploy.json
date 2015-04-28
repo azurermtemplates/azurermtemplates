@@ -25,8 +25,7 @@
             ],
         },
         "uniqueDNSNameBase":{
-          "type" : "string",
-          "defaultValue" : "chocvm"
+          "type" : "string"
         },
         "vmSize": {
             "type": "string",
@@ -62,7 +61,7 @@
         "sourceImageName": "[concat('/',subscription().subscriptionId,'/services/images/',parameters('vmSourceImageName'))]",
         "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
         "scriptUrl" : "https://iaasscripts.blob.core.windows.net/scripts/InstallApplication.ps1",
-	      "scriptName" : "InstallApplication.ps1",
+	      "scriptName" : ".\\InstallApplication.ps1",
         "customScriptExtensionVersion" : "1.4",
 	      "scriptArg" : "[parameters('applicationToInstall')]",
         "publicIPAddressName" : "[concat(parameters('uniqueDNSNameBase'),'pubIP')]",
@@ -193,7 +192,7 @@
                 "typeHandlerVersion": "[variables('customScriptExtensionVersion')]",
                 "settings": {
                     "fileUris": ["[variables('scriptUrl')]"],
-                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file ',variables('scriptName'),' ',variables('scriptArg'))]"
+                    "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -command ',variables('scriptName'),' ',variables('scriptArg'))]"
                 }
             }
         }
