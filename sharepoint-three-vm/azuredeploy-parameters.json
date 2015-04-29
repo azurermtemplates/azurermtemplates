@@ -3,7 +3,7 @@
 	"contentVersion": "1.0.0.0",
 	"parameters": {
 		"newStorageAccountName": {
-			"value": "sdsp2013test23"
+			"value": "sdsp2013test25"
 		},
 		"deploymentLocation": {
 			"value": "West US"
@@ -27,13 +27,13 @@
 			"value":"https://sdaviesms.blob.core.windows.net/windows-powershell-dsc",
 		},
 		"adDNSPrefix":{
-			"value":"sdspfarmad23"
+			"value":"sdspfarmad25"
 		},
 		"sqlDNSPrefix":{
-			"value":"sdspfarmsql23"
+			"value":"sdspfarmsql25"
 		},
 		"spDNSPrefix":{
-			"value":"sdspfarmsp23"
+			"value":"sdspfarmsp25"
 		}
 	}
 }

@@ -646,36 +646,21 @@
 							"backendPort": 3389,
 							"enableFloatingIP": false
 						}
+					},
+					{
+						"name": "[variables('spWebNAT')]",
+						"properties": {
+							"frontendIPConfiguration": {
+								"id": "[variables('splbFEConfigID')]"
+							},
+							"protocol": "tcp",
+							"frontendPort": 80,
+							"backendPort": 80,
+							"enableFloatingIP": false
+						}
 					}
 				],
-				"loadBalancingRules": [
-                    {
-                        "name": "spWeb",
-                        "properties": {
-                        "frontendIPConfiguration": {
-                            "id": "[variables('splbFEConfigID')]"
-                        },
-                        "probe": {
-                            "id": "[concat(variables('splbID'),'/probes/spWebProbe')]"
-                        },
-                        "protocol": "tcp",
-                        "frontendPort": 80,
-                        "backendPort": 80,
-                        "enableFloatingIP": false
-                        }
-                    }
-                ],
-                "probes": [
-                    {
-                        "name": "spWebProbe",
-                        "properties": {
-                            "protocol": "tcp",
-                            "port": 80,
-                            "intervalInSeconds": "15",
-                            "numberOfProbes": "5"
-                        }
-                    }
-                ]
+
 			}
 		},
 		{
@@ -771,6 +756,9 @@
 							"loadBalancerInboundNatRules": [
 								{
 									"id": "[variables('spRDPNATRuleID')]"
+								},
+								{
+									"id": "[variables('spWebNATRuleID')]"
 								}
 							]
 						}
