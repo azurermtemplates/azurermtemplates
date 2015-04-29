@@ -767,8 +767,7 @@
 							],
 							"loadBalancerInboundNatRules": [
 								{
-									"id": "[variables('spRDPNATRuleID')]",
-									"id": "[variables('spWebNATRuleID')]"
+									"id": "[variables('spRDPNATRuleID')]"
 								}
 							]
 						}
@@ -797,10 +796,7 @@
 				"osProfile": {
 					"computername": "[parameters('adVMName')]",
 					"adminUsername": "[parameters('adminUsername')]",
-					"adminPassword": "[parameters('adminPassword')]",
-					"windowsProfile": {
-						"provisionVMAgent": "true"
-					}
+					"adminPassword": "[parameters('adminPassword')]"
 				},
 				"storageProfile": {
 					"imageReference": {
@@ -914,10 +910,7 @@
 				"osProfile": {
 					"computername": "[parameters('sqlVMName')]",
 					"adminUsername": "[parameters('adminUsername')]",
-					"adminPassword": "[parameters('adminPassword')]",
-					"windowsProfile": {
-						"provisionVMAgent": "true"
-					}
+					"adminPassword": "[parameters('adminPassword')]"
 				},
 				"storageProfile": {
 					"imageReference": {
@@ -964,7 +957,7 @@
 						}
 					]
 				}
-			},
+			}
 		},
 		{
 			"type": "Microsoft.Compute/virtualMachines/extensions",
@@ -1030,10 +1023,7 @@
 				"osProfile": {
 					"computername": "[parameters('spVMName')]",
 					"adminUsername": "[parameters('adminUsername')]",
-					"adminPassword": "[parameters('adminPassword')]",
-					"windowsProfile": {
-						"provisionVMAgent": "true"
-					}
+					"adminPassword": "[parameters('adminPassword')]"
 				},
 				"storageProfile": {
 					"imageReference": {
@@ -1053,7 +1043,7 @@
 					"dataDisks": [
 						{
 							"vhd": {
-								"uri":"[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',parameters('vmContainerName'),'/',,parameters('spVMName'),'-', variables('spDataDisk'),'-1.vhd')]"
+								"uri":"[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',parameters('vmContainerName'),'/',parameters('spVMName'),'-', variables('spDataDisk'),'-1.vhd')]"
 								},
 							"name":"[concat(parameters('spVMName'),'-data-disk1')]",
 							"createOption": "empty",

@@ -1,0 +1,39 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"newStorageAccountName": {
+			"value": "sdsp2013test19"
+		},
+		"deploymentLocation": {
+			"value": "West US"
+		},
+		"adminPassword": {
+			"value": "!!Passw0rd!!"
+		},
+		"sqlServerServiceAccountPassword":{
+			"value": "!!Passw0rd!!"
+		},
+		"sharePointSetupUserAccountPassword":{
+			"value": "!!Passw0rd!!"
+		},
+		"sharePointFarmAccountPassword":{
+			"value": "!!Passw0rd!!"
+		},
+		"sharePointFarmPassphrasePassword":{
+			"value": "!!Passw0rd!!"
+		},
+		"AssetLocation":{
+			"value":"https://raw.githubusercontent.com/simongdavies/azurermtemplates/master/sharepoint-three-vm",
+		},
+		"adDNSPrefix":{
+			"value":"sdspfarmad20"
+		},
+		"sqlDNSPrefix":{
+			"value":"sdspfarmsql20"
+		},
+		"spDNSPrefix":{
+			"value":"sdspfarmsp20"
+		}
+	}
+}
