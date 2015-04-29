@@ -3,7 +3,7 @@
 	"contentVersion": "1.0.0.0",
 	"parameters": {
 		"newStorageAccountName": {
-			"value": "sdsp2013test19"
+			"value": "sdsp2013test23"
 		},
 		"deploymentLocation": {
 			"value": "West US"
@@ -24,16 +24,16 @@
 			"value": "!!Passw0rd!!"
 		},
 		"AssetLocation":{
-			"value":"https://raw.githubusercontent.com/simongdavies/azurermtemplates/master/sharepoint-three-vm",
+			"value":"https://sdaviesms.blob.core.windows.net/windows-powershell-dsc",
 		},
 		"adDNSPrefix":{
-			"value":"sdspfarmad20"
+			"value":"sdspfarmad23"
 		},
 		"sqlDNSPrefix":{
-			"value":"sdspfarmsql20"
+			"value":"sdspfarmsql23"
 		},
 		"spDNSPrefix":{
-			"value":"sdspfarmsp20"
+			"value":"sdspfarmsp23"
 		}
 	}
 }

@@ -43,10 +43,10 @@
 			},
 			"defaultValue":"spfarmVNET"
 		},
-		"virtualNetworkPrefix": {
+		"virtualNetworkAddressRange": {
 			"type": "string",
 			"metadata": {
-				"Description": "The address range of the new VNET in CIDR format"
+				"Description": "The address range of the new VNET "
 			},
 			"defaultValue":"10.0.0.0/16"
 		},
@@ -309,7 +309,7 @@
 				"Description": "The Sharepoint Farm Passphrase"
 			}
 		},
-		"databaseName":{
+		"configDatabaseName":{
 			"type":"string",
 			"metadata": {
 				"Description": "The Sharepoint Config Database Name"
@@ -322,6 +322,13 @@
 				"Description": "The Sharepoint Admin Site Database Name"
 			},
 			"defaultValue":"SP_AdminContent"
+		},
+		"contentDatabaseName":{
+			"type":"string",
+			"metadata": {
+				"Description": "The Sharepoint Admin Site Database Name"
+			},
+			"defaultValue":"spARM_Content"
 		},
 		"spSiteTemplateName":{
 			"type":"string",
@@ -337,34 +344,31 @@
 			},
 			"defaultValue":3389
 		},
+		"adDNSPrefix": {
+			"type":"string",
+			"metadata": {
+				"Description": "The DNS Prefix for the AD Public IP Address"
+			}
+		},
+		"sqlDNSPrefix": {
+			"type":"string",
+			"metadata": {
+				"Description": "The DNS Prefix for the SQL Public IP Address"
+			}
+		},
+		"spDNSPrefix":{
+			"type":"string",
+			"metadata": {
+				"Description": "The DNS Prefix for the SharePoint Public IP Address"
+			}
+		},
 		"AssetLocation":{
 			"type":"string",
 			"metadata": {
 				"Description": "The location of resources such as templates and DSC modules that the script is dependent"
 			},
 			"defaultValue":"https://raw.githubusercontent.com/azurermtemplates/azurermtemplates/master/sharepoint-three-vm"
-		},
-		"adDNSPrefix": {
-			"type":"string",
-			"metadata": {
-				"Description": "The DNS Prefix for the AD Public IP Address"
-			},
-			"defaultValue":"New AD DNS Prefix"
-		},
-		"sqlDNSPrefix": {
-			"type":"string",
-			"metadata": {
-				"Description": "The DNS Prefix for the SQL Public IP Address"
-			},
-			"defaultValue":"New SQL DNS Prefix"
-		},
-		"spDNSPrefix":{
-			"type":"string",
-			"metadata": {
-				"Description": "The DNS Prefix for the SharePoint Public IP Address"
-			},
-			"defaultValue":"New SP DNS Prefix"
-		},
+		}
 	},
 	"variables": {
 		"LBFE":"LBFE",
@@ -415,7 +419,6 @@
 		"sqlpublicIPAddressName": "sqlpublicIP",
 		"sppublicIPAddressName": "sppublicIP",
 		"spCentralAdminPort":8080,
-		"spContentDatabase":"spARM_Content",
 		"spAvailabilitySetName":"spAvailabiltySet",
 		"sqlAvailabilitySetName":"sqlAvailabiltySet",
 		"adAvailabilitySetName": "adAvailabiltySet",
@@ -521,7 +524,7 @@
 			"properties": {
 				"addressSpace": {
 				"addressPrefixes": [
-					"[parameters('virtualNetworkPrefix')]"
+					"[parameters('virtualNetworkAddressRange')]"
 				]
 				},
 				"subnets": "[variables('subnets')]"
@@ -883,7 +886,7 @@
 				"parameters": {
 					"deploymentLocation": {"value":"[parameters('deploymentLocation')]"},
 					"virtualNetworkName": {"value":"[parameters('virtualNetworkName')]"},
-					"virtualNetworkAddressRange": {"value":"[parameters('virtualNetworkPrefix')]"},
+					"virtualNetworkAddressRange": {"value":"[parameters('virtualNetworkAddressRange')]"},
 					"subnets": {"value":"[variables('subnets')]"},
 					"DNSServerAddress": {"value":["[parameters('adNicIPAddress')]"]}
 				}
@@ -1096,10 +1099,10 @@
 									"UserName": "ignore",
 									"Password": "PrivateSettingsRef:SharePointFarmPassphrasePassword"
 								},
-								"DatabaseName":"[parameters('databaseName')]",
+								"DatabaseName":"[parameters('configDatabaseName')]",
 								"AdministrationContentDatabaseName":"[parameters('administrationContentDatabaseName')]",
 								"DatabaseServer":"[concat(parameters('sqlVMName'),'.',parameters('domainName'))]",
-								"Configuration":"[concat('{\"roles\":[{\"type\":\"application\",\"properties\":{\"fqdn\":\"',reference(variables('sppublicIPAddressName')).dnsSettings.fqdn,'\",\"port\":',variables('spCentralAdminPort'),'}},{\"type\":\"web\",\"properties\":{\"webApp\":{\"name\":\"spARM\",\"applicationPool\":\"spARM AppPool\",\"applicationPoolAccount\":\"', parameters('sharePointFarmAccountUserName'),'\",\"url\":\"http://',reference(variables('sppublicIPAddressName')).dnsSettings.fqdn,'\",\"port\":80,\"hostHeader\":\"',reference(variables('sppublicIPAddressName')).dnsSettings.fqdn,'\",\"databaseName\":\"',variables('spContentDatabase'),'\"},\"site\":{\"name\":\"spARM\",\"template\":\"',parameters('spSiteTemplateName'),'\",\"url\":\"http://',reference(variables('sppublicIPAddressName')).dnsSettings.fqdn,'\",\"ownerAliasDomain\":\"',parameters('domainName'),'\",\"ownerAliasUserName\":\"',parameters('sharePointFarmAccountUserName'),'\",\"secondaryOwnerAliasDomain\":\"',parameters('domainName'),'\",\"secondaryOwnerAliasUserName\":\"',parameters('adminUserName'),'\"}}}],\"configureForHa\":\"False\",\"loadBalancedSetProbePort\":0}')]"
+								"Configuration":"[concat('{\"roles\":[{\"type\":\"application\",\"properties\":{\"fqdn\":\"',reference(variables('sppublicIPAddressName')).dnsSettings.fqdn,'\",\"port\":',variables('spCentralAdminPort'),'}},{\"type\":\"web\",\"properties\":{\"webApp\":{\"name\":\"spARM\",\"applicationPool\":\"spARM AppPool\",\"applicationPoolAccount\":\"', parameters('sharePointFarmAccountUserName'),'\",\"url\":\"http://',reference(variables('sppublicIPAddressName')).dnsSettings.fqdn,'\",\"port\":80,\"hostHeader\":\"',reference(variables('sppublicIPAddressName')).dnsSettings.fqdn,'\",\"databaseName\":\"',parameters('contentDatabaseName'),'\"},\"site\":{\"name\":\"spARM\",\"template\":\"',parameters('spSiteTemplateName'),'\",\"url\":\"http://',reference(variables('sppublicIPAddressName')).dnsSettings.fqdn,'\",\"ownerAliasDomain\":\"',parameters('domainName'),'\",\"ownerAliasUserName\":\"',parameters('sharePointFarmAccountUserName'),'\",\"secondaryOwnerAliasDomain\":\"',parameters('domainName'),'\",\"secondaryOwnerAliasUserName\":\"',parameters('adminUserName'),'\"}}}],\"configureForHa\":\"False\",\"loadBalancedSetProbePort\":0}')]"
 							}
 						},
 						"protectedSettings": {
