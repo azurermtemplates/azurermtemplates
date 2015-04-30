@@ -3,22 +3,22 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "newStorageAccountName": {
-            "value": "cawadsciis23"
+            "value": "cawadscstrg005"
         },
-        "location": {
+        "resourceLocation": {
             "value": "West US"
         },
         "dnsName": {
-            "value": "cawaiisdns23"
+            "value": "cawaiisdns05"
         },
         "publicIPAddressName": {
-            "value": "cawaiisIP23"
+            "value": "cawaiisIP05"
         },
         "publicIPAddressType": {
             "value": "Dynamic"
         },
         "vmName": {
-            "value": "cawaiisvm23"
+            "value": "cawaiisvm05"
         },
         "vmSize": {
             "value": "Standard_A2"
@@ -30,31 +30,25 @@
             "value": "test.123"
         },
         "virtualNetworkName": {
-            "value": "cawaiisvnet23"
+            "value": "cawaiisvnet05"
         },
         "subscriptionId": {
             "value": "9de7ded6-0ad3-43e6-87b8-17d93e3ff695"
         },
         "nicName": {
-            "value": "cawaiisNic23"
+            "value": "cawaiisNic05"
         },
         "vmExtensionName": {
             "value": "dscExtension"
-        },
-        "modulesUrl": {
-            "value": "https://cawadscstrg.blob.core.windows.net/windows-powershell-dsc/ConfigureWebServer.ps1.zip"
-        },
+        },     
         "webdeploypkg": {
             "value": "https://github.com/CawaMS/FileShare/releases/download/releasetag/WebApplication3.zip"
-        },
-        "sasToken": {
-            "value": "?sv=2014-02-14&sr=c&sig=UbYSuZI51IyEgNnV41C6Ko1XWspYEv864cF6AxXf8j8%3D&se=2015-04-13T04%3A51%3A10Z&sp=r"
         },
         "configurationFunction": {
             "value": "ConfigureWebServer.ps1\\Main"
         },
         "serverName": {
-            "value": "cawadbserver23"
+            "value": "cawadbserver05"
         },
         "serverLocation": {
             "value": "westus"
