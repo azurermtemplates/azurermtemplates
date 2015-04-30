@@ -1,0 +1,514 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01-preview/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": "East US",
+            "metadata" :
+            {
+              "Description": "The location to where the Apprenda cluster will be deployed."
+            }
+        },
+        "newStorageAccountName": {
+            "type": "string",
+            "defaultValue": "apprendaTest",
+            "metadata" :
+            {
+              "Description": "The name of the storage account to store the VMs."
+            }
+        },
+        "storageAccountType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_GRS"
+            ],
+            "metadata" :
+            {
+              "Description": "The type of storage account. Default is Standard_LRS."
+            }
+        },
+        "platformNode": {
+            "type": "string",
+            "defaultValue": "apprenda01",
+            "metadata" :
+            {
+              "Description": "The name of the platform node. Default is apprenda01."
+            }
+        },
+        "windowsNode02": {
+            "type": "string",
+            "defaultValue": "apprenda02",
+            "metadata" :
+            {
+              "Description": "The name of the second windows node. Default is apprenda02."
+            }
+        },
+        "windowsNode03": {
+            "type": "string",
+            "defaultValue": "apprenda03",
+            "metadata" :
+            {
+              "Description": "The name of the third windows node. Default is apprenda03."
+            }
+        },
+        "domainControllerNode": {
+            "type": "string",
+            "defaultValue": "apprendadc",
+            "metadata" :
+            {
+              "Description": "The name of the domain controller node. Default is apprendadc."
+            }
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_A1",
+            "allowedValues": [
+                "Standard_A0",
+                "Standard_A1",
+                "Standard_A2",
+                "Standard_A3",
+                "Standard_A4"
+            ],
+            "metadata" :
+            {
+              "Description": "The size for all of the VMs in the cluster. Default is Standard_A1."
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "metadata" :
+            {
+              "Description": "The admin account name for all nodes in the cluster."
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata" :
+            {
+              "Description": "The admin account password for all nodes in the cluster."
+            }
+        },
+        "subscriptionId": {
+            "type": "string",
+            "metadata" :
+            {
+              "Description": "The user's subscription ID."
+            }
+        },
+        "vmSourceImageName": {
+            "type": "string",
+            "defaultValue": "a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201412.01-en.us-127GB.vhd",
+            "metadata" :
+            {
+              "Description": "The Windows Image source VHD file. Override only if you wish to use your own."
+            }
+        },
+        "vmExpressImageName": {
+            "type": "string",
+            "defaultValue": "ApprendaAzureCertifiedTemplateV1.0-os-2014-09-24_Copy.vhd",
+            "metadata" :
+            {
+              "Description": "The image file used for Deploying Apprenda. Override only if you require a custom setup."
+            }
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "defaultValue": "apprendaVNet",
+            "metadata" :
+            {
+              "Description": "The name of the virtual network for the cluster."
+            }
+        }
+    },
+    "variables": {
+        "sourceImageName": "[concat('/',parameters('subscriptionId'),'/services/images/',parameters('vmSourceImageName'))]",
+        "apprendaImageName":  "[concat('/', parameters('subscriptionId'), '/services/images', parameters('vmExpressImageName'))]",
+        "dcscript1Url": "http://apprendavhds.blob.core.windows.net/vhds/SetupDomainController.ps1",
+        "dcscript1Name": "SetupDomainController.ps1",
+        "dcscript1Arg": "Apprenda2015!",
+        "customScriptExtensionVersion": "1.2",
+        "publicIPAddressDC": "[concat(parameters('domainControllerNode'),'pubIP')]",
+        "publicIPAddressType": "Dynamic",
+        "publicIPAddressPlatform": "[concat(parameters('platformNode'), 'pubIP')]",
+        "platformNodeScriptName": "ConfigureApprenda.ps1",
+        "platformEmail": "parameters('platformEmail')",
+        "appNodes":"{parameters('windowsNode02'), parameters('windowsNode03'), parameters('linuxNode04'), parameters('linuxNode05')}",
+        "platformNodeScriptArgs": "parameters('domainName'), parameters('domainControllerNode'), parameters('adminUsername'), parameters('adminPassword'), parameters('platformEmail'), variables('appNodes')",
+        "vmStorageAccountContainerName": "apprendavhds",
+        "addressPrefix": "10.0.0.0/16",
+        "subnet1Name": "Subnet-1",
+        "subnet1Ref": "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]",
+        "subnet1Prefix": "10.0.0.0/24",
+        "pnNicName": "[concat(parameters('platformNode'),'Nic')]",
+        "dcNicName": "[concat(parameters('domainControllerNode'),'Nic')]",
+        "vmExtensionName": "CustomScriptExtension",
+        "customScriptExtensionVerstion": "1.2",
+        "apprenda02Nic": "apprenda02Nic",
+        "apprenda03Nic": "apprenda03Nic",
+        "anscriptName": "AddNodesToDC.ps1",
+        "anscriptArgs": "parameters('domainName'), parameters('domainConttrollerNode'), parameters('adminUsername'), parameters('adminPassword')"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('newStorageAccountName')]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "properties": {
+                "accountType": "[parameters('storageAccountType')]"
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIPAddressDC')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('domainControllerNode')]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIPAddressPlatform')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('platformNode')]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('virtualNetworkName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('addressPrefix')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('subnet1Name')]",
+                        "properties": {
+                            "addressPrefix": "[variables('subnet1Prefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "apprenda02Nic",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnet1Ref')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "apprenda03Nic",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnet1Ref')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('pnNicName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressPlatform'))]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnet1Ref')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[variables('dcNicName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressDC'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressDC'))]"
+                            },
+                            "subnet": {
+                                "id": "[variables('subnet1Ref')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('domainControllerNode')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('dcNicName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computername": "[parameters('domainControllerNode')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "sourceImage": {
+                        "id": "[variables('sourceImageName')]"
+                    },
+                    "destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('dcNicName'))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('platformNode')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('pnNicName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computername": "[parameters('domainControllerNode')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "sourceImage": {
+                        "id": "[variables('apprendaImageName')]"
+                    },
+                    "destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('pnNicName'))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('domainControllerNode'),'/', variables('vmExtensionName'))]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('domainControllerNode'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "[variables('customScriptExtensionVersion')]",
+                "settings": {
+                    "fileUris": [ "[variables('dcscript1Url')]" ],
+                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file ',variables('dcscript1Name'),' ',variables('dcscript1Arg'))]"
+                }
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('windowsNode02')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('apprenda02Nic'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computername": "[parameters('windowsNode03')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "sourceImage": {
+                        "id": "[variables('sourceImageName')]"
+                    },
+                    "destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('apprenda02Nic'))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "apiVersion": "2014-12-01-preview",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('windowsNode03')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Storage/storageAccounts/', parameters('newStorageAccountName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('apprenda03Nic'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computername": "[parameters('windowsNode03')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "sourceImage": {
+                        "id": "[variables('sourceImageName')]"
+                    },
+                    "destinationVhdsContainer": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/')]"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('apprenda03Nic'))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('windowsNode02'),'/', variables('vmExtensionName'))]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('domainControllerNode'))]",
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('windowsNode02'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "[variables('customScriptExtensionVersion')]",
+                "settings": {
+                    "fileUris": [ "[variables('anscriptUrl')]" ],
+                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file ',variables('anscriptName'),' ',variables('anscriptArgs'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('windowsNode03'),'/', variables('vmExtensionName'))]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('domainControllerNode'))]",
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('windowsNode03'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "[variables('customScriptExtensionVersion')]",
+                "settings": {
+                    "fileUris": [ "[variables('anscriptUrl')]" ],
+                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file ',variables('anscriptName'),' ',variables('anscriptArgs'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('windowsNode03'),'/', variables('vmExtensionName'))]",
+            "apiVersion": "2014-12-01-preview",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('domainControllerNode'))]",
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('platformNode'))]",
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('windowsNode02'))]",
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('windowsNode03'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "[variables('customScriptExtensionVersion')]",
+                "settings": {
+                    "fileUris": [ "[variables('anscriptUrl')]" ],
+                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -file ',variables('AIscriptName'),' ',variables('AIscriptArgs'))]"
+                }
+            }
+        }
+    ]
+}
