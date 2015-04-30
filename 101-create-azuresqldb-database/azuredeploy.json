@@ -1,0 +1,126 @@
+{
+    "$schema": "http://schemas.management.azure.com/deploymentTemplate?api-version=2014-04-01-preview",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "administratorLogin": {
+            "type": "string",
+            "metadata": { 
+                "Description":  "This is the Server Admin login"
+            }
+        },
+        "administratorLoginPassword": {
+            "type": "securestring",
+            "metadata": { 
+                "Description":  "This is the Server Admin password"
+            }
+        },
+        "collation": {
+            "type": "string",
+            "defaultValue": "SQL_Latin1_General_CP1_CI_AS",
+            "metadata": { 
+                "Description":  "This is the database collation."
+            }
+        },
+        "databaseName": {
+            "type": "string",
+            "metadata": { 
+                "Description":  "This is the name of your database"
+            }
+        },
+        "edition": {
+            "type": "string",
+            "defaultValue": "Standard",
+            "metadata": { 
+                "Description":  "This is the edition of your database"
+            }
+        },
+        "maxSizeBytes": {
+            "type": "string",
+            "defaultValue": "268435456000",
+            "metadata": { 
+                "Description":  "This is the max size of your database in bytes."
+            }
+        },
+        "requestedServiceObjectiveId": {
+            "type": "string",
+            "defaultValue": "f1173c43-91bd-4aaa-973c-54e79e15235b",
+            "metadata": { 
+                "Description":  "This is the performance tier of your database."
+            }
+        },
+        "serverLocation": {
+            "type": "string",
+            "metadata": { 
+                "Description":  "This is the location of your server and database"
+            }
+        },
+        "serverName": {
+            "type": "string",
+            "metadata": { 
+                "Description":  "This is the name of your server"
+            }
+        },
+        "firewallStartIP": {
+            "type": "string",
+            "metadata": { 
+                "Description":  "This is the starting IP of your Firewall Rule IP Range"
+            }
+        },
+        "firewallEndIP": {
+            "type": "string",
+            "metadata": { 
+                "Description":  "This is the ending IP of your Firewall Rule IP Range"
+            }
+        },
+        "version": {
+            "type": "string",
+            "defaultValue": "12.0",
+            "metadata": { 
+                "Description":  "This is the version of your database."
+            }
+        }
+    },
+  "resources": [
+    {
+      "apiVersion": "2014-04-01-preview",
+      "location": "[parameters('serverLocation')]",
+      "name": "[parameters('serverName')]",
+      "properties": {
+        "administratorLogin": "[parameters('administratorLogin')]",
+        "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
+        "version": "[parameters('version')]"
+      },
+      "resources": [
+        {
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('serverName'))]"
+          ],
+          "location": "[parameters('serverLocation')]",
+          "name": "[parameters('databaseName')]",
+          "properties": {
+             "collation": "[parameters('collation')]",
+             "edition": "[parameters('edition')]",
+             "maxSizeBytes": "[parameters('maxSizeBytes')]",
+             "requestedServiceObjectiveId": "[parameters('requestedServiceObjectiveId')]"
+           },
+          "type": "databases"
+        },
+        {
+          "apiVersion": "2014-04-01-preview",
+          "dependsOn": [
+            "[concat('Microsoft.Sql/servers/', parameters('serverName'))]"
+          ],
+          "location": "[parameters('serverLocation')]",
+          "name": "FirewallRule1",
+          "properties": {
+            "endIpAddress": "[parameters('firewallEndIP')]",
+            "startIpAddress": "[parameters('firewallStartIP')]"
+          },
+          "type": "firewallrules"
+        }
+      ],
+      "type": "Microsoft.Sql/servers"
+    }
+  ]
+}
