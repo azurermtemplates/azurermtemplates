@@ -1,7 +1,0 @@
-{
-  "itemDisplayName": "Install Elasticsearch cluster on Ubuntu Virtual Machines using Custom Script Linux Extension",
-  "description": "This template deploys an Elasticsearch cluster on Ubuntu Virtual Machines.  The template provisions 3 dedicated master nodes in one availability set, and a configurable number of data nodes in another availability set.  A load balancer is configured with a rule to route traffic on port 9200 to the client/data nodes, and also includes SSH nat rules for management.  Elasticsearch data nodes are configured to store indexes using multiple data disks attached to each virtual machine.",
-  "summary": "Install Elasticsearch cluster on Ubuntu Virtual Machines using Custom Script Linux Extension",
-  "githubUsername": "trentmswanson",
-  "dateUpdated": "2015-04-06"
-}
