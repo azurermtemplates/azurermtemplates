@@ -22,7 +22,7 @@ Below are the parameters that the template requires
 | dcfswSourceImageName  | Windows Server image name. Must be a Windows Server 2012 R2 image. Suggested value is a699494373c04fc0bc8f2bb1389d6106__Windows-Server-2012-R2-201502.01-en.us-127GB.vhd |
 | sqlSourceImageName  | SQL Server image name. Must be an image that supports AlwaysOn and Windows Server 2012 R2, this means a SQL Server 2012 or 2014 Enterprise image. Suggested value is fb83b3509582419d99629ce476bcb5c8__SQL-Server-2014-RTM-12.0.2430.0-Ent-ENU-Win2012R2-cy14su11 |
 | DcVMSize  | Domain Controller VM size. Suggested value is Small |
-| SqlVMSize  | SQL VM size. Suggested value is Standard_A3 |
+| SqlVMSize  | SQL VM size. Suggested value is Large |
 | administratorAccount  | VMs local administrator account name |
 | administratorPassword  | VMs local administrator password |
 | administratorPasswordEncrypted  | VMs local administrator password encrypted. See PowerShell helper functions to see how this is generated |
