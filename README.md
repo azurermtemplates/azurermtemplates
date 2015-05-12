@@ -1,1 +1,1 @@
-# We've moved to a new repo https://github.com/Azure/azure-quickstart-templates. Please migrate your existing templates and new templates to the new repo.
+# We've moved to a new repo https://github.com/Azure/azure-quickstart-templates. Please migrate your existing templates and new templates to the new repo. Here's the information regarding the change needed to be made to existing templates with 2014-12-01-preview API version header https://github.com/Azure/azure-quickstart-templates/blob/master/breaking-change.md
