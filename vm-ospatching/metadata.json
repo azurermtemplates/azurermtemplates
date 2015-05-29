@@ -1,7 +1,0 @@
-{
-  "itemDisplayName": "Create a Linux VM with OSPatching extension",
-  "description": "This template creates a Linux VM and installs the OSPathing extension",
-  "summary": "This template creates a Linux VM and installs the OSPathing extension",
-  "githubUsername": "thomas1206",
-  "dateUpdated": "2015-04-24"
-}
