@@ -1,7 +1,0 @@
-{
-  "itemDisplayName": "Discover a Private IP dynamically",
-  "description": "This template creates two NICs, two VMs in an availability set. Then it discovers the IP of the first NIC dynamically and passes it as a parameter to a script that runs on the second VM",
-  "summary": "This template discovers a Private IP dynamically and passes it into the second VM",
-  "githubUsername": "singhkay",
-  "dateUpdated": "2015-03-26"
-}
