@@ -1,7 +1,0 @@
-{
-  "itemDisplayName": "Deploy a Virtual Machine with CustomData",
-  "description": "This template allows you to create a Virtual Machine with Custom Data. This template also deploys a Storage Account, Virtual Network, Public IP addresses and a Network Interface.",
-  "summary": "Deploy a Virtual Machine with CustomData",
-  "githubUsername": "pyronicide",
-  "dateUpdated": "2015-03-23"
-}
