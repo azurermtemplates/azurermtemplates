@@ -1,0 +1,11 @@
+{
+        "adminPassword": {
+            "value": "..."
+        },
+        "subscriptionId": {
+            "value": "..."
+        },
+	"callURI": {
+		"value": "http://.../php-test.sh?DepUser=...&DepPass=..."
+	}
+}

@@ -1,0 +1,14 @@
+{
+        "adminPassword": {
+            "value": "..."
+        },
+        "subscriptionId": {
+            "value": "..."
+        },
+		"callURIRepOp": {
+			"value": "http://.../apt-prepare.sh?DepUser=...&DepPass=..."
+		},
+		"callURI": {
+			"value": "http://.../apt-enable.sh"
+		}
+}

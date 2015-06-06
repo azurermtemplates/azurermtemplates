@@ -1,0 +1,7 @@
+{
+  "itemDisplayName": "Linux VM with preconfigured azure-cli",
+  "description": "This template deploys an APT-based Linux VM (Ubuntu by default) and uses scriptgen to install and preconfigures azure-cli",
+  "summary": "This template deploys an APT-based Linux VM (Ubuntu by default) and uses scriptgen to install and preconfigures azure-cli",
+  "githubUsername": "bureado",
+  "dateUpdated": "2015-04-10"
+}
